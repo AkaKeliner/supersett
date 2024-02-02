@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  test_node:
+    image: node:16
+    working_dir: /usr/src/app
+    volumes:
+      - ./superset-frontend:/usr/src/app
+#    command: ["npm", "start"]
+    command: npm install
+    ports:
+      - "3000:3000"
