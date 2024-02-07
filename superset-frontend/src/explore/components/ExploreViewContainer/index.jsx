@@ -240,6 +240,7 @@ function ExploreViewContainer(props) {
   const dynamicPlugin = dynamicPluginContext.dynamicPlugins[props.vizType];
   const isDynamicPluginLoading = dynamicPlugin && dynamicPlugin.mounting;
   const wasDynamicPluginLoading = usePrevious(isDynamicPluginLoading);
+  console.log('ExploreViewContainer props', props);
 
   /** the state of controls in the previous render */
   const previousControls = usePrevious(props.controls);
@@ -299,17 +300,17 @@ function ExploreViewContainer(props) {
         formData,
         props.force,
         props.timeout,
-        props.chart.id,
+        props.chart?.id,
       );
     }
-  }, [props.actions, props.chart.id, props.timeout]);
+  }, [props.actions, props.chart?.id, props.timeout]);
 
   const onQuery = useCallback(() => {
     props.actions.setForceQuery(false);
-    props.actions.triggerQuery(true, props.chart.id);
+    props.actions.triggerQuery(true, props.chart?.id);
     addHistory();
     setLastQueriedControls(props.controls);
-  }, [props.controls, addHistory, props.actions, props.chart.id]);
+  }, [props.controls, addHistory, props.actions, props.chart?.id]);
 
   const handleKeydown = useCallback(
     event => {
@@ -413,7 +414,7 @@ function ExploreViewContainer(props) {
     [
       addHistory,
       props.actions,
-      props.chart.id,
+      props.chart?.id,
       props.chart.latestQueryFormData,
       props.controls,
     ],
@@ -719,7 +720,7 @@ function mapStateToProps(state) {
     user,
     saveModal,
   } = state;
-  const { controls, slice, datasource, metadata } = explore;
+  const { controls, slice, datasource = {}, metadata } = explore;
   const form_data = getFormDataFromControls(controls);
   const slice_id = form_data.slice_id ?? slice?.slice_id ?? 0; // 0 - unsaved chart
   form_data.extra_form_data = mergeExtraFormData(
@@ -729,7 +730,7 @@ function mapStateToProps(state) {
     },
   );
   const chart = charts[slice_id];
-
+  console.log('MEGAPROPS +==================>', state);
   let dashboardId = Number(explore.form_data?.dashboardId);
   if (Number.isNaN(dashboardId)) {
     dashboardId = undefined;
@@ -738,7 +739,7 @@ function mapStateToProps(state) {
   return {
     isDatasourceMetaLoading: explore.isDatasourceMetaLoading,
     datasource,
-    datasource_type: datasource.type,
+    datasource_type: datasource?.type,
     datasourceId: datasource.datasource_id,
     dashboardId,
     controls: explore.controls,

@@ -4727,7 +4727,8 @@
       "y": [""],
       "y: values are normalized within each row": [""],
       "year": [""],
-      "zoom area": [""]
+      "zoom area": [""],
+      "Drill to chart by": ["Drill to chart by"]
     }
   }
 }

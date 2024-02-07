@@ -45,6 +45,10 @@ export interface ContextMenuFilters {
     groupbyFieldName: string;
     adhocFilterFieldName?: string;
   };
+  drillToChart: {
+    chartId: number;
+    url: string;
+  };
 }
 
 export enum AppSection {

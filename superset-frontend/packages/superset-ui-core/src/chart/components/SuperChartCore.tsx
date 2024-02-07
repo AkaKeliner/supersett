@@ -153,7 +153,7 @@ export default class SuperChartCore extends React.PureComponent<Props, {}> {
   private renderChart = (loaded: LoadedModules, props: RenderProps) => {
     const { Chart, transformProps } = loaded;
     const { chartProps, preTransformProps, postTransformProps } = props;
-
+    console.log('chartProps =================', chartProps)
     return (
       <Chart
         {...this.processChartProps({

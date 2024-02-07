@@ -36,5 +36,11 @@ function mapDispatchToProps(dispatch) {
     ),
   };
 }
+function mapStateToProps(state) {
+  console.log('state', state)
+  return {
+    ...state
+  };
+}
 
-export default connect(null, mapDispatchToProps)(Chart);
+export default connect(mapStateToProps, mapDispatchToProps)(Chart);

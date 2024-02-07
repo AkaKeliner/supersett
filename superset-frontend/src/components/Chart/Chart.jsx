@@ -284,7 +284,7 @@ class Chart extends React.PureComponent {
         />
       );
     }
-
+    console.log('CONTAINER PROPS', this.props)
     return (
       <ErrorBoundary
         onError={this.handleRenderContainerFailure}

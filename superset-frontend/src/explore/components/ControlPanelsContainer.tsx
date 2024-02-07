@@ -268,6 +268,7 @@ function useResetOnChangeRef(initialValue: () => any, resetOnChangeValue: any) {
 }
 
 export const ControlPanelsContainer = (props: ControlPanelsContainerProps) => {
+  console.log('ControlPanelsContainer =====>', props);
   const { colors } = useTheme();
   const pluginContext = useContext(PluginContext);
 
@@ -448,6 +449,7 @@ export const ControlPanelsContainer = (props: ControlPanelsContainerProps) => {
 
   const renderControl = ({ name, config }: CustomControlItem) => {
     const { controls, chart, exploreState } = props;
+
     const { visibility } = config;
 
     // If the control item is not an object, we have to look up the control data from
@@ -504,7 +506,10 @@ export const ControlPanelsContainer = (props: ControlPanelsContainerProps) => {
         return true;
       };
     }
-
+    const allProps = {
+      ...restProps,
+      latestQueryFormData: props.chart.latestQueryFormData,
+    };
     return (
       <Control
         key={`control-${name}`}
@@ -514,7 +519,7 @@ export const ControlPanelsContainer = (props: ControlPanelsContainerProps) => {
         validationErrors={validationErrors}
         actions={props.actions}
         isVisible={isVisible}
-        {...restProps}
+        {...allProps}
       />
     );
   };

@@ -63,6 +63,7 @@ import {
   getSequentialSchemeRegistry,
   legacyValidateInteger,
   validateNonEmpty,
+  ChartDataResponseResult,
 } from '@superset-ui/core';
 import { formatSelectOptions } from 'src/explore/exploreUtils';
 import { TIME_FILTER_LABELS } from './constants';
@@ -463,5 +464,24 @@ export const controls = {
     choices: () => categoricalSchemeRegistry.keys().map(s => [s, s]),
     description: t('The color scheme for rendering chart'),
     schemes: () => categoricalSchemeRegistry.getMap(),
+  },
+  url_drillDowns: {
+    type: 'URLDrilldownControl',
+    label: t('URL Drilldowns'),
+    default: [],
+    shouldMapStateToProps(state) {
+      return {
+        state,
+      };
+    },
+    mapStateToProps(explore, state, chart) {
+      return {
+        state,
+        chart,
+        datasource: explore.datasource,
+        slices: explore.data_objects.slices,
+        dashboards: explore.data_objects.dashboards,
+      };
+    },
   },
 };

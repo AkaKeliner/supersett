@@ -474,7 +474,7 @@ export default function DataSourcePanel({
       shouldForceUpdate,
     ],
   );
-
+  console.log('showSaveDatasetModal', showSaveDatasetModal);
   return (
     <DatasourceContainer>
       {datasourceIsSaveable && showSaveDatasetModal && (

@@ -43,6 +43,7 @@ import { Menu } from 'src/components/Menu';
 import { AntdDropdown as Dropdown } from 'src/components/index';
 import { updateDataMask } from 'src/dataMask/actions';
 import { DrillDetailMenuItems } from '../DrillDetail';
+import { DrillToChartMenuItems } from '../DrillToChart';
 import { getMenuAdjustedY } from '../utils';
 import { MenuItemTooltip } from '../DisabledMenuItemTooltip';
 import { DrillByMenuItems } from '../DrillBy/DrillByMenuItems';
@@ -103,7 +104,7 @@ const ChartContextMenu = (
     clientY: number;
     filters?: ContextMenuFilters;
   }>({ clientX: 0, clientY: 0 });
-
+  console.log('filters ==================>', filters);
   const menuItems = [];
 
   const showDrillToDetail =
@@ -213,8 +214,8 @@ const ChartContextMenu = (
   if (showDrillToDetail) {
     menuItems.push(
       <DrillDetailMenuItems
-        chartId={id}
-        formData={formData}
+        chartId={138}
+        formData={{ ...formData, viz_type: 'pie' }}
         filters={filters?.drillToDetail}
         isContextMenu
         contextMenuY={clientY}
@@ -240,6 +241,22 @@ const ChartContextMenu = (
         contextMenuY={clientY}
         submenuIndex={submenuIndex}
         {...(additionalConfig?.drillBy || {})}
+      />,
+    );
+  }
+  if (filters?.drillToChart) {
+    console.log('filters?.drillToDashboard', filters?.drillToChart);
+    const newChartId = filters?.drillToChart?.chartId;
+    menuItems.push(
+      <DrillToChartMenuItems
+        chartId={newChartId}
+        formData={{ ...formData, viz_type: 'pie' }}
+        filters={filters?.drillToDetail}
+        isContextMenu
+        contextMenuY={clientY}
+        onSelection={onSelection}
+        submenuIndex={showCrossFilters ? 2 : 1}
+        {...(additionalConfig?.drillToDetail || {})}
       />,
     );
   }

@@ -23,9 +23,9 @@ export function getFormDataFromControls(
   controlsState: ControlStateMapping,
 ): QueryFormData {
   const formData = {};
-  Object.keys(controlsState).forEach(controlName => {
+  Object.keys((controlsState || {})).forEach(controlName => {
     const control = controlsState[controlName];
-    formData[controlName] = control.value;
+      formData[controlName] = control.value;
   });
   return formData as QueryFormData;
 }

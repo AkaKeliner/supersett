@@ -57,6 +57,7 @@ export interface ChartState {
   queryController: AbortController | null;
   queriesResponse: QueryData | null;
   triggerQuery: boolean;
+  prevFormData: Array<any>;
 }
 
 export type OptionSortType = Partial<

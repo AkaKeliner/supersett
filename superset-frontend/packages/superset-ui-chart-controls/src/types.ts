@@ -90,6 +90,8 @@ export interface ControlPanelState {
   controls: ControlStateMapping;
   common: JsonObject;
   metadata?: JsonObject | null;
+  dashboards?: JsonObject | null;
+  slice?: JsonObject | null;
 }
 
 /**
@@ -147,6 +149,7 @@ export type InternalControlType =
   | 'CollectionControl'
   | 'ColorPickerControl'
   | 'ColorSchemeControl'
+  | 'URLDrilldownControl'
   | 'DatasourceControl'
   | 'DateFilterControl'
   | 'FixedOrMetricControl'
@@ -278,7 +281,8 @@ export type SelectControlType =
   | 'MetricsControl'
   | 'FixedOrMetricControl'
   | 'AdhocFilterControl'
-  | 'FilterBoxItemControl';
+  | 'FilterBoxItemControl'
+  | 'URLDrilldownControl';
 
 export interface FilterOption<T extends SelectOption> {
   label: string;

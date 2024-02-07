@@ -129,6 +129,10 @@ export default function ExplorePage() {
     if (!isExploreInitialized.current || !!saveAction) {
       fetchExploreData(exploreUrlParams)
         .then(({ result }) => {
+          console.log(
+            'RESULT fetchExploreData =======================>',
+            result,
+          );
           const formData =
             !isExploreInitialized.current && dashboardContextFormData
               ? getFormDataWithDashboardContext(

@@ -377,6 +377,7 @@ export function exploreJSON(
   key,
   dashboardId,
   ownState,
+  isDD,
 ) {
   return async dispatch => {
     const logStart = Logger.getTimestamp();
@@ -521,8 +522,17 @@ export function postChartFormData(
   key,
   dashboardId,
   ownState,
+  isDD,
 ) {
-  return exploreJSON(formData, force, timeout, key, dashboardId, ownState);
+  return exploreJSON(
+    formData,
+    force,
+    timeout,
+    key,
+    dashboardId,
+    ownState,
+    isDD,
+  );
 }
 
 export function redirectSQLLab(formData, history) {
@@ -575,6 +585,67 @@ export function refreshChart(chartKey, force, dashboardId) {
         getState().dataMask[chart.id]?.ownState,
       ),
     );
+  };
+}
+export const SAVE_SLICE_STATE = 'SAVE_SLICE_STATE';
+export function saveSliceState(payload, key) {
+  return {
+    type: SAVE_SLICE_STATE,
+    payload,
+    key,
+  };
+}
+export const saveChartState = chartId => (dispatch, getState) => {
+  const { charts } = getState();
+  const currentChartData = charts[chartId];
+  const prevFormData = {
+    formData: currentChartData.latestQueryFormData,
+    filters: [...(currentChartData.latestQueryFormData.filters || [])],
+    groupby: [...currentChartData.latestQueryFormData.groupby],
+    // columns: [...(action.payload.latestQueryFormData.columns || [])],
+  };
+  const prev = [prevFormData, ...(currentChartData?.prevFormData || [])];
+  const newChartData = { ...currentChartData, prevFormData: prev };
+  dispatch(saveSliceState(newChartData, chartId));
+};
+
+export const DD = 'DD';
+export function postDDChartFormData(payload, key) {
+  return {
+    type: DD,
+    payload,
+    key,
+  };
+}
+export function drilldownToChart(chartKey, toChartKey, dashboardId) {
+  return (dispatch, getState) => {
+    const newChart = (getState().charts || {})[toChartKey];
+    const currentChart = (getState().charts || {})[chartKey];
+    // const currentChart = (getState().charts || {})[chartKey];
+    // const newChartData = {
+    //   ...currentChart,
+    //   form_data: newChart.form_data,
+    // };
+    // console.log('newChart', newChart);
+    // console.log('chartKey', chartKey);
+    // console.log('toChartKey', toChartKey);
+    // dispatch(postDDChartFormData(newChartData, chartKey));
+    const timeout =
+      getState().dashboardInfo.common.conf.SUPERSET_WEBSERVER_TIMEOUT;
+    dispatch(
+      postChartFormData(
+        newChart.latestQueryFormData,
+        false,
+        timeout,
+        currentChart.id,
+        dashboardId,
+        getState().dataMask[newChart.id]?.ownState,
+        true,
+      ),
+    );
+    // dispatch(triggerQuery(true, chartKey));
+    // dispatch(updateQueryFormData(newChart.form_data, chartKey));
+    // dispatch(postDDChartFormData(newChart.form_data, chartKey));
   };
 }
 
