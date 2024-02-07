@@ -20,8 +20,9 @@ set -e
 #
 # Always install local overrides first
 #
+/app/docker/docker-bootstrap.sh
 
-STEP_CNT=5
+STEP_CNT=4
 
 echo_step() {
 cat <<EOF
@@ -45,39 +46,6 @@ if [ "$CYPRESS_CONFIG" == "true" ]; then
     export SUPERSET__SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://superset:superset@db:5432/superset
 fi
 # Initialize the database
-echo_step "0" "PreIntall" "Install sqlglot"
-#
-# playwright is an optional package - run only if it is installed
-#
-if command -v playwright > /dev/null 2>&1; then
-  playwright install-deps
-  playwright install chromium
-fi
-
-case "${1}" in
-  worker)
-    echo "Starting Celery worker..."
-    celery --app=superset.tasks.celery_app:app worker -O fair -l INFO
-    ;;
-  beat)
-    echo "Starting Celery beat..."
-    rm -f /tmp/celerybeat.pid
-    celery --app=superset.tasks.celery_app:app beat --pidfile /tmp/celerybeat.pid -l INFO -s "${SUPERSET_HOME}"/celerybeat-schedule
-    ;;
-  app)
-    echo "Starting web app (using development server)..."
-    flask run -p 8088 --with-threads --reload --debugger --host=0.0.0.0
-    ;;
-  app-gunicorn)
-    echo "Starting web app..."
-    /usr/bin/run-server.sh
-    ;;
-  *)
-    echo "Unknown Operation!!!"
-    ;;
-esac
-
-pip install sqlglot holidays==0.23
 echo_step "1" "Starting" "Applying DB migrations"
 superset db upgrade
 echo_step "1" "Complete" "Applying DB migrations"
