@@ -167,22 +167,22 @@ msgstr "%(object)s не существует в этой базе данных."
 
 #: superset-frontend/src/features/home/EmptyState.tsx:43
 #, fuzzy, python-format
-msgid "%(other)s charts will appear here"
+msgid "%(other)s %(tableName)s charts will appear here"
 msgstr "%(other)s %(tableName)s появятся здесь после добавления"
 
 #: superset-frontend/src/features/home/EmptyState.tsx:45
 #, fuzzy, python-format
-msgid "%(other)s dashboards will appear here"
+msgid "%(other)s %(tableName)s dashboards will appear here"
 msgstr "%(other)s %(tableName)s появятся здесь после добавления"
 
 #: superset-frontend/src/features/home/EmptyState.tsx:47
 #, fuzzy, python-format
-msgid "%(other)s recents will appear here"
+msgid "%(other)s %(tableName)s recents will appear here"
 msgstr "%(other)s %(tableName)s появятся здесь после добавления"
 
 #: superset-frontend/src/features/home/EmptyState.tsx:49
 #, fuzzy, python-format
-msgid "%(other)s saved queries will appear here"
+msgid "%(other)s %(tableName)s saved queries will appear here"
 msgstr "%(other)s %(tableName)s появятся здесь после добавления"
 
 #: superset/reports/notifications/email.py:180
@@ -274,7 +274,7 @@ msgstr ""
 #: superset-frontend/src/features/databases/DatabaseModal/index.tsx:1411
 #, fuzzy, python-format
 msgid "%s SSH TUNNEL PRIVATE KEY PASSWORD"
-msgstr "Пароль приватного ключа"
+msgstr "%s Пароль приватного ключа"
 
 #: superset-frontend/src/components/ListView/ListView.tsx:245
 #, python-format
@@ -14226,7 +14226,7 @@ msgstr "Извините, похоже, что данные отсутствую
 #: superset-frontend/src/utils/getClientErrorObject.ts:100
 #, fuzzy, python-format
 msgid "Sorry, there was an error saving this %s: %s"
-msgstr "Извините, произошла ошибка при сохранении дашборда: %s"
+msgstr "Извините, произошла ошибка при сохранении дашборда %s: %s"
 
 #: superset-frontend/src/dashboard/actions/dashboardState.js:362
 #, python-format
@@ -14926,7 +14926,7 @@ msgstr "Имя таблицы не определено"
 #: superset/db_engine_specs/ocient.py:287
 #, fuzzy, python-format
 msgid "Table or View \"%(table)s\" does not exist."
-msgstr "Пользователь \"%(username)s\" не существует."
+msgstr "Таблица или Представление \"%(table)s\" не существует."
 
 #: superset-frontend/plugins/legacy-plugin-chart-paired-t-test/src/index.js:26
 msgid ""
@@ -16024,7 +16024,7 @@ msgstr "Произошла ошибка при удалении %s: %s"
 #: superset-frontend/src/pages/RowLevelSecurityList/index.tsx:111
 #, fuzzy, python-format
 msgid "There was an issue deleting rules: %s"
-msgstr "Произошла ошибка при удалении %s: %s"
+msgstr "Произошла ошибка при удалении: %s"
 
 #: superset-frontend/src/pages/AlertReportList/index.tsx:201
 #, python-format
@@ -17282,7 +17282,7 @@ msgstr "Неожиданная ошибка: "
 #: superset/views/api.py:108
 #, fuzzy, python-format
 msgid "Unexpected time range: %s"
-msgstr "Неожиданная ошибка: "
+msgstr "Неожиданная ошибка: %s"
 
 #: superset-frontend/src/features/home/ActivityTable.tsx:86
 msgid "Unknown"
@@ -18834,7 +18834,7 @@ msgstr ""
 #: superset-frontend/src/utils/getClientErrorObject.ts:107
 #, fuzzy, python-format
 msgid "You do not have permission to edit this %s"
-msgstr "У вас нет прав на редактирование этого графика"
+msgstr "У вас нет прав на редактирование этого графика %s"
 
 #: superset-frontend/src/explore/components/PropertiesModal/index.tsx:94
 msgid "You do not have permission to edit this chart"
