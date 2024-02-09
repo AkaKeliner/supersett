@@ -36,12 +36,18 @@ ENV BUILD_CMD=${NPM_BUILD_CMD} \
 # NPM ci first, as to NOT invalidate previous steps except for when package.json changes
 WORKDIR /app/superset-frontend
 
-RUN --mount=type=bind,target=/frontend-mem-nag.sh,src=./docker/frontend-mem-nag.sh \
-    /frontend-mem-nag.sh
+#RUN --mount=type=bind,target=/frontend-mem-nag.sh,src=./docker/frontend-mem-nag.sh \
+#    /frontend-mem-nag.sh
+COPY ./docker/frontend-mem-nag.sh /frontend-mem-nag.sh
+RUN /frontend-mem-nag.sh
 
-RUN --mount=type=bind,target=./package.json,src=./superset-frontend/package.json \
-    --mount=type=bind,target=./package-lock.json,src=./superset-frontend/package-lock.json \
-    npm ci
+#RUN --mount=type=bind,target=./package.json,src=./superset-frontend/package.json \
+#    --mount=type=bind,target=./package-lock.json,src=./superset-frontend/package-lock.json \
+#    npm ci
+COPY ./superset-frontend/package.json ./package.json
+COPY ./superset-frontend/package-lock.json ./package-lock.json
+RUN npm ci
+
 
 COPY ./superset-frontend ./
 # This seems to be the most expensive step
@@ -79,21 +85,32 @@ RUN mkdir -p ${PYTHONPATH} superset/static superset-frontend apache_superset.egg
 COPY --chown=superset:superset setup.py MANIFEST.in README.md ./
 # setup.py uses the version information in package.json
 COPY --chown=superset:superset superset-frontend/package.json superset-frontend/
-RUN --mount=type=bind,target=./requirements/local.txt,src=./requirements/local.txt \
-    --mount=type=bind,target=./requirements/development.txt,src=./requirements/development.txt \
-    --mount=type=bind,target=./requirements/base.txt,src=./requirements/base.txt \
-    --mount=type=cache,target=/root/.cache/pip \
-    pip install -r requirements/local.txt
+#RUN --mount=type=bind,target=./requirements/local.txt,src=./requirements/local.txt \
+#    --mount=type=bind,target=./requirements/development.txt,src=./requirements/development.txt \
+#    --mount=type=bind,target=./requirements/base.txt,src=./requirements/base.txt \
+#    --mount=type=cache,target=/root/.cache/pip \
+#    pip install -r requirements/local.txt
+COPY ./requirements/local.txt ./requirements/local.txt
+COPY ./requirements/development.txt ./requirements/development.txt
+COPY ./requirements/base.txt ./requirements/base.txt
+RUN pip install -r requirements/local.txt
+
 
 COPY --chown=superset:superset --from=superset-node /app/superset/static/assets superset/static/assets
 ## Lastly, let's install superset itself
 COPY --chown=superset:superset superset superset
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install -e . \
+
+RUN pip install -e . \
     && flask fab babel-compile --target superset/translations \
     && chown -R superset:superset superset/translations
+#RUN --mount=type=cache,target=/root/.cache/pip \
+#    pip install -e . \
+#    && flask fab babel-compile --target superset/translations \
+#    && chown -R superset:superset superset/translations
 
-COPY --chmod=755 ./docker/run-server.sh /usr/bin/
+#COPY --chmod=755 ./docker/run-server.sh /usr/bin/
+COPY ./docker/run-server.sh /usr/bin/
+RUN chmod 755 /usr/bin/run-server.sh
 USER superset
 
 HEALTHCHECK CMD curl -f "http://localhost:${SUPERSET_PORT}/health"
@@ -127,10 +144,23 @@ RUN apt-get update -qq \
     && ln -s /opt/firefox/firefox /usr/local/bin/firefox \
     && apt-get autoremove -yqq --purge wget && rm -rf /var/[log,tmp]/* /tmp/* /var/lib/apt/lists/*
 # Cache everything for dev purposes...
-RUN --mount=type=bind,target=./requirements/base.txt,src=./requirements/base.txt \
-    --mount=type=bind,target=./requirements/docker.txt,src=./requirements/docker.txt \
-    --mount=type=cache,target=/root/.cache/pip \
-    pip install -r requirements/docker.txt
+COPY ./requirements/base.txt ./requirements/base.txt
+COPY ./requirements/docker.txt ./requirements/docker.txt
+COPY ./requirements.txt ./requirements.txt
+RUN pip install -r requirements/docker.txt \
+    && pip install -r requirements.txt
+
+#RUN --mount=type=bind,target=./requirements/base.txt,src=./requirements/base.txt \
+#    --mount=type=bind,target=./requirements/docker.txt,src=./requirements/docker.txt \
+#    --mount=type=cache,target=/root/.cache/pip \
+#    --mount=type=bind,target=./requirements.txt,src=./requirements.txt \
+#    pip install -r requirements/docker.txt \
+#    pip install -r requirements.txt
+
+COPY ./docker/ /app/docker/
+RUN chown -R superset:superset /app/docker/*.sh
+RUN chmod 755 /app/docker/*.sh
+
 
 USER superset
 ######################################################################
@@ -138,6 +168,6 @@ USER superset
 ######################################################################
 FROM lean AS ci
 
-COPY --chown=superset:superset --chmod=755 ./docker/*.sh /app/docker/
+#COPY --chown=superset:superset --chmod=755 ./docker/*.sh /app/docker/
 
 CMD ["/app/docker/docker-ci.sh"]
