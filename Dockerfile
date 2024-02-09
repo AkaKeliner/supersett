@@ -1,4 +1,4 @@
-#
+
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
 # this work for additional information regarding copyright ownership.
@@ -160,6 +160,8 @@ RUN pip install -r requirements/docker.txt \
 COPY ./docker/ /app/docker/
 RUN chown -R superset:superset /app/docker/*.sh
 RUN chmod 755 /app/docker/*.sh
+COPY ./superset_config.py /app/pythonpath/superset_config.py
+RUN /app/docker/docker-ci.sh
 
 
 USER superset
@@ -170,4 +172,5 @@ FROM lean AS ci
 
 #COPY --chown=superset:superset --chmod=755 ./docker/*.sh /app/docker/
 
-CMD ["/app/docker/docker-ci.sh"]
+#CMD ["/app/docker/docker-ci.sh"]
+CMD ["/app/docker/docker-bootstrap.sh"]
