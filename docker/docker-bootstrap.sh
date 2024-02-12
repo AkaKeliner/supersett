@@ -65,3 +65,9 @@ case "${1}" in
     echo "Unknown Operation!!!"
     ;;
 esac
+
+
+export SERVER_THREADS_AMOUNT=8
+# start up the web server
+
+/usr/bin/run-server.sh
