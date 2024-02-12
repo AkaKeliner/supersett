@@ -18,9 +18,10 @@ import io
 from typing import Any
 
 import pandas as pd
+from xlsxwriter.workbook import Workbook
 
 
-def df_to_excel(df: pd.DataFrame, **kwargs: Any) -> Any:
+def df_to_excel(df: pd.DataFrame,additional_data=None, **kwargs: Any) -> Any:
     output = io.BytesIO()
 
     # timezones are not supported
@@ -32,3 +33,5 @@ def df_to_excel(df: pd.DataFrame, **kwargs: Any) -> Any:
         df.to_excel(writer, **kwargs)
 
     return output.getvalue()
+
+# def add_width_normalization(df: pd.DataFrame,additional_data=None, **kwargs: Any)

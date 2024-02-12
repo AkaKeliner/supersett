@@ -903,6 +903,7 @@ class Database(
             conn = conn.set(password=self.password)
         return str(conn)
 
+
     @property
     def sql_url(self) -> str:
         return f"/superset/sql/{self.id}/"

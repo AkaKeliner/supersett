@@ -89,7 +89,7 @@ class QueryContext:
         self,
         df: pd.DataFrame,
     ) -> str | list[dict[str, Any]]:
-        return self._processor.get_data(df)
+        return self._processor.get_data(df, additional_data=self.form_data.get('conditional_formatting'))
 
     def get_payload(
         self,
