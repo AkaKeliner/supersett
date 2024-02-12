@@ -32,6 +32,17 @@ def get_dataset_exist_error_msg(full_name: str) -> str:
     return _("Dataset %(name)s already exists", name=full_name)
 
 
+class WorkspacesNotFoundValidationError(ValidationError):
+    """
+    Marshmallow validation error for dashboards don't exist
+    """
+
+    def __init__(self) -> None:
+        super().__init__(_("Workspaces do not exist"), field_name="workspaces")
+
+class WorkspacesForbiddenError(ForbiddenError):
+    message = _("Changing one or more of these workspaces is forbidden")
+
 class DatabaseNotFoundValidationError(ValidationError):
     """
     Marshmallow validation error for database does not exist

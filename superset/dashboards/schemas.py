@@ -66,6 +66,9 @@ published_description = (
 charts_description = (
     "The names of the dashboard's charts. Names are used for legacy reasons."
 )
+workspaces_description = (
+    "The names of the dashboard's workspaces. Names are used for legacy reasons."
+)
 certified_by_description = "Person or group that has certified this dashboard"
 certification_details_description = "Details of the certification"
 
@@ -305,6 +308,9 @@ class DashboardPostSchema(BaseDashboardSchema):
     )
     is_managed_externally = fields.Boolean(allow_none=True, dump_default=False)
     external_url = fields.String(allow_none=True)
+    workspaces = fields.List(
+        fields.Integer(metadata={"description": workspaces_description},allow_none=None)
+    )
 
 
 class DashboardCopySchema(Schema):
@@ -365,6 +371,9 @@ class DashboardPutSchema(BaseDashboardSchema):
     )
     is_managed_externally = fields.Boolean(allow_none=True, dump_default=False)
     external_url = fields.String(allow_none=True)
+    workspaces = fields.List(
+        fields.Integer(metadata={"description": workspaces_description},allow_none=True)
+    )
 
 
 class ChartFavStarResponseResult(Schema):

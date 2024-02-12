@@ -29,9 +29,12 @@ from superset.commands.dashboard.exceptions import (
     DashboardNotFoundError,
     DashboardSlugExistsValidationError,
     DashboardUpdateFailedError,
+    WorkspacesForbiddenError,
+    WorkspacesNotFoundValidationError,
 )
 from superset.commands.utils import populate_roles
 from superset.daos.dashboard import DashboardDAO
+from superset.daos.workspace import WorkspaceDAO
 from superset.daos.exceptions import DAOUpdateFailedError
 from superset.exceptions import SupersetSecurityException
 from superset.extensions import db
@@ -69,6 +72,8 @@ class UpdateDashboardCommand(UpdateMixin, BaseCommand):
         owners_ids: Optional[list[int]] = self._properties.get("owners")
         roles_ids: Optional[list[int]] = self._properties.get("roles")
         slug: Optional[str] = self._properties.get("slug")
+        workspace_ids = self._properties.get("workspaces")
+
 
         # Validate/populate model exists
         self._model = DashboardDAO.find_by_id(self._model_id)
@@ -79,7 +84,14 @@ class UpdateDashboardCommand(UpdateMixin, BaseCommand):
             security_manager.raise_for_ownership(self._model)
         except SupersetSecurityException as ex:
             raise DashboardForbiddenError() from ex
-
+        if workspace_ids is not None:
+            workspaces = WorkspaceDAO.find_by_ids(
+                workspace_ids,
+                skip_base_filter=True
+            )
+            if len(workspaces)!= len(workspace_ids):
+                exceptions.append(WorkspacesNotFoundValidationError())
+            self._properties["workspaces"] = workspaces
         # Validate slug uniqueness
         if not DashboardDAO.validate_update_slug_uniqueness(self._model_id, slug):
             exceptions.append(DashboardSlugExistsValidationError())

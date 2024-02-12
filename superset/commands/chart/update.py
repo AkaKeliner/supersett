@@ -31,11 +31,13 @@ from superset.commands.chart.exceptions import (
     ChartUpdateFailedError,
     DashboardsNotFoundValidationError,
     DatasourceTypeUpdateRequiredValidationError,
+    WorkspacesNotFoundValidationError
 )
 from superset.commands.utils import get_datasource_by_id
 from superset.daos.chart import ChartDAO
 from superset.daos.dashboard import DashboardDAO
 from superset.daos.exceptions import DAOUpdateFailedError
+from superset.daos.workspace import WorkspaceDAO
 from superset.exceptions import SupersetSecurityException
 from superset.models.slice import Slice
 
@@ -71,6 +73,7 @@ class UpdateChartCommand(UpdateMixin, BaseCommand):
     def validate(self) -> None:
         exceptions: list[ValidationError] = []
         dashboard_ids = self._properties.get("dashboards")
+        workspace_ids = self._properties.get("workspaces")
         owner_ids: Optional[list[int]] = self._properties.get("owners")
 
         # Validate if datasource_id is provided datasource_type is required
@@ -114,6 +117,14 @@ class UpdateChartCommand(UpdateMixin, BaseCommand):
             if len(dashboards) != len(dashboard_ids):
                 exceptions.append(DashboardsNotFoundValidationError())
             self._properties["dashboards"] = dashboards
+        if workspace_ids is not None:
+            workspaces = WorkspaceDAO.find_by_ids(
+                workspace_ids,
+                skip_base_filter=True
+            )
+            if len(workspaces)!= len(workspace_ids):
+                exceptions.append(WorkspacesNotFoundValidationError())
+            self._properties["workspaces"] = workspaces
 
         if exceptions:
             raise ChartInvalidError(exceptions=exceptions)

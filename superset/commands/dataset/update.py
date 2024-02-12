@@ -36,9 +36,11 @@ from superset.commands.dataset.exceptions import (
     DatasetMetricsNotFoundValidationError,
     DatasetNotFoundError,
     DatasetUpdateFailedError,
+    WorkspacesNotFoundValidationErrorб,
 )
 from superset.connectors.sqla.models import SqlaTable
 from superset.daos.dataset import DatasetDAO
+from superset.daos.workspace import WorkspaceDAO
 from superset.daos.exceptions import DAOUpdateFailedError
 from superset.exceptions import SupersetSecurityException
 
@@ -76,6 +78,7 @@ class UpdateDatasetCommand(UpdateMixin, BaseCommand):
         exceptions: list[ValidationError] = []
         owner_ids: Optional[list[int]] = self._properties.get("owners")
         # Validate/populate model exists
+        workspace_ids = self._properties.get("workspaces")
         self._model = DatasetDAO.find_by_id(self._model_id)
         if not self._model:
             raise DatasetNotFoundError()
@@ -107,7 +110,14 @@ class UpdateDatasetCommand(UpdateMixin, BaseCommand):
         # Validate columns
         if columns := self._properties.get("columns"):
             self._validate_columns(columns, exceptions)
-
+        if workspace_ids is not None:
+            workspaces = WorkspaceDAO.find_by_ids(
+                workspace_ids,
+                skip_base_filter=True
+            )
+            if len(workspaces)!= len(workspace_ids):
+                exceptions.append(WorkspacesNotFoundValidationError())
+            self._properties["workspaces"] = workspaces
         # Validate metrics
         if metrics := self._properties.get("metrics"):
             self._validate_metrics(metrics, exceptions)

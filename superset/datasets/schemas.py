@@ -29,7 +29,9 @@ from superset.exceptions import SupersetMarshmallowValidationError
 
 get_delete_ids_schema = {"type": "array", "items": {"type": "integer"}}
 get_export_ids_schema = {"type": "array", "items": {"type": "integer"}}
-
+workspaces_description = (
+    "The names of the dataset's workspaces. Names are used for legacy reasons."
+)
 openapi_spec_methods_override = {
     "get": {"get": {"summary": "Get a dataset detail information"}},
     "get_list": {
@@ -101,6 +103,9 @@ class DatasetPostSchema(Schema):
     external_url = fields.String(allow_none=True)
     normalize_columns = fields.Boolean(load_default=False)
     always_filter_main_dttm = fields.Boolean(load_default=False)
+    workspaces = fields.List(
+        fields.Integer(metadata={"description":workspaces_description}, allow_none=True)
+    )
 
 
 class DatasetPutSchema(Schema):
@@ -125,6 +130,9 @@ class DatasetPutSchema(Schema):
     extra = fields.String(allow_none=True)
     is_managed_externally = fields.Boolean(allow_none=True, dump_default=False)
     external_url = fields.String(allow_none=True)
+    workspaces = fields.List(
+        fields.Integer(metadata={"description":workspaces_description}, allow_none=True)
+    )
 
     def handle_error(
         self,

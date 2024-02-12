@@ -90,6 +90,13 @@ class DashboardsNotFoundValidationError(ValidationError):
     def __init__(self) -> None:
         super().__init__(_("Dashboards do not exist"), field_name="dashboards")
 
+class WorkspacesNotFoundValidationError(ValidationError):
+    """
+    Marshmallow validation error for dashboards don't exist
+    """
+
+    def __init__(self) -> None:
+        super().__init__(_("Workspaces do not exist"), field_name="workspaces")
 
 class DatasourceTypeUpdateRequiredValidationError(ValidationError):
     """
@@ -150,6 +157,8 @@ class ChartImportError(ImportFailedError):
 class DashboardsForbiddenError(ForbiddenError):
     message = _("Changing one or more of these dashboards is forbidden")
 
+class WorkspacesForbiddenError(ForbiddenError):
+    message = _("Changing one or more of these workspaces is forbidden")
 
 class WarmUpCacheChartNotFoundError(CommandException):
     status = 404

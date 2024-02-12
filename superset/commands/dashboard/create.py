@@ -19,15 +19,18 @@ from typing import Any, Optional
 
 from flask_appbuilder.models.sqla import Model
 from marshmallow import ValidationError
-
+from superset import  security_manager
 from superset.commands.base import BaseCommand, CreateMixin
 from superset.commands.dashboard.exceptions import (
     DashboardCreateFailedError,
     DashboardInvalidError,
     DashboardSlugExistsValidationError,
+    WorkspacesForbiddenError,
+    WorkspacesNotFoundValidationError,
 )
 from superset.commands.utils import populate_roles
 from superset.daos.dashboard import DashboardDAO
+from superset.daos.workspace import WorkspaceDAO
 from superset.daos.exceptions import DAOCreateFailedError
 
 logger = logging.getLogger(__name__)
@@ -51,6 +54,15 @@ class CreateDashboardCommand(CreateMixin, BaseCommand):
         owner_ids: Optional[list[int]] = self._properties.get("owners")
         role_ids: Optional[list[int]] = self._properties.get("roles")
         slug: str = self._properties.get("slug", "")
+        workspace_ids = self._properties.get("workspaces",[])
+
+        workspaces = WorkspaceDAO.find_by_ids(workspace_ids)
+        if len(workspaces) != len(workspace_ids):
+            exceptions.append(WorkspacesNotFoundValidationError())
+        for work in workspaces:
+            if not security_manager.is_owner(work):
+                raise WorkspacesForbiddenError()
+        self._workspaces['workspaces'] = workspaces
 
         # Validate slug uniqueness
         if not DashboardDAO.validate_slug_uniqueness(slug):
@@ -63,7 +75,6 @@ class CreateDashboardCommand(CreateMixin, BaseCommand):
             exceptions.append(ex)
         if exceptions:
             raise DashboardInvalidError(exceptions=exceptions)
-
         try:
             roles = populate_roles(role_ids)
             self._properties["roles"] = roles

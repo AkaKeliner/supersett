@@ -113,6 +113,7 @@ datasource_type_description = (
 )
 datasource_name_description = "The datasource name."
 dashboards_description = "A list of dashboards to include this new chart to."
+workspaces_description = "A list of workspace to include this new chart to."
 changed_on_description = "The ISO date that the chart was last changed."
 slice_url_description = "The URL of the chart."
 form_data_description = (
@@ -221,6 +222,9 @@ class ChartPostSchema(Schema):
     dashboards = fields.List(
         fields.Integer(metadata={"description": dashboards_description})
     )
+    workspaces = fields.List(
+        fields.Integer(metadata={"description": workspaces_description}, allow_none=True)
+    )
     certified_by = fields.String(
         metadata={"description": certified_by_description}, allow_none=True
     )
@@ -275,6 +279,9 @@ class ChartPutSchema(Schema):
     )
     dashboards = fields.List(
         fields.Integer(metadata={"description": dashboards_description})
+    )
+    workspaces = fields.List(
+        fields.Integer(metadata={"description": workspaces_description}, allow_none=True)
     )
     certified_by = fields.String(
         metadata={"description": certified_by_description}, allow_none=True

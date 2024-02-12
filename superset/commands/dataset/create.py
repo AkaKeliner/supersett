@@ -24,6 +24,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from superset.commands.base import BaseCommand, CreateMixin
 from superset.commands.dataset.exceptions import (
     DatabaseNotFoundValidationError,
+    WorkspacesForbiddenError,
+    WorkspacesNotFoundValidationError,
     DatasetCreateFailedError,
     DatasetDataAccessIsNotAllowed,
     DatasetExistsValidationError,
@@ -31,6 +33,7 @@ from superset.commands.dataset.exceptions import (
     TableNotFoundValidationError,
 )
 from superset.daos.dataset import DatasetDAO
+from superset.daos.workspace import WorkspaceDAO
 from superset.daos.exceptions import DAOCreateFailedError
 from superset.exceptions import SupersetSecurityException
 from superset.extensions import db, security_manager
@@ -63,6 +66,7 @@ class CreateDatasetCommand(CreateMixin, BaseCommand):
         table_name = self._properties["table_name"]
         schema = self._properties.get("schema", None)
         sql = self._properties.get("sql", None)
+        workspace_ids = self._properties.get("workspaces", [])
         owner_ids: Optional[list[int]] = self._properties.get("owners")
 
         # Validate uniqueness
@@ -84,6 +88,13 @@ class CreateDatasetCommand(CreateMixin, BaseCommand):
         ):
             exceptions.append(TableNotFoundValidationError(table_name))
 
+        workspaces = WorkspaceDAO.find_by_ids(workspace_ids)
+        if len(workspaces) != len(workspace_ids):
+            exceptions.append(WorkspacesNotFoundValidationError())
+        for work in workspaces:
+            if not security_manager.is_owner(work):
+                raise WorkspacesForbiddenError()
+        self._properties["workspaces"] = workspaces
         if sql:
             try:
                 security_manager.raise_for_access(

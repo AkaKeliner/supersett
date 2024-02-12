@@ -28,11 +28,14 @@ from superset.commands.chart.exceptions import (
     ChartCreateFailedError,
     ChartInvalidError,
     DashboardsForbiddenError,
+    WorkspacesForbiddenError,
     DashboardsNotFoundValidationError,
+    WorkspacesNotFoundValidationError,
 )
 from superset.commands.utils import get_datasource_by_id
 from superset.daos.chart import ChartDAO
 from superset.daos.dashboard import DashboardDAO
+from superset.daos.workspace import WorkspaceDAO
 from superset.daos.exceptions import DAOCreateFailedError
 
 logger = logging.getLogger(__name__)
@@ -57,6 +60,7 @@ class CreateChartCommand(CreateMixin, BaseCommand):
         datasource_type = self._properties["datasource_type"]
         datasource_id = self._properties["datasource_id"]
         dashboard_ids = self._properties.get("dashboards", [])
+        workspace_ids = self._properties.get("workspaces", [])
         owner_ids: Optional[list[int]] = self._properties.get("owners")
 
         # Validate/Populate datasource
@@ -74,7 +78,13 @@ class CreateChartCommand(CreateMixin, BaseCommand):
             if not security_manager.is_owner(dash):
                 raise DashboardsForbiddenError()
         self._properties["dashboards"] = dashboards
-
+        workspaces = WorkspaceDAO.find_by_ids(workspace_ids)
+        if len(workspaces) != len(workspace_ids):
+            exceptions.append(WorkspacesNotFoundValidationError())
+        for work in workspaces:
+            if not security_manager.is_owner(work):
+                raise WorkspacesForbiddenError()
+        self._properties["workspaces"] = workspaces
         try:
             owners = self.populate_owners(owner_ids)
             self._properties["owners"] = owners
