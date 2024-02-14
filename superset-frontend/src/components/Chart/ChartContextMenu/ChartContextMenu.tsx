@@ -47,6 +47,7 @@ import { DrillToChartMenuItems } from '../DrillToChart';
 import { getMenuAdjustedY } from '../utils';
 import { MenuItemTooltip } from '../DisabledMenuItemTooltip';
 import { DrillByMenuItems } from '../DrillBy/DrillByMenuItems';
+import { DrillToDashboardMenuItems } from "../DrillToDashboard";
 
 export enum ContextMenuItem {
   CrossFilter,
@@ -104,9 +105,8 @@ const ChartContextMenu = (
     clientY: number;
     filters?: ContextMenuFilters;
   }>({ clientX: 0, clientY: 0 });
-  console.log('filters ==================>', filters);
   const menuItems = [];
-
+  console.log('filters', filters)
   const showDrillToDetail =
     isFeatureEnabled(FeatureFlag.DRILL_TO_DETAIL) &&
     canExplore &&
@@ -244,13 +244,29 @@ const ChartContextMenu = (
       />,
     );
   }
-  if (filters?.drillToChart) {
-    console.log('filters?.drillToDashboard', filters?.drillToChart);
-    const newChartId = filters?.drillToChart?.chartId;
+  if (filters?.drillToCharts) {
+    console.log('filters?.drillToChart', filters?.drillToCharts);
     menuItems.push(
       <DrillToChartMenuItems
-        chartId={newChartId}
-        formData={{ ...formData, viz_type: 'pie' }}
+        drillToChart={filters.drillToCharts}
+        // drillToDashboards={filters.drillToDashboards}
+        formData={formData}
+        filters={filters?.drillToDetail}
+        isContextMenu
+        contextMenuY={clientY}
+        onSelection={onSelection}
+        submenuIndex={showCrossFilters ? 2 : 1}
+        {...(additionalConfig?.drillToDetail || {})}
+      />,
+    );
+  }
+  if (filters?.drillToDashboards) {
+    console.log('filters?.drillToDashboards', filters?.drillToDashboards);
+    menuItems.push(
+      <DrillToDashboardMenuItems
+        // drillToChart={filters.drillToCharts}
+        drillToDashboards={filters.drillToDashboards}
+        formData={formData}
         filters={filters?.drillToDetail}
         isContextMenu
         contextMenuY={clientY}

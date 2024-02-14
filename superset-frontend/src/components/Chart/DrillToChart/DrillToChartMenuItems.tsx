@@ -18,13 +18,10 @@
  */
 
 import React, { ReactNode, useContext, useMemo } from 'react';
-import { isEmpty } from 'lodash';
 import {
-  Behavior,
   BinaryQueryObjectFilterClause,
   css,
-  extractQueryFields,
-  getChartMetadataRegistry,
+  DDChart,
   QueryFormData,
   t,
 } from '@superset-ui/core';
@@ -32,7 +29,9 @@ import { Menu } from 'src/components/Menu';
 import { useDispatch } from 'react-redux';
 import { MenuItemTooltip } from '../DisabledMenuItemTooltip';
 import { DashboardPageIdContext } from '../../../dashboard/containers/DashboardPage';
-import { drilldownToChart, saveChartState } from '../chartAction';
+import { drilldownToChart } from '../chartAction';
+import {getSubmenuYOffset} from "../utils";
+import {MenuItemWithTruncation} from "../MenuItemWithTruncation";
 
 const DisabledMenuItem = ({ children, ...props }: { children: ReactNode }) => (
   <Menu.Item disabled {...props}>
@@ -47,7 +46,8 @@ const DisabledMenuItem = ({ children, ...props }: { children: ReactNode }) => (
   </Menu.Item>
 );
 export type DrillDetailMenuItemsProps = {
-  chartId: number;
+  drillToChart?: Array<DDChart>;
+  drillToDashboards?: Array<DDChart>;
   formData: QueryFormData;
   filters?: BinaryQueryObjectFilterClause[];
   isContextMenu?: boolean;
@@ -57,16 +57,16 @@ export type DrillDetailMenuItemsProps = {
   submenuIndex?: number;
 };
 const DrillToChartMenuItems = ({
-  chartId,
-  formData,
-  filters = [],
-  isContextMenu = false,
-  contextMenuY = 0,
-  onSelection = () => null,
-  onClick = () => null,
-  submenuIndex = 0,
-  ...props
-}: DrillDetailMenuItemsProps) => {
+                                   formData,
+                                 drillToChart,
+                                   filters = [],
+                                   isContextMenu = false,
+                                   contextMenuY = 0,
+                                   onSelection = () => null,
+                                   onClick = () => null,
+                                   submenuIndex = 0,
+                                   ...props
+                                 }: DrillDetailMenuItemsProps) => {
   const dispatch = useDispatch();
   const dashboardPageId = useContext(DashboardPageIdContext);
   // const exploreUrl = useMemo(
@@ -75,51 +75,57 @@ const DrillToChartMenuItems = ({
   // );
 
   // const state = useSelector(state => state);
-  const goToChart = () => {
-    dispatch(saveChartState(chartId));
+  const goToChart = (filter: DDChart) => {
+
+    console.log('CLICKe', filter)
+    console.log('formData', formData)
+    // dispatch(saveChartState(chartId));
     // dispatch(drilldownToChart(chartKey, toChartKey, force, dashboardId));
-    dispatch(drilldownToChart(137, 138, dashboardPageId));
+    dispatch(drilldownToChart(filter.url, formData.slice_id, dashboardPageId));
   };
 
-  // Check for Behavior.DRILL_TO_DETAIL to tell if plugin handles the `contextmenu`
-  // event for dimensions.  If it doesn't, tell the user that drill to detail by
-  // dimension is not supported.  If it does, and the `contextmenu` handler didn't
-  // pass any filters, tell the user that they didn't select a dimension.
-  const handlesDimensionContextMenu = useMemo(
+  const submenuYOffset = useMemo(
     () =>
-      getChartMetadataRegistry()
-        .get(formData.viz_type)
-        ?.behaviors.find(behavior => behavior === Behavior.DRILL_TO_DETAIL),
-    [formData.viz_type],
+      getSubmenuYOffset(
+        contextMenuY,
+        filters.length > 1 ? filters.length + 1 : filters.length,
+        submenuIndex,
+      ),
+    [contextMenuY, filters.length, submenuIndex],
   );
-
-  // Check metrics to see if chart's current configuration lacks
-  // aggregations, in which case Drill to Detail should be disabled.
-  const noAggregations = useMemo(() => {
-    const { metrics } = extractQueryFields(formData);
-    return isEmpty(metrics);
-  }, [formData]);
-
-  let drillToDetailMenuItem;
-  if (handlesDimensionContextMenu && noAggregations) {
-    drillToDetailMenuItem = (
+  let drillToDashboardMenuItem;
+  if (!drillToChart?.length) {
+    drillToDashboardMenuItem = (
       <DisabledMenuItem {...props} key="drill-detail-no-aggregations">
-        {t('Drill to chart')}
-        <MenuItemTooltip
-          title={t(
-            'Drill to detail is disabled because this chart does not group data by dimension value.',
-          )}
-        />
+        {t('Drill to charts by')}
+        <MenuItemTooltip title={t('Нет DD')} />
       </DisabledMenuItem>
     );
   } else {
-    drillToDetailMenuItem = (
-      <Menu.Item {...props} key="drill-detail-no-filters" onClick={goToChart}>
-        {t('Drill to chart by')}
-      </Menu.Item>
+    drillToDashboardMenuItem = (
+      <Menu.SubMenu
+        {...props}
+        popupOffset={[0, submenuYOffset]}
+        popupClassName="chart-context-submenu"
+        title={t('Drill to charts by')}
+      >
+        {t('Drill to charts by')}
+        <div data-test="drill-to-detail-by-submenu">
+          {drillToChart.map((filter, i) => (
+            <MenuItemWithTruncation
+              {...props}
+              key={`drill-detail-filter-${i}`}
+              tooltipText={`${filter.title}`}
+              onClick={() => goToChart(filter)}
+            >
+              {`${filter.title} `}
+            </MenuItemWithTruncation>
+          ))}
+        </div>
+      </Menu.SubMenu>
     );
   }
-  return <>{drillToDetailMenuItem}</>;
+  return <>{drillToDashboardMenuItem}</>;
 };
 
 export default DrillToChartMenuItems;

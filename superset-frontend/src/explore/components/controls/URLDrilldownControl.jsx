@@ -134,8 +134,6 @@ export default class URLDrilldownControl extends React.Component {
   changeDrilldown(index, control, value) {
     const newFields = Object.assign([], this.props.value);
     const modifiedDrilldown = { ...newFields[index] };
-    console.log('control', control);
-    console.log('modifiedDrilldown', modifiedDrilldown);
 
     if (typeof control === 'string') {
       if (control === 'type') {
@@ -167,21 +165,6 @@ export default class URLDrilldownControl extends React.Component {
       value: typeof m === 'string' ? m : m.label,
     }));
     return mappedMetrics;
-    // eslint-disable-next-line camelcase
-    // const temp_metrics =
-    //   this.props.datasource.temp_metrics !== undefined
-    //     ? this.props.datasource.temp_metrics
-    //     : [];
-    // const metr =
-    //   metrics && Array.isArray(metrics)
-    //     ? metrics
-    //     : [{ label: metrics, value: metrics }];
-    // // eslint-disable-next-line camelcase
-    // return [...temp_metrics, ...metr].map(c => {
-    //   const { label } = c;
-    //   const value = c.label;
-    //   return { value, label };
-    // });
   }
 
   setHover(hovered) {
@@ -223,7 +206,6 @@ export default class URLDrilldownControl extends React.Component {
             onChange={val => {
               this.onChangeType(i, val);
             }}
-            // disabled={drilldown.drilldownToInfoPanel}
           />
         </Row>
         <Row>
@@ -250,21 +232,6 @@ export default class URLDrilldownControl extends React.Component {
           />
         </Row>
 
-        {/* <div */}
-        {/*  style={{ padding: '10px 0' }} */}
-        {/*  onMouseEnter={this.setHover.bind(this, true)} */}
-        {/*  onMouseLeave={this.setHover.bind(this, false)} */}
-        {/* > */}
-        {/*  {this.props.vizType === 'bubble_map' ? ( */}
-        {/*    <CheckboxControl */}
-        {/*      label={t('Display info panels on the map')} */}
-        {/*      description={t('Display info panels on the map')} */}
-        {/*      onChange={val => this.onChangeCheckBox(i, val)} */}
-        {/*      value={drilldown.drilldownToInfoPanel} */}
-        {/*      hovered={this.state.hovered} */}
-        {/*    /> */}
-        {/*  ) : null} */}
-        {/* </div> */}
         <Row className="space-2">
           <Button
             id="remove-button"

@@ -28,7 +28,7 @@ const DisabledMenuItem = ({ children, ...props }: { children: ReactNode }) => (
 );
 export type DrillDetailMenuItemsProps = {
   drillToChart?: Array<DDChart>;
-  drillToDashboard?: Array<DDChart>;
+  drillToDashboards?: Array<DDChart>;
   formData: QueryFormData;
   filters?: BinaryQueryObjectFilterClause[];
   isContextMenu?: boolean;
@@ -38,9 +38,8 @@ export type DrillDetailMenuItemsProps = {
   submenuIndex?: number;
 };
 const DrillToDashboardMenuItems = ({
-  // chartId,
   formData,
-  drillToDashboard,
+                                     drillToDashboards,
   filters = [],
   isContextMenu = false,
   contextMenuY = 0,
@@ -73,7 +72,7 @@ const DrillToDashboardMenuItems = ({
     [contextMenuY, filters.length, submenuIndex],
   );
   let drillToDashboardMenuItem;
-  if (!drillToDashboard?.length) {
+  if (!drillToDashboards?.length) {
     drillToDashboardMenuItem = (
       <DisabledMenuItem {...props} key="drill-detail-no-aggregations">
         {t('Drill to dashboard by')}
@@ -90,7 +89,7 @@ const DrillToDashboardMenuItems = ({
       >
         {t('Drill to dashboard by')}
         <div data-test="drill-to-detail-by-submenu">
-          {drillToDashboard.map((filter, i) => (
+          {drillToDashboards.map((filter, i) => (
             <MenuItemWithTruncation
               {...props}
               key={`drill-detail-filter-${i}`}

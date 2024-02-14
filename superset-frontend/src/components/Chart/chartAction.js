@@ -619,6 +619,7 @@ export function postDDChartFormData(payload, key) {
 }
 export function drilldownToChart(chartKey, toChartKey, dashboardId) {
   return (dispatch, getState) => {
+    console.log('getState().charts ', getState().charts )
     const newChart = (getState().charts || {})[toChartKey];
     const currentChart = (getState().charts || {})[chartKey];
     // const currentChart = (getState().charts || {})[chartKey];

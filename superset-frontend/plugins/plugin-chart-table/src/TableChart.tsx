@@ -47,7 +47,7 @@ import {
   styled,
   css,
   t,
-  tn,
+  tn, DDChart,
 } from '@superset-ui/core';
 
 import { DataColumnMeta, TableChartTransformedProps } from './types';
@@ -238,8 +238,9 @@ export default function TableChart<D extends DataRecord = DataRecord>(
     allowRearrangeColumns = false,
     onContextMenu,
     emitCrossFilters,
+    urlDrillDowns,
   } = props;
-  console.log('PROPS', props)
+  console.log('urlDrillDowns', urlDrillDowns)
   const timestampFormatter = useCallback(
     value => getTimeFormatterForGranularity(timeGrain)(value),
     [timeGrain],
@@ -381,6 +382,8 @@ export default function TableChart<D extends DataRecord = DataRecord>(
         clientY: number,
       ) => {
         const drillToDetailFilters: BinaryQueryObjectFilterClause[] = [];
+        const ddToCharts: DDChart[]= [];
+        const ddToDashboards: DDChart[]= [];
         columnsMeta.forEach(col => {
           if (!col.isMetric) {
             const dataRecordValue = value[col.key];
@@ -392,6 +395,23 @@ export default function TableChart<D extends DataRecord = DataRecord>(
             });
           }
         });
+
+        if (urlDrillDowns?.length) {
+          urlDrillDowns.forEach((dd) => {
+            if (dd.field === cellPoint.key) {
+              if (dd.type === 'slices') {
+                ddToCharts.push({...dd, value: cellPoint.value})
+              }
+
+              if (dd.type === 'dashboards') {
+                ddToDashboards.push({...dd, value: cellPoint.value})
+              }
+            }
+
+          })
+        }
+        console.log('ddToCharts', ddToCharts)
+        console.log('ddToDashboards', ddToDashboards)
         onContextMenu(clientX, clientY, {
           drillToDetail: drillToDetailFilters,
           crossFilter: cellPoint.isMetric
@@ -409,10 +429,8 @@ export default function TableChart<D extends DataRecord = DataRecord>(
                 ],
                 groupbyFieldName: 'groupby',
               },
-          drillToChart: {
-            // chartId: 138,
-            // url: 'http://localhost:8088/superset/dashboard/11/?native_filters_key=o_8b35xyensATRIYTt0Gxx62SbZfUE3omh-36n--Fofb_1_Uf1Hh130N2zs3lGCL',
-          },
+          drillToCharts: ddToCharts?.length ? ddToCharts : null,
+          drillToDashboards: ddToDashboards?.length ? ddToDashboards : null,
         });
       };
 

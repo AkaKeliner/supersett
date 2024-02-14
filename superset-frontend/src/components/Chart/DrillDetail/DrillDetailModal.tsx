@@ -74,9 +74,9 @@ export default function DrillDetailModal({
   const dashboardPageId = useContext(DashboardPageIdContext);
   const { slice_name: chartName } = useSelector(
     (state: { sliceEntities: { slices: Record<number, Slice> } }) => {
-      return state.sliceEntities.slices[chartId]
+      return state.sliceEntities.slices[chartId] || {}
     }
-  );
+  ) || {};
 
   const exploreUrl = useMemo(
     () => `/explore/?dashboard_page_id=${dashboardPageId}&slice_id=${chartId}`,

@@ -130,6 +130,7 @@ export interface TableChartTransformedProps<D extends DataRecord = DataRecord> {
   onChangeFilter?: ChartProps['hooks']['onAddFilter'];
   columnColorFormatters?: ColorFormatters;
   allowRearrangeColumns?: boolean;
+  urlDrillDowns?: Array<{ url: number, type: string, field: string, title: string }>;
   onContextMenu?: (
     clientX: number,
     clientY: number,
