@@ -410,7 +410,6 @@ export default function TableChart<D extends DataRecord = DataRecord>(
 
           })
         }
-        console.log('ddToCharts', ddToCharts)
         console.log('ddToDashboards', ddToDashboards)
         onContextMenu(clientX, clientY, {
           drillToDetail: drillToDetailFilters,
