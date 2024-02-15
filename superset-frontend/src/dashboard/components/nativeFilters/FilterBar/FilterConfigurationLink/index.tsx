@@ -52,6 +52,7 @@ export const FilterConfigurationLink: React.FC<FCBProps> = ({
 
   const submit = useCallback(
     async (filterConfig: FilterConfiguration) => {
+      console.log('filterConfig ==============+++>', filterConfig)
       dispatch(await setFilterConfiguration(filterConfig));
       close();
     },

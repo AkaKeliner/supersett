@@ -1,4 +1,4 @@
-import React, { ReactNode, useContext, useMemo } from 'react';
+import React, {ReactNode, useContext, useMemo} from 'react';
 import {
   BinaryQueryObjectFilterClause,
   css,
@@ -6,15 +6,16 @@ import {
   QueryFormData,
   t,
 } from '@superset-ui/core';
-import { Menu } from 'src/components/Menu';
-import { useDispatch } from 'react-redux';
-import { MenuItemTooltip } from '../DisabledMenuItemTooltip';
-import { DashboardPageIdContext } from '../../../dashboard/containers/DashboardPage';
-import { drilldownToChart } from '../chartAction';
-import { MenuItemWithTruncation } from '../MenuItemWithTruncation';
-import { getSubmenuYOffset } from '../utils';
+import {Menu} from 'src/components/Menu';
+import {useDispatch} from 'react-redux';
+import {MenuItemTooltip} from '../DisabledMenuItemTooltip';
+import {DashboardPageIdContext} from '../../../dashboard/containers/DashboardPage';
+import {drilldownToChart} from '../chartAction';
+import {MenuItemWithTruncation} from '../MenuItemWithTruncation';
+import {getSubmenuYOffset} from '../utils';
+import shortid from "shortid";
 
-const DisabledMenuItem = ({ children, ...props }: { children: ReactNode }) => (
+const DisabledMenuItem = ({children, ...props}: { children: ReactNode }) => (
   <Menu.Item disabled {...props}>
     <div
       css={css`
@@ -38,16 +39,16 @@ export type DrillDetailMenuItemsProps = {
   submenuIndex?: number;
 };
 const DrillToDashboardMenuItems = ({
-  formData,
+                                     formData,
                                      drillToDashboards,
-  filters = [],
-  isContextMenu = false,
-  contextMenuY = 0,
-  onSelection = () => null,
-  onClick = () => null,
-  submenuIndex = 0,
-  ...props
-}: DrillDetailMenuItemsProps) => {
+                                     filters = [],
+                                     isContextMenu = false,
+                                     contextMenuY = 0,
+                                     onSelection = () => null,
+                                     onClick = () => null,
+                                     submenuIndex = 0,
+                                     ...props
+                                   }: DrillDetailMenuItemsProps) => {
   const dispatch = useDispatch();
   const dashboardPageId = useContext(DashboardPageIdContext);
   // const exploreUrl = useMemo(
@@ -56,10 +57,74 @@ const DrillToDashboardMenuItems = ({
   // );
 
   // const state = useSelector(state => state);
-  const goToChart = () => {
+  const goToChart = (filter: DDChart) => {
+    // const origin = window.location.origin;
+    // console.log('LOCATION', window.location)
+    // const url = `${origin}/superset/dashboard/${filter.url}/?native_filters_key=3_nA4NGnGbwzkpjBMpMZjazQtpsnNrzbx3N57F0vG5VcTNmgLOsWYhDLM2SEt6E-`
+    // window.open(url)
+
+
+    try {
+      // const dashboardId = filter.url;
+      const testFilter = {
+        id: "NATIVE_FILTER-7p4ZcGPbt",
+        controlValues: {
+          enableEmptyFilter: false,
+          defaultToFirstItem: false,
+          multiSelect: true,
+          searchAllOptions: false,
+          inverseSelection: false
+        },
+        name: "ФИЛЬТР 1",
+        filterType: "filter_select",
+        targets: [
+          {
+            datasetId: 10,
+            column: {
+              name: filter.field
+            }
+          }
+        ],
+        defaultDataMask: {
+          extraFormData: {},
+          filterState: {
+            validateMessage: false,
+            validateStatus: false,
+            label: typeof filter.value === 'string' ? filter.value : filter.value[0],
+            value: typeof filter.value === 'string' ? [filter.value] : filter.value,
+          },
+          ownState: {}
+        },
+        cascadeParentIds: [],
+        scope: {
+          rootPath: [
+            "ROOT_ID"
+          ],
+          excluded: []
+        },
+        type: "NATIVE_FILTER",
+        description: ""
+      }
+      const dashboardId = 10;
+      const newFormData = formData;
+      const sliceId = formData.sliceId;
+      // actions.saveDashboardState(hid, hidIndex);
+      const newFilters = newFormData.extra_filters;
+      // const newFilters = newFormData.filters;
+      const native_filters_key = "native_filters_key";
+      const preselect_filters = {[sliceId]: [...newFilters]};
+      sessionStorage.setItem(native_filters_key, JSON.stringify(preselect_filters));
+      const dataKey = shortid.generate();
+      const data = {extra_where: newFormData.where, filters: newFilters};
+      sessionStorage.setItem(dataKey, JSON.stringify(data));
+      window.location.href = `/superset/dashboard/${dashboardId}/?native_filters_key=xIhfEZKfACZZ8cRqlSV44Eb4A_KluE3Yeivdh6R-T5vL0SLwxUbfO6hwG4tE7AKl`;
+    } catch (err) {
+      console.log("ERROR!!!!!!!!!!!!", err)
+    }
+
     // dispatch(saveChartState(chartId));
     // dispatch(drilldownToChart(chartKey, toChartKey, force, dashboardId));
-    dispatch(drilldownToChart(137, 138, dashboardPageId));
+    // dispatch(drilldownToChart(137, 138, dashboardPageId));
   };
 
   const submenuYOffset = useMemo(
@@ -76,7 +141,7 @@ const DrillToDashboardMenuItems = ({
     drillToDashboardMenuItem = (
       <DisabledMenuItem {...props} key="drill-detail-no-aggregations">
         {t('Drill to dashboard by')}
-        <MenuItemTooltip title={t('Нет DD')} />
+        <MenuItemTooltip title={t('Нет DD')}/>
       </DisabledMenuItem>
     );
   } else {
@@ -94,7 +159,7 @@ const DrillToDashboardMenuItems = ({
               {...props}
               key={`drill-detail-filter-${i}`}
               tooltipText={`${filter.title}`}
-              onClick={goToChart}
+              onClick={() => goToChart(filter)}
             >
               {`${filter.title} `}
             </MenuItemWithTruncation>

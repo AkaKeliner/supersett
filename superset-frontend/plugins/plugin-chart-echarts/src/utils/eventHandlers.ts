@@ -24,7 +24,7 @@ import {
   QueryFormData,
   getColumnLabel,
   getNumberFormatter,
-  getTimeFormatter,
+  getTimeFormatter, DDChart,
 } from '@superset-ui/core';
 
 import {
@@ -120,6 +120,25 @@ export const contextMenuEventHandler =
       e.event.stop();
       const pointerEvent = e.event.event;
       const drillFilters: BinaryQueryObjectFilterClause[] = [];
+      const ddToCharts: DDChart[]= [];
+      const ddToDashboards: DDChart[]= [];
+      const urlDrillDowns = formData.urlDrillDowns;
+      console.log('e.name', e.name)
+      console.log('urlDrillDowns', urlDrillDowns)
+      if (urlDrillDowns?.length) {
+        urlDrillDowns.forEach((dd) => {
+            const values = labelMap[e.name];
+            console.log('values', values)
+            if (dd.type === 'slices') {
+              ddToCharts.push({...dd, value: values})
+            }
+
+            if (dd.type === 'dashboards') {
+              ddToDashboards.push({...dd, value: values})
+            }
+        })
+      }
+
       if (groupby.length > 0) {
         const values = labelMap[e.name];
         groupby.forEach((dimension, i) => {
@@ -139,6 +158,8 @@ export const contextMenuEventHandler =
         drillToDetail: drillFilters,
         crossFilter: getCrossFilterDataMask(e.name),
         drillBy: { filters: drillFilters, groupbyFieldName: 'groupby' },
+        drillToCharts: ddToCharts?.length ? ddToCharts : null,
+        drillToDashboards: ddToDashboards?.length ? ddToDashboards : null,
       });
     }
   };

@@ -750,7 +750,7 @@ function mapStateToProps(state) {
     containerId: slice
       ? `slice-container-${slice.slice_id}`
       : 'slice-container',
-    isStarred: explore.isStarred,
+    isStarred: explore?.isStarred,
     slice,
     sliceName: explore.sliceName ?? slice?.slice_name ?? null,
     triggerRender: explore.triggerRender,

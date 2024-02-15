@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { t } from '@superset-ui/core';
-import { Col, Row, Select } from 'antd';
+import {t} from '@superset-ui/core';
+import {Col, Row, Select} from 'antd';
 import Button from '../../../components/Button';
 
 const propTypes = {
@@ -64,14 +64,16 @@ const defaultProps = {
   isLoading: false,
   label: null,
   multi: false,
-  onChange: () => {},
-  onFocus: () => {},
+  onChange: () => {
+  },
+  onFocus: () => {
+  },
   showHeader: true,
   valueKey: 'value',
 };
 const targetType = [
-  { value: 'dashboards', label: t('Dashboard') },
-  { value: 'slices', label: t('Slice') },
+  {value: 'dashboards', label: t('Dashboard')},
+  {value: 'slices', label: t('Slice')},
 ];
 
 export default class URLDrilldownControl extends React.Component {
@@ -80,7 +82,7 @@ export default class URLDrilldownControl extends React.Component {
 
     super(props);
     // eslint-disable-next-line react/no-unused-state
-    this.state = { hovered: false, availableObjects: {} };
+    this.state = {hovered: false, availableObjects: {}};
   }
 
   componentDidMount() {
@@ -133,7 +135,7 @@ export default class URLDrilldownControl extends React.Component {
 
   changeDrilldown(index, control, value) {
     const newFields = Object.assign([], this.props.value);
-    const modifiedDrilldown = { ...newFields[index] };
+    const modifiedDrilldown = {...newFields[index]};
 
     if (typeof control === 'string') {
       if (control === 'type') {
@@ -159,16 +161,26 @@ export default class URLDrilldownControl extends React.Component {
   }
 
   getMetrics() {
-    const { metrics = [] } = this.props.latestQueryFormData || {};
-    const mappedMetrics = metrics.map(m => ({
-      label: typeof m === 'string' ? m : m.label,
-      value: typeof m === 'string' ? m : m.label,
-    }));
+    const {metrics = [], metric} = this.props.latestQueryFormData || {};
+    const mappedMetrics = [];
+    if (metric) {
+      mappedMetrics.push({
+        label: typeof metric === 'string' ? metric : metric.label,
+        value: typeof metric === 'string' ? metric : metric.label,
+      })
+    }
+    if (Array.isArray(metrics) && metrics.length)
+      metrics.forEach(m => {
+        mappedMetrics.push({
+          label: typeof m === 'string' ? m : m.label,
+          value: typeof m === 'string' ? m : m.label,
+        });
+      });
     return mappedMetrics;
   }
 
   setHover(hovered) {
-    this.setState({ hovered });
+    this.setState({hovered});
   }
 
   render() {
@@ -180,7 +192,7 @@ export default class URLDrilldownControl extends React.Component {
       <div key={i}>
         <Row>
           <input
-            style={{ width: '271px' }}
+            style={{width: '271px'}}
             placeholder={t('Title')}
             className="form-control"
             type="text"
@@ -190,7 +202,7 @@ export default class URLDrilldownControl extends React.Component {
         </Row>
         <Row>
           <Select
-            style={{ width: '271px' }}
+            style={{width: '271px'}}
             placeholder={t('Metric')}
             options={this.getMetrics()}
             value={drilldown.field}
@@ -199,7 +211,7 @@ export default class URLDrilldownControl extends React.Component {
         </Row>
         <Row>
           <Select
-            style={{ width: '271px' }}
+            style={{width: '271px'}}
             placeholder={t('Type')}
             options={targetType}
             value={drilldown.type}
@@ -210,22 +222,22 @@ export default class URLDrilldownControl extends React.Component {
         </Row>
         <Row>
           <Select
-            style={{ width: '271px' }}
+            style={{width: '271px'}}
             placeholder={t('Object')}
             options={
               drilldown.drilldownToInfoPanel
                 ? this.props.dashboards
                   ? this.props.dashboards.map(o => ({
-                      label: o.dashboard_title,
-                      value: o.id,
-                    }))
+                    label: o.dashboard_title,
+                    value: o.id,
+                  }))
                   : []
                 : this.props[drilldown.type]
-                ? this.props[drilldown.type].map(o => ({
+                  ? this.props[drilldown.type].map(o => ({
                     label: o.slice_name,
                     value: o.slice_id,
                   }))
-                : []
+                  : []
             }
             value={drilldown.url}
             onChange={val => this.changeDrilldown(i, 'url', val)}
@@ -238,7 +250,7 @@ export default class URLDrilldownControl extends React.Component {
             bsSize="small"
             onClick={this.removeDrilldown.bind(this, i)}
           >
-            <i className="fa fa-minus" />
+            <i className="fa fa-minus"/>
           </Button>
         </Row>
       </div>
@@ -260,7 +272,7 @@ export default class URLDrilldownControl extends React.Component {
               bsSize="sm"
               onClick={this.addDrilldown.bind(this)}
             >
-              <i className="fa fa-plus" /> &nbsp; {t('Add Drilldown URL')}
+              <i className="fa fa-plus"/> &nbsp; {t('Add Drilldown URL')}
             </Button>
           </Col>
         </Row>

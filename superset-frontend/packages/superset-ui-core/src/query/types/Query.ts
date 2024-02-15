@@ -463,6 +463,6 @@ export enum ContributionType {
 export type DatasourceSamplesQuery = {
   filters?: QueryObjectFilterClause[];
 };
-export type DDChart = { url: number; type: string; field: string; title: string; value: DataRecordValue};
+export type DDChart = { url: number; type: string; field: string; title: string; value: DataRecordValue|DataRecordValue[]};
 
 export default {};

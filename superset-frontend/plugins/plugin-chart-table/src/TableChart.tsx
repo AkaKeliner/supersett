@@ -240,7 +240,6 @@ export default function TableChart<D extends DataRecord = DataRecord>(
     emitCrossFilters,
     urlDrillDowns,
   } = props;
-  console.log('urlDrillDowns', urlDrillDowns)
   const timestampFormatter = useCallback(
     value => getTimeFormatterForGranularity(timeGrain)(value),
     [timeGrain],
