@@ -356,7 +356,6 @@ export default function TableChart<D extends DataRecord = DataRecord>(
     },
     [emitCrossFilters, getCrossFilterDataMask, setDataMask],
   );
-
   const getSharedStyle = (column: DataColumnMeta): CSSProperties => {
     const { isNumeric, config = {} } = column;
     const textAlign = config.horizontalAlign
@@ -394,19 +393,19 @@ export default function TableChart<D extends DataRecord = DataRecord>(
             });
           }
         });
-
         if (urlDrillDowns?.length) {
           urlDrillDowns.forEach((dd) => {
-            if (dd.field === cellPoint.key) {
+            if (dd.key === cellPoint.key) {
               if (dd.type === 'slices') {
+                // @ts-ignore
                 ddToCharts.push({...dd, value: cellPoint.value})
               }
 
               if (dd.type === 'dashboards') {
+                // @ts-ignore
                 ddToDashboards.push({...dd, value: cellPoint.value})
               }
             }
-
           })
         }
         console.log('ddToDashboards', ddToDashboards)

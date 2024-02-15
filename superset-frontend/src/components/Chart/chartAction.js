@@ -617,25 +617,18 @@ export function postDDChartFormData(payload, key) {
     key,
   };
 }
-export function drilldownToChart(chartKey, toChartKey, dashboardId) {
+export function drilldownToChart(chartKey, toChartKey, dashboardId, filters) {
   return (dispatch, getState) => {
     console.log('getState().charts ', getState().charts )
     const newChart = (getState().charts || {})[toChartKey];
     const currentChart = (getState().charts || {})[chartKey];
-    // const currentChart = (getState().charts || {})[chartKey];
-    // const newChartData = {
-    //   ...currentChart,
-    //   form_data: newChart.form_data,
-    // };
-    // console.log('newChart', newChart);
-    // console.log('chartKey', chartKey);
-    // console.log('toChartKey', toChartKey);
-    // dispatch(postDDChartFormData(newChartData, chartKey));
     const timeout =
       getState().dashboardInfo.common.conf.SUPERSET_WEBSERVER_TIMEOUT;
+    const fd = newChart.latestQueryFormData;
+    const newFormData = {...fd, extra_filters: [...fd.extra_filters, ...filters] };
     dispatch(
       postChartFormData(
-        newChart.latestQueryFormData,
+        newFormData,
         false,
         timeout,
         currentChart.id,
@@ -644,9 +637,6 @@ export function drilldownToChart(chartKey, toChartKey, dashboardId) {
         true,
       ),
     );
-    // dispatch(triggerQuery(true, chartKey));
-    // dispatch(updateQueryFormData(newChart.form_data, chartKey));
-    // dispatch(postDDChartFormData(newChart.form_data, chartKey));
   };
 }
 

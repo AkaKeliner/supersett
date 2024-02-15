@@ -415,7 +415,7 @@ function ExploreViewContainer(props) {
       addHistory,
       props.actions,
       props.chart?.id,
-      props.chart.latestQueryFormData,
+      props?.chart?.latestQueryFormData,
       props.controls,
     ],
   );

@@ -126,6 +126,7 @@ export default class URLDrilldownControl extends React.Component {
     newFields.push({
       title: '',
       field: '',
+      key: '',
       type: '',
       url: '',
       drilldownToInfoPanel: false,
@@ -152,8 +153,12 @@ export default class URLDrilldownControl extends React.Component {
       });
     }
     newFields.splice(index, 1, modifiedDrilldown);
-    console.log('newFields', newFields);
-    this.props.onChange(newFields);
+    const {metrics = [], metric} = this.props.latestQueryFormData || {};
+    const urlDDValue = newFields.map((f) => {
+      const key = (this.getMetrics() || []).find((m) => m.value === f.field);
+      return {...f, key: key?.key || f.field}
+    });
+    this.props.onChange(urlDDValue);
   }
 
   removeDrilldown(index) {
@@ -165,15 +170,18 @@ export default class URLDrilldownControl extends React.Component {
     const mappedMetrics = [];
     if (metric) {
       mappedMetrics.push({
-        label: typeof metric === 'string' ? metric : metric.label,
-        value: typeof metric === 'string' ? metric : metric.label,
+        label: typeof metric === 'string' ? metric : metric.column.column_name,
+        value: typeof metric === 'string' ? metric : metric.column.column_name,
+        key: typeof metric === 'string' ? metric : metric.label,
       })
     }
     if (Array.isArray(metrics) && metrics.length)
       metrics.forEach(m => {
+        const col = typeof m === 'string' ? m : m.column.column_name
         mappedMetrics.push({
-          label: typeof m === 'string' ? m : m.label,
-          value: typeof m === 'string' ? m : m.label,
+          label: col,
+          value: col,
+          key: m.label,
         });
       });
     return mappedMetrics;

@@ -7,10 +7,10 @@ import {
   t,
 } from '@superset-ui/core';
 import {Menu} from 'src/components/Menu';
-import {useDispatch} from 'react-redux';
+// import {useDispatch} from 'react-redux';
 import {MenuItemTooltip} from '../DisabledMenuItemTooltip';
-import {DashboardPageIdContext} from '../../../dashboard/containers/DashboardPage';
-import {drilldownToChart} from '../chartAction';
+// import {DashboardPageIdContext} from '../../../dashboard/containers/DashboardPage';
+// import {drilldownToChart} from '../chartAction';
 import {MenuItemWithTruncation} from '../MenuItemWithTruncation';
 import {getSubmenuYOffset} from '../utils';
 import shortid from "shortid";
@@ -49,8 +49,9 @@ const DrillToDashboardMenuItems = ({
                                      submenuIndex = 0,
                                      ...props
                                    }: DrillDetailMenuItemsProps) => {
-  const dispatch = useDispatch();
-  const dashboardPageId = useContext(DashboardPageIdContext);
+  //TODO понадобится
+  // const dispatch = useDispatch();
+  // const dashboardPageId = useContext(DashboardPageIdContext);
   // const exploreUrl = useMemo(
   //   () => `/explore/?dashboard_page_id=${dashboardPageId}&slice_id=${chartId}`,
   //   [chartId, dashboardPageId],
@@ -66,6 +67,7 @@ const DrillToDashboardMenuItems = ({
 
     try {
       // const dashboardId = filter.url;
+      //ToDO Тестовый фильтр для инфопанели
       const testFilter = {
         id: "NATIVE_FILTER-7p4ZcGPbt",
         controlValues: {
@@ -90,7 +92,7 @@ const DrillToDashboardMenuItems = ({
           filterState: {
             validateMessage: false,
             validateStatus: false,
-            label: typeof filter.value === 'string' ? filter.value : filter.value[0],
+            label: typeof filter.value === 'string' ? filter.value : (filter || {}).value[0],
             value: typeof filter.value === 'string' ? [filter.value] : filter.value,
           },
           ownState: {}
@@ -108,9 +110,7 @@ const DrillToDashboardMenuItems = ({
       const dashboardId = 10;
       const newFormData = formData;
       const sliceId = formData.sliceId;
-      // actions.saveDashboardState(hid, hidIndex);
-      const newFilters = newFormData.extra_filters;
-      // const newFilters = newFormData.filters;
+      const newFilters = newFormData?.extra_filters || [];
       const native_filters_key = "native_filters_key";
       const preselect_filters = {[sliceId]: [...newFilters]};
       sessionStorage.setItem(native_filters_key, JSON.stringify(preselect_filters));
@@ -121,10 +121,6 @@ const DrillToDashboardMenuItems = ({
     } catch (err) {
       console.log("ERROR!!!!!!!!!!!!", err)
     }
-
-    // dispatch(saveChartState(chartId));
-    // dispatch(drilldownToChart(chartKey, toChartKey, force, dashboardId));
-    // dispatch(drilldownToChart(137, 138, dashboardPageId));
   };
 
   const submenuYOffset = useMemo(

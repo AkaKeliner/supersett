@@ -76,12 +76,15 @@ const DrillToChartMenuItems = ({
 
   // const state = useSelector(state => state);
   const goToChart = (filter: DDChart) => {
-
-    console.log('CLICKe', filter)
-    console.log('formData', formData)
-    // dispatch(saveChartState(chartId));
-    // dispatch(drilldownToChart(chartKey, toChartKey, force, dashboardId));
-    dispatch(drilldownToChart(filter.url, formData.slice_id, dashboardPageId));
+    const filters = [];
+    const field = filter.field === 'count' ? 'COUNT(*)' : filter.field;
+    const filt = {
+      col: field,
+      op: "IN",
+      val: typeof filter.value === 'string' ? [filter.value] : filter.value
+    };
+    filters.push(filt);
+    dispatch(drilldownToChart(filter.url, formData.slice_id, dashboardPageId, filters));
   };
 
   const submenuYOffset = useMemo(
