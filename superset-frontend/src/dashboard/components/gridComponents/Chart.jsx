@@ -39,6 +39,7 @@ import { URL_PARAMS } from 'src/constants';
 import SliceHeader from '../SliceHeader';
 import MissingChart from '../MissingChart';
 import { slicePropShape, chartPropShape } from '../../util/propShapes';
+import {revertChartState} from "../../../components/Chart/chartAction";
 
 const propTypes = {
   id: PropTypes.number.isRequired,
@@ -143,6 +144,7 @@ class Chart extends React.Component {
     this.setHeaderRef = this.setHeaderRef.bind(this);
     this.getChartHeight = this.getChartHeight.bind(this);
     this.getDescriptionHeight = this.getDescriptionHeight.bind(this);
+    this.revertChartState = this.revertChartState.bind(this);
   }
 
   shouldComponentUpdate(nextProps, nextState) {

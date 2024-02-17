@@ -606,7 +606,32 @@ export const saveChartState = chartId => (dispatch, getState) => {
   };
   const prev = [prevFormData, ...(currentChartData?.prevFormData || [])];
   const newChartData = { ...currentChartData, prevFormData: prev };
+  console.log('saveChartState')
+  console.log('prev', prev)
+  console.log('newChartData', newChartData)
   dispatch(saveSliceState(newChartData, chartId));
+};
+export const revertChartState = chartId => (dispatch, getState) => {
+  const timeout =
+    getState().dashboardInfo.common.conf.SUPERSET_WEBSERVER_TIMEOUT;
+  const { charts } = getState();
+  const currentChartData = charts[chartId];
+  const prev = [...(currentChartData?.prevFormData || [])];
+  const data = prev[prev.length - 1] || {};
+  const newChartData = { ...data.formData, prevFormData: prev.splice(0, prev.length - 1) };
+  dispatch(saveSliceState(newChartData, chartId));
+
+  dispatch(
+    postChartFormData(
+      newChartData,
+      false,
+      timeout,
+      newChartData.slice_id,
+      newChartData.dashboardId,
+      getState().dataMask[newChartData.slice_id]?.ownState,
+      true,
+    ),
+  );
 };
 
 export const DD = 'DD';
@@ -619,13 +644,19 @@ export function postDDChartFormData(payload, key) {
 }
 export function drilldownToChart(chartKey, toChartKey, dashboardId, filters) {
   return (dispatch, getState) => {
+    dispatch(saveChartState(chartKey));
+
     console.log('getState().charts ', getState().charts )
     const newChart = (getState().charts || {})[toChartKey];
     const currentChart = (getState().charts || {})[chartKey];
     const timeout =
       getState().dashboardInfo.common.conf.SUPERSET_WEBSERVER_TIMEOUT;
     const fd = newChart.latestQueryFormData;
-    const newFormData = {...fd, extra_filters: [...fd.extra_filters, ...filters] };
+    //TODO уточнить на бэке в какой фильтр добавлять
+    // const newFormData = {...fd, extra_filters: [...fd.extra_filters, ...filters] };
+    console.log('fd ===========>', fd)
+    const newFormData = {...fd, extra_form_data: {...fd.extra_form_data, filters: [...fd.extra_form_data.filters, ...filters]} };
+    // const prevFD = fd
     dispatch(
       postChartFormData(
         newFormData,

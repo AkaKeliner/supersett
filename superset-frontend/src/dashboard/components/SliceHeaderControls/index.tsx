@@ -73,6 +73,7 @@ const MENU_KEYS = {
   VIEW_RESULTS: 'view_results',
   DRILL_TO_DETAIL: 'drill_to_detail',
   CROSS_FILTER_SCOPING: 'cross_filter_scoping',
+  BACK: 'back',
 };
 
 // TODO: replace 3 dots with an icon
@@ -247,6 +248,7 @@ const ViewResultsModalTrigger = ({
 };
 
 const SliceHeaderControls = (props: SliceHeaderControlsPropsWithRouter) => {
+  console.log('PROPS ================>', props)
   const [openScopingModal, scopingModal] = useCrossFiltersScopingModal(
     props.slice.slice_id,
   );
@@ -274,6 +276,10 @@ const SliceHeaderControls = (props: SliceHeaderControlsPropsWithRouter) => {
     domEvent: MouseEvent<HTMLElement>;
   }) => {
     switch (key) {
+      case MENU_KEYS.BACK:
+        console.log('BACK')
+        props.addSuccessToast(t('Data refreshed'));
+        break;
       case MENU_KEYS.FORCE_REFRESH:
         refreshChart();
         props.addSuccessToast(t('Data refreshed'));
@@ -385,6 +391,17 @@ const SliceHeaderControls = (props: SliceHeaderControlsPropsWithRouter) => {
       selectable={false}
       data-test={`slice_${slice.slice_id}-menu`}
     >
+      {
+        props.formData.
+      }
+      <Menu.Item
+        // key={'BACK'}
+        key={MENU_KEYS.BACK}
+        style={{ height: 'auto', lineHeight: 'initial' }}
+        data-test="back-chart"
+      >
+        {t('back')}
+      </Menu.Item>
       <Menu.Item
         key={MENU_KEYS.FORCE_REFRESH}
         disabled={props.chartStatus === 'loading'}

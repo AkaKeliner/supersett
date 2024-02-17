@@ -29,7 +29,7 @@ import {
   addSuccessToast,
   addDangerToast,
 } from 'src/components/MessageToasts/actions';
-import { refreshChart } from 'src/components/Chart/chartAction';
+import {refreshChart, revertChartState} from 'src/components/Chart/chartAction';
 import { logEvent } from 'src/logger/actions';
 import {
   getActiveFilters,
@@ -116,6 +116,7 @@ function mapDispatchToProps(dispatch) {
       unsetFocusedFilterField,
       refreshChart,
       logEvent,
+      revertChartState,
     },
     dispatch,
   );
