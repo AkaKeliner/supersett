@@ -268,7 +268,6 @@ function useResetOnChangeRef(initialValue: () => any, resetOnChangeValue: any) {
 }
 
 export const ControlPanelsContainer = (props: ControlPanelsContainerProps) => {
-  console.log('ControlPanelsContainer =====>', props);
   const { colors } = useTheme();
   const pluginContext = useContext(PluginContext);
 
@@ -508,7 +507,7 @@ export const ControlPanelsContainer = (props: ControlPanelsContainerProps) => {
     }
     const allProps = {
       ...restProps,
-      latestQueryFormData: props.chart.latestQueryFormData,
+      latestQueryFormData: props.chart?.latestQueryFormData,
     };
     return (
       <Control

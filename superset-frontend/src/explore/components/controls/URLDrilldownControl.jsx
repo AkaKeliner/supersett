@@ -78,7 +78,7 @@ const targetType = [
 
 export default class URLDrilldownControl extends React.Component {
   constructor(props) {
-    console.log('PROPS', props);
+    console.log('PROPS URLDrilldownControl', props);
 
     super(props);
     // eslint-disable-next-line react/no-unused-state
@@ -106,8 +106,7 @@ export default class URLDrilldownControl extends React.Component {
     if (type && this.props.value[index].type !== type) {
       this.props.value[index].url = null;
       this.setState({
-        // eslint-disable-next-line react/no-unused-state
-        availableObjects: this.props[type].map(o => ({
+        availableObjects: this.props?.datasource?.[type].map(o => ({
           label: type === 'slices' ? o.slice_name : o.dashboard_title,
           value: type === 'slices' ? o.slice_id : o.id,
         })),
@@ -234,14 +233,14 @@ export default class URLDrilldownControl extends React.Component {
             placeholder={t('Object')}
             options={
               drilldown.drilldownToInfoPanel
-                ? this.props.dashboards
-                  ? this.props.dashboards.map(o => ({
+                ? this.props?.datasource?.dashboards
+                  ? this.props.datasource.dashboards.map(o => ({
                     label: o.dashboard_title,
                     value: o.id,
                   }))
                   : []
-                : this.props[drilldown.type]
-                  ? this.props[drilldown.type].map(o => ({
+                : this.props?.datasource?.slices
+                  ? this.props?.datasource?.slices?.map(o => ({
                     label: o.slice_name,
                     value: o.slice_id,
                   }))
@@ -263,8 +262,7 @@ export default class URLDrilldownControl extends React.Component {
         </Row>
       </div>
     ));
-    console.log('PROPS', this.props);
-    console.log('STATE', this.state);
+    console.log('STATE URLDrilldownControl', this.state);
     return (
       <div>
         <Row>

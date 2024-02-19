@@ -616,9 +616,12 @@ export function saveSliceState(payload, key) {
 }
 
 export const saveChartState = chartId => (dispatch, getState) => {
+  debugger
+const id = chartId
   const {charts} = getState();
   const currentChartData = (charts[chartId] || {});
   console.log('currentChartData', currentChartData)
+  console.log('chartId', id)
   const prevFormData = {
     formData: currentChartData?.latestQueryFormData,
     filters: [...(currentChartData?.latestQueryFormData?.filters || [])],
@@ -627,7 +630,6 @@ export const saveChartState = chartId => (dispatch, getState) => {
   };
   const prev = [prevFormData, ...(currentChartData?.prevFormData || [])];
   const newChartData = {...currentChartData, prevFormData: prev};
-  console.log('saveChartState')
   console.log('prev', prev)
   console.log('newChartData', newChartData)
   dispatch(saveSliceState(newChartData, chartId));
@@ -657,7 +659,6 @@ export const revertChartState = chartId => (dispatch, getState) => {
 };
 
 export const DD = 'DD';
-
 export function postDDChartFormData(payload, key) {
   return {
     type: DD,
@@ -670,9 +671,13 @@ export function drilldownToChart(chartKey, toChartKey, dashboardId, filters) {
   return (dispatch, getState) => {
     dispatch(saveChartState(chartKey));
 
-    console.log('getState().charts ', getState().charts)
+    // TODO нужно запросить formData для нового chart по его id
+    // сейчас newChart - неправильно находится
     const newChart = (getState().charts || {})[toChartKey];
+    console.log('newChart ', newChart)
+
     const currentChart = (getState().charts || {})[chartKey];
+    console.log('currentChart ', currentChart)
     const timeout =
       getState().dashboardInfo.common.conf.SUPERSET_WEBSERVER_TIMEOUT;
     const fd = newChart.latestQueryFormData;
@@ -683,7 +688,7 @@ export function drilldownToChart(chartKey, toChartKey, dashboardId, filters) {
       ...fd,
       extra_form_data: {...(fd.extra_form_data || {}), filters: [...(fd.extra_form_data.filters || []), ...(filters || [])]}
     };
-    // const prevFD = fd
+    console.log('newFormData ', newFormData)
     dispatch(
       postChartFormData(
         newFormData,

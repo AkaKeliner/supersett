@@ -68,6 +68,7 @@ import ConnectedControlPanelsContainer from '../ControlPanelsContainer';
 import SaveModal from '../SaveModal';
 import DataSourcePanel from '../DatasourcePanel';
 import ConnectedExploreChartHeader from '../ExploreChartHeader';
+import { defaultControls } from '../../store'
 
 const propTypes = {
   ...ExploreChartPanel.propTypes,
@@ -720,7 +721,8 @@ function mapStateToProps(state) {
     user,
     saveModal,
   } = state;
-  const { controls, slice, datasource = {}, metadata } = explore;
+  // const { controls, slice, datasource = {}, metadata } = explore;
+  const { controls = defaultControls, slice, datasource, metadata } = explore;
   const form_data = getFormDataFromControls(controls);
   const slice_id = form_data.slice_id ?? slice?.slice_id ?? 0; // 0 - unsaved chart
   form_data.extra_form_data = mergeExtraFormData(

@@ -214,6 +214,7 @@ export class StandardizedFormData {
       ...publicFormData,
       viz_type: targetVizType,
     });
+
     const targetFormData = {
       ...getFormDataFromControls(targetControlsState),
       standardizedFormData: this.serialize(),

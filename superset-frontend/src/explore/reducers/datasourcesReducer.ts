@@ -36,6 +36,7 @@ export default function datasourcesReducer(
     };
   }
   if (action.type === HYDRATE_EXPLORE) {
+    // debugger
     return { ...(action as HydrateExplore).data.datasources };
   }
   return datasources || {};

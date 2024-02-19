@@ -78,14 +78,14 @@ const DrillToChartMenuItems = ({
   const goToChart = (filter: DDChart) => {
     const filters = [];
     const field = filter.field === 'count' ? 'COUNT(*)' : filter.field;
-    console.log('filter.value', filter.value)
     const filt = {
       col: field,
       op: "IN",
       val: typeof filter.value === 'string' || typeof filter.value === 'number' ? [filter.value] : filter.value
     };
+    console.log('filter', filter)
     filters.push(filt);
-    dispatch(drilldownToChart(filter.url, formData.slice_id, dashboardPageId, filters));
+    dispatch(drilldownToChart(formData.slice_id, filter.url, dashboardPageId, filters));
   };
 
   const submenuYOffset = useMemo(

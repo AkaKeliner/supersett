@@ -17,6 +17,7 @@
  * under the License.
  */
 
+// @ts-ignore
 import { sharedControlComponents } from '@superset-ui/chart-controls';
 import AnnotationLayerControl from './AnnotationLayerControl';
 import BoundsControl from './BoundsControl';

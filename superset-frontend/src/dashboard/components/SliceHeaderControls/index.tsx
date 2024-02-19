@@ -258,12 +258,9 @@ const SliceHeaderControls = (props: SliceHeaderControlsPropsWithRouter) => {
   const hasPrevFormData = useSelector(state => {
     const sliceId = props.slice.slice_id;
     const chart = sliceId && state.charts[sliceId];
-    console.log('chart', chart)
     const prevFormData = chart?.prevFormData
-console.log('prevFormData', prevFormData)
     return !!prevFormData?.length
   })
-  console.log('hasPrevFormData', hasPrevFormData)
 
   const canEditCrossFilters =
     useSelector<RootState, boolean>(
@@ -289,7 +286,6 @@ console.log('prevFormData', prevFormData)
   }) => {
     switch (key) {
       case MENU_KEYS.BACK:
-        console.log('BACK')
         props.revertChartState(slice.slice_id);
         break;
       case MENU_KEYS.FORCE_REFRESH:

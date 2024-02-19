@@ -20,10 +20,11 @@ import { QueryFormData } from '@superset-ui/core';
 import { ControlStateMapping } from '@superset-ui/chart-controls';
 
 export function getFormDataFromControls(
-  controlsState: ControlStateMapping,
+    controls: ControlStateMapping,
 ): QueryFormData {
+  const controlsState = controls;
   const formData = {};
-  Object.keys((controlsState || {})).forEach(controlName => {
+  Object.keys((controlsState)).forEach(controlName => {
     const control = controlsState[controlName];
       formData[controlName] = control.value;
   });

@@ -106,7 +106,6 @@ const ChartContextMenu = (
     filters?: ContextMenuFilters;
   }>({ clientX: 0, clientY: 0 });
   const menuItems = [];
-  console.log('filters', filters)
   const showDrillToDetail =
     isFeatureEnabled(FeatureFlag.DRILL_TO_DETAIL) &&
     canExplore &&
@@ -245,7 +244,6 @@ const ChartContextMenu = (
     );
   }
   if (filters?.drillToCharts) {
-    console.log('filters?.drillToChart', filters?.drillToCharts);
     menuItems.push(
       <DrillToChartMenuItems
         drillToChart={filters.drillToCharts}
@@ -261,7 +259,6 @@ const ChartContextMenu = (
     );
   }
   if (filters?.drillToDashboards) {
-    console.log('filters?.drillToDashboards', filters?.drillToDashboards);
     menuItems.push(
       <DrillToDashboardMenuItems
         // drillToChart={filters.drillToCharts}

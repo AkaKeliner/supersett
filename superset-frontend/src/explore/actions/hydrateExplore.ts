@@ -43,6 +43,7 @@ import { getDatasourceUid } from 'src/utils/getDatasourceUid';
 import { getUrlParam } from 'src/utils/urlUtils';
 import { URL_PARAMS } from 'src/constants';
 import { findPermission } from 'src/utils/findPermission';
+import {de} from "chrono-node";
 
 enum ColorSchemeType {
   CATEGORICAL = 'CATEGORICAL',
@@ -52,6 +53,8 @@ enum ColorSchemeType {
 export const HYDRATE_EXPLORE = 'HYDRATE_EXPLORE';
 export const hydrateExplore =
   ({
+     dashboards_data,
+     slices_data,
     form_data,
     slice,
     dataset,
@@ -61,7 +64,7 @@ export const hydrateExplore =
   (dispatch: Dispatch, getState: () => ExplorePageState) => {
     const { user, datasources, charts, sliceEntities, common, explore } =
       getState();
-
+    // debugger
     const sliceId = getUrlParam(URL_PARAMS.sliceId);
     const dashboardId = getUrlParam(URL_PARAMS.dashboardId);
     const fallbackSlice = sliceId ? sliceEntities?.slices?.[sliceId] : null;
@@ -96,9 +99,7 @@ export const hydrateExplore =
     if (dashboardId) {
       initialFormData.dashboardId = dashboardId;
     }
-
-    const initialDatasource = dataset;
-
+    const initialDatasource = {...dataset, dashboards: dashboards_data, slices: slices_data };
     const initialExploreState = {
       form_data: initialFormData,
       slice: initialSlice,
@@ -159,10 +160,12 @@ export const hydrateExplore =
       saveAction,
       common,
     };
+    console.log('exploreState', exploreState)
 
     // apply initial mapStateToProps for all controls, must execute AFTER
     // bootstrapState has initialized `controls`. Order of execution is not
     // guaranteed, so controls shouldn't rely on each other's mapped state.
+    // debugger
     Object.entries(exploreState.controls).forEach(([key, controlState]) => {
       exploreState.controls[key] = applyMapStateToPropsToControl(
         controlState,
@@ -187,8 +190,8 @@ export const hydrateExplore =
       queriesResponse: null,
       triggerQuery: false,
       lastRendered: 0,
+      prevFormData: [],
     };
-
     return dispatch({
       type: HYDRATE_EXPLORE,
       data: {

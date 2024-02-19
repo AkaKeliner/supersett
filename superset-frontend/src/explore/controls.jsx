@@ -469,18 +469,12 @@ export const controls = {
     type: 'URLDrilldownControl',
     label: t('URL Drilldowns'),
     default: [],
-    shouldMapStateToProps(state) {
-      return {
-        state,
-      };
-    },
     mapStateToProps(explore, state, chart) {
+      console.log('explore, state, chart', explore, state, chart)
       return {
-        state,
-        chart,
+        // state,
+        // chart,
         datasource: explore.datasource,
-        slices: explore.data_objects.slices,
-        dashboards: explore.data_objects.dashboards,
       };
     },
   },

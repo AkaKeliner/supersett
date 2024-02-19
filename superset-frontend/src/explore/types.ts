@@ -72,6 +72,8 @@ export type Datasource = Dataset & {
 };
 
 export interface ExplorePageInitialData {
+  dashboards_data: Array<any>;
+  slices_data: Array<any>;
   dataset: Dataset;
   form_data: QueryFormData;
   slice: Slice | null;

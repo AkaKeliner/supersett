@@ -240,6 +240,7 @@ export default function TableChart<D extends DataRecord = DataRecord>(
     emitCrossFilters,
     urlDrillDowns,
   } = props;
+  console.log('urlDrillDowns1', urlDrillDowns)
   const timestampFormatter = useCallback(
     value => getTimeFormatterForGranularity(timeGrain)(value),
     [timeGrain],
@@ -408,7 +409,7 @@ export default function TableChart<D extends DataRecord = DataRecord>(
             }
           })
         }
-        console.log('ddToDashboards', ddToDashboards)
+        console.log('ddToCharts', ddToCharts)
         onContextMenu(clientX, clientY, {
           drillToDetail: drillToDetailFilters,
           crossFilter: cellPoint.isMetric

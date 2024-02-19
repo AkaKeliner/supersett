@@ -177,7 +177,6 @@ class SuperChart extends React.PureComponent<Props, {}> {
       width,
       theme,
     });
-    console.log('chartProps', chartProps);
 
     let chart;
     // Render the no results component if the query data is null or empty
