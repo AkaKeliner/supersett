@@ -41,23 +41,25 @@ import {
   t,
   useTheme,
 } from '@superset-ui/core';
-import { useSelector } from 'react-redux';
-import { Menu } from 'src/components/Menu';
-import { NoAnimationDropdown } from 'src/components/Dropdown';
+import {useSelector} from 'react-redux';
+import {Menu} from 'src/components/Menu';
+import {NoAnimationDropdown} from 'src/components/Dropdown';
 import ShareMenuItems from 'src/dashboard/components/menu/ShareMenuItems';
 import downloadAsImage from 'src/utils/downloadAsImage';
-import { getSliceHeaderTooltip } from 'src/dashboard/util/getSliceHeaderTooltip';
-import { Tooltip } from 'src/components/Tooltip';
+import {getSliceHeaderTooltip} from 'src/dashboard/util/getSliceHeaderTooltip';
+import {Tooltip} from 'src/components/Tooltip';
 import Icons from 'src/components/Icons';
 import ModalTrigger from 'src/components/ModalTrigger';
 import Button from 'src/components/Button';
 import ViewQueryModal from 'src/explore/components/controls/ViewQueryModal';
-import { ResultsPaneOnDashboard } from 'src/explore/components/DataTablesPane';
+import {ResultsPaneOnDashboard} from 'src/explore/components/DataTablesPane';
 import Modal from 'src/components/Modal';
-import { DrillDetailMenuItems } from 'src/components/Chart/DrillDetail';
-import { LOG_ACTIONS_CHART_DOWNLOAD_AS_IMAGE } from 'src/logger/LogUtils';
-import { RootState } from 'src/dashboard/types';
-import { useCrossFiltersScopingModal } from '../nativeFilters/FilterBar/CrossFilters/ScopingModal/useCrossFiltersScopingModal';
+import {DrillDetailMenuItems} from 'src/components/Chart/DrillDetail';
+import {LOG_ACTIONS_CHART_DOWNLOAD_AS_IMAGE} from 'src/logger/LogUtils';
+import {RootState} from 'src/dashboard/types';
+import {
+  useCrossFiltersScopingModal
+} from '../nativeFilters/FilterBar/CrossFilters/ScopingModal/useCrossFiltersScopingModal';
 
 const MENU_KEYS = {
   DOWNLOAD_AS_IMAGE: 'download_as_image',
@@ -78,18 +80,17 @@ const MENU_KEYS = {
 
 // TODO: replace 3 dots with an icon
 const VerticalDotsContainer = styled.div`
-  padding: ${({ theme }) => theme.gridUnit / 4}px
-    ${({ theme }) => theme.gridUnit * 1.5}px;
+  padding: ${({theme}) => theme.gridUnit / 4}px ${({theme}) => theme.gridUnit * 1.5}px;
 
   .dot {
     display: block;
 
-    height: ${({ theme }) => theme.gridUnit}px;
-    width: ${({ theme }) => theme.gridUnit}px;
+    height: ${({theme}) => theme.gridUnit}px;
+    width: ${({theme}) => theme.gridUnit}px;
     border-radius: 50%;
-    margin: ${({ theme }) => theme.gridUnit / 2}px 0;
+    margin: ${({theme}) => theme.gridUnit / 2}px 0;
 
-    background-color: ${({ theme }) => theme.colors.text.label};
+    background-color: ${({theme}) => theme.colors.text.label};
   }
 
   &:hover {
@@ -99,8 +100,8 @@ const VerticalDotsContainer = styled.div`
 
 const RefreshTooltip = styled.div`
   height: auto;
-  margin: ${({ theme }) => theme.gridUnit}px 0;
-  color: ${({ theme }) => theme.colors.grayscale.base};
+  margin: ${({theme}) => theme.gridUnit}px 0;
+  color: ${({theme}) => theme.colors.grayscale.base};
   line-height: 21px;
   display: flex;
   flex-direction: column;
@@ -113,9 +114,9 @@ const getScreenshotNodeSelector = (chartId: string | number) =>
 
 const VerticalDotsTrigger = () => (
   <VerticalDotsContainer>
-    <span className="dot" />
-    <span className="dot" />
-    <span className="dot" />
+    <span className="dot"/>
+    <span className="dot"/>
+    <span className="dot"/>
   </VerticalDotsContainer>
 );
 
@@ -159,7 +160,9 @@ export interface SliceHeaderControlsProps {
   supersetCanCSV?: boolean;
 
   crossFiltersEnabled?: boolean;
+  revertChartState?: (sliceId: number) => void;
 }
+
 type SliceHeaderControlsPropsWithRouter = SliceHeaderControlsProps &
   RouteComponentProps;
 
@@ -171,11 +174,11 @@ const dropdownIconsStyles = css`
 `;
 
 const ViewResultsModalTrigger = ({
-  exploreUrl,
-  triggerNode,
-  modalTitle,
-  modalBody,
-}: {
+                                   exploreUrl,
+                                   triggerNode,
+                                   modalTitle,
+                                   modalBody,
+                                 }: {
   exploreUrl: string;
   triggerNode: ReactChild;
   modalTitle: ReactChild;
@@ -252,10 +255,19 @@ const SliceHeaderControls = (props: SliceHeaderControlsPropsWithRouter) => {
   const [openScopingModal, scopingModal] = useCrossFiltersScopingModal(
     props.slice.slice_id,
   );
+  const hasPrevFormData = useSelector(state => {
+    const sliceId = props.slice.slice_id;
+    const chart = sliceId && state.charts[sliceId];
+    console.log('chart', chart)
+    const prevFormData = chart?.prevFormData
+console.log('prevFormData', prevFormData)
+    return !!prevFormData?.length
+  })
+  console.log('hasPrevFormData', hasPrevFormData)
 
   const canEditCrossFilters =
     useSelector<RootState, boolean>(
-      ({ dashboardInfo }) => dashboardInfo.dash_edit_perm,
+      ({dashboardInfo}) => dashboardInfo.dash_edit_perm,
     ) &&
     isFeatureEnabled(FeatureFlag.DASHBOARD_CROSS_FILTERS) &&
     getChartMetadataRegistry()
@@ -269,16 +281,16 @@ const SliceHeaderControls = (props: SliceHeaderControlsPropsWithRouter) => {
   };
 
   const handleMenuClick = ({
-    key,
-    domEvent,
-  }: {
+                             key,
+                             domEvent,
+                           }: {
     key: Key;
     domEvent: MouseEvent<HTMLElement>;
   }) => {
     switch (key) {
       case MENU_KEYS.BACK:
         console.log('BACK')
-        props.addSuccessToast(t('Data refreshed'));
+        props.revertChartState(slice.slice_id);
         break;
       case MENU_KEYS.FORCE_REFRESH:
         refreshChart();
@@ -347,8 +359,10 @@ const SliceHeaderControls = (props: SliceHeaderControlsPropsWithRouter) => {
     isFullSize,
     cachedDttm = [],
     updatedDttm = null,
-    addSuccessToast = () => {},
-    addDangerToast = () => {},
+    addSuccessToast = () => {
+    },
+    addDangerToast = () => {
+    },
     supersetCanShare = false,
     isCached = [],
   } = props;
@@ -392,20 +406,20 @@ const SliceHeaderControls = (props: SliceHeaderControlsPropsWithRouter) => {
       data-test={`slice_${slice.slice_id}-menu`}
     >
       {
-        props.formData.
+        hasPrevFormData &&
+          <Menu.Item
+            key={MENU_KEYS.BACK}
+            style={{height: 'auto', lineHeight: 'initial'}}
+            data-test="back-chart"
+          >
+            {t('go back')}
+          </Menu.Item>
       }
-      <Menu.Item
-        // key={'BACK'}
-        key={MENU_KEYS.BACK}
-        style={{ height: 'auto', lineHeight: 'initial' }}
-        data-test="back-chart"
-      >
-        {t('back')}
-      </Menu.Item>
+
       <Menu.Item
         key={MENU_KEYS.FORCE_REFRESH}
         disabled={props.chartStatus === 'loading'}
-        style={{ height: 'auto', lineHeight: 'initial' }}
+        style={{height: 'auto', lineHeight: 'initial'}}
         data-test="refresh-chart-menu-item"
       >
         {t('Force refresh')}
@@ -416,7 +430,7 @@ const SliceHeaderControls = (props: SliceHeaderControlsPropsWithRouter) => {
 
       <Menu.Item key={MENU_KEYS.FULLSCREEN}>{fullscreenLabel}</Menu.Item>
 
-      <Menu.Divider />
+      <Menu.Divider/>
 
       {slice.description && (
         <Menu.Item key={MENU_KEYS.TOGGLE_CHART_DESCRIPTION}>
@@ -441,7 +455,7 @@ const SliceHeaderControls = (props: SliceHeaderControlsPropsWithRouter) => {
           <Menu.Item key={MENU_KEYS.CROSS_FILTER_SCOPING}>
             {t('Cross-filtering scoping')}
           </Menu.Item>
-          <Menu.Divider />
+          <Menu.Divider/>
         </>
       )}
 
@@ -452,7 +466,7 @@ const SliceHeaderControls = (props: SliceHeaderControlsPropsWithRouter) => {
               <span data-test="view-query-menu-item">{t('View query')}</span>
             }
             modalTitle={t('View query')}
-            modalBody={<ViewQueryModal latestQueryFormData={props.formData} />}
+            modalBody={<ViewQueryModal latestQueryFormData={props.formData}/>}
             draggable
             resizable
             responsive
@@ -489,7 +503,7 @@ const SliceHeaderControls = (props: SliceHeaderControlsPropsWithRouter) => {
           />
         )}
 
-      {(slice.description || props.supersetCanExplore) && <Menu.Divider />}
+      {(slice.description || props.supersetCanExplore) && <Menu.Divider/>}
 
       {supersetCanShare && (
         <Menu.SubMenu title={t('Share')}>
@@ -510,13 +524,13 @@ const SliceHeaderControls = (props: SliceHeaderControlsPropsWithRouter) => {
         <Menu.SubMenu title={t('Download')}>
           <Menu.Item
             key={MENU_KEYS.EXPORT_CSV}
-            icon={<Icons.FileOutlined css={dropdownIconsStyles} />}
+            icon={<Icons.FileOutlined css={dropdownIconsStyles}/>}
           >
             {t('Export to .CSV')}
           </Menu.Item>
           <Menu.Item
             key={MENU_KEYS.EXPORT_XLSX}
-            icon={<Icons.FileOutlined css={dropdownIconsStyles} />}
+            icon={<Icons.FileOutlined css={dropdownIconsStyles}/>}
           >
             {t('Export to Excel')}
           </Menu.Item>
@@ -527,13 +541,13 @@ const SliceHeaderControls = (props: SliceHeaderControlsPropsWithRouter) => {
               <>
                 <Menu.Item
                   key={MENU_KEYS.EXPORT_FULL_CSV}
-                  icon={<Icons.FileOutlined css={dropdownIconsStyles} />}
+                  icon={<Icons.FileOutlined css={dropdownIconsStyles}/>}
                 >
                   {t('Export to full .CSV')}
                 </Menu.Item>
                 <Menu.Item
                   key={MENU_KEYS.EXPORT_FULL_XLSX}
-                  icon={<Icons.FileOutlined css={dropdownIconsStyles} />}
+                  icon={<Icons.FileOutlined css={dropdownIconsStyles}/>}
                 >
                   {t('Export to full Excel')}
                 </Menu.Item>
@@ -542,7 +556,7 @@ const SliceHeaderControls = (props: SliceHeaderControlsPropsWithRouter) => {
 
           <Menu.Item
             key={MENU_KEYS.DOWNLOAD_AS_IMAGE}
-            icon={<Icons.FileImageOutlined css={dropdownIconsStyles} />}
+            icon={<Icons.FileImageOutlined css={dropdownIconsStyles}/>}
           >
             {t('Download as image')}
           </Menu.Item>
@@ -555,7 +569,7 @@ const SliceHeaderControls = (props: SliceHeaderControlsPropsWithRouter) => {
     <>
       {isFullSize && (
         <Icons.FullscreenExitOutlined
-          style={{ fontSize: 22 }}
+          style={{fontSize: 22}}
           onClick={() => {
             props.handleToggleFullSize();
           }}
@@ -576,7 +590,7 @@ const SliceHeaderControls = (props: SliceHeaderControlsPropsWithRouter) => {
           role="button"
           aria-label="More Options"
         >
-          <VerticalDotsTrigger />
+          <VerticalDotsTrigger/>
         </span>
       </NoAnimationDropdown>
       {canEditCrossFilters && scopingModal}

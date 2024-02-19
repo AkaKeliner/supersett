@@ -360,6 +360,11 @@ class Chart extends React.Component {
     });
   }
 
+  revertChartState(chartId) {
+    // const chartId = '';
+    this.props.revertChartState(chartId);
+  }
+
   forceRefresh() {
     this.props.logEvent(LOG_ACTIONS_FORCE_REFRESH_CHART, {
       slice_id: this.props.slice.slice_id,
@@ -465,6 +470,7 @@ class Chart extends React.Component {
           formData={formData}
           width={width}
           height={this.getHeaderHeight()}
+          revertChartState={this.revertChartState}
         />
 
         {/*

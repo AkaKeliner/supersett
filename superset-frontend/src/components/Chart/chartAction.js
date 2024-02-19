@@ -26,7 +26,7 @@ import {
   t,
   isFeatureEnabled,
 } from '@superset-ui/core';
-import { getControlsState } from 'src/explore/store';
+import {getControlsState} from 'src/explore/store';
 import {
   getAnnotationJsonUrl,
   getExploreUrl,
@@ -35,16 +35,17 @@ import {
   getQuerySettings,
   getChartDataUri,
 } from 'src/explore/exploreUtils';
-import { addDangerToast } from 'src/components/MessageToasts/actions';
-import { logEvent } from 'src/logger/actions';
-import { Logger, LOG_ACTIONS_LOAD_CHART } from 'src/logger/LogUtils';
-import { getClientErrorObject } from 'src/utils/getClientErrorObject';
-import { allowCrossDomain as domainShardingEnabled } from 'src/utils/hostNamesConfig';
-import { updateDataMask } from 'src/dataMask/actions';
-import { waitForAsyncData } from 'src/middleware/asyncEvent';
-import { safeStringify } from 'src/utils/safeStringify';
+import {addDangerToast} from 'src/components/MessageToasts/actions';
+import {logEvent} from 'src/logger/actions';
+import {Logger, LOG_ACTIONS_LOAD_CHART} from 'src/logger/LogUtils';
+import {getClientErrorObject} from 'src/utils/getClientErrorObject';
+import {allowCrossDomain as domainShardingEnabled} from 'src/utils/hostNamesConfig';
+import {updateDataMask} from 'src/dataMask/actions';
+import {waitForAsyncData} from 'src/middleware/asyncEvent';
+import {safeStringify} from 'src/utils/safeStringify';
 
 export const CHART_UPDATE_STARTED = 'CHART_UPDATE_STARTED';
+
 export function chartUpdateStarted(queryController, latestQueryFormData, key) {
   return {
     type: CHART_UPDATE_STARTED,
@@ -55,48 +56,57 @@ export function chartUpdateStarted(queryController, latestQueryFormData, key) {
 }
 
 export const CHART_UPDATE_SUCCEEDED = 'CHART_UPDATE_SUCCEEDED';
+
 export function chartUpdateSucceeded(queriesResponse, key) {
-  return { type: CHART_UPDATE_SUCCEEDED, queriesResponse, key };
+  return {type: CHART_UPDATE_SUCCEEDED, queriesResponse, key};
 }
 
 export const CHART_UPDATE_STOPPED = 'CHART_UPDATE_STOPPED';
+
 export function chartUpdateStopped(key) {
-  return { type: CHART_UPDATE_STOPPED, key };
+  return {type: CHART_UPDATE_STOPPED, key};
 }
 
 export const CHART_UPDATE_FAILED = 'CHART_UPDATE_FAILED';
+
 export function chartUpdateFailed(queriesResponse, key) {
-  return { type: CHART_UPDATE_FAILED, queriesResponse, key };
+  return {type: CHART_UPDATE_FAILED, queriesResponse, key};
 }
 
 export const CHART_RENDERING_FAILED = 'CHART_RENDERING_FAILED';
+
 export function chartRenderingFailed(error, key, stackTrace) {
-  return { type: CHART_RENDERING_FAILED, error, key, stackTrace };
+  return {type: CHART_RENDERING_FAILED, error, key, stackTrace};
 }
 
 export const CHART_RENDERING_SUCCEEDED = 'CHART_RENDERING_SUCCEEDED';
+
 export function chartRenderingSucceeded(key) {
-  return { type: CHART_RENDERING_SUCCEEDED, key };
+  return {type: CHART_RENDERING_SUCCEEDED, key};
 }
 
 export const REMOVE_CHART = 'REMOVE_CHART';
+
 export function removeChart(key) {
-  return { type: REMOVE_CHART, key };
+  return {type: REMOVE_CHART, key};
 }
 
 export const ANNOTATION_QUERY_SUCCESS = 'ANNOTATION_QUERY_SUCCESS';
+
 export function annotationQuerySuccess(annotation, queryResponse, key) {
-  return { type: ANNOTATION_QUERY_SUCCESS, annotation, queryResponse, key };
+  return {type: ANNOTATION_QUERY_SUCCESS, annotation, queryResponse, key};
 }
 
 export const ANNOTATION_QUERY_STARTED = 'ANNOTATION_QUERY_STARTED';
+
 export function annotationQueryStarted(annotation, queryController, key) {
-  return { type: ANNOTATION_QUERY_STARTED, annotation, queryController, key };
+  return {type: ANNOTATION_QUERY_STARTED, annotation, queryController, key};
 }
 
 export const ANNOTATION_QUERY_FAILED = 'ANNOTATION_QUERY_FAILED';
+
 export function annotationQueryFailed(annotation, queryResponse, key) {
-  return { type: ANNOTATION_QUERY_FAILED, annotation, queryResponse, key };
+  return {type: ANNOTATION_QUERY_FAILED, annotation, queryResponse, key};
 }
 
 export const DYNAMIC_PLUGIN_CONTROLS_READY = 'DYNAMIC_PLUGIN_CONTROLS_READY';
@@ -122,7 +132,7 @@ const legacyChartDataRequest = async (
   requestParams = {},
   parseMethod,
 ) => {
-  const endpointType = getLegacyEndpointType({ resultFormat, resultType });
+  const endpointType = getLegacyEndpointType({resultFormat, resultType});
   const allowDomainSharding =
     // eslint-disable-next-line camelcase
     domainShardingEnabled && requestParams?.dashboard_id;
@@ -133,22 +143,22 @@ const legacyChartDataRequest = async (
     allowDomainSharding,
     method,
     requestParams: requestParams.dashboard_id
-      ? { dashboard_id: requestParams.dashboard_id }
+      ? {dashboard_id: requestParams.dashboard_id}
       : {},
   });
   const querySettings = {
     ...requestParams,
     url,
-    postPayload: { form_data: formData },
+    postPayload: {form_data: formData},
     parseMethod,
   };
 
-  return SupersetClient.post(querySettings).then(({ json, response }) =>
+  return SupersetClient.post(querySettings).then(({json, response}) =>
     // Make the legacy endpoint return a payload that corresponds to the
     // V1 chart data endpoint response signature.
     ({
       response,
-      json: { result: [json] },
+      json: {result: [json]},
     }),
   );
 };
@@ -173,8 +183,8 @@ const v1ChartDataRequest = async (
   });
 
   // The dashboard id is added to query params for tracking purposes
-  const { slice_id: sliceId } = formData;
-  const { dashboard_id: dashboardId } = requestParams;
+  const {slice_id: sliceId} = formData;
+  const {dashboard_id: dashboardId} = requestParams;
 
   const qs = {};
   if (sliceId !== undefined) qs.form_data = `{"slice_id":${sliceId}}`;
@@ -193,7 +203,7 @@ const v1ChartDataRequest = async (
   const querySettings = {
     ...requestParams,
     url,
-    headers: { 'Content-Type': 'application/json' },
+    headers: {'Content-Type': 'application/json'},
     body: JSON.stringify(payload),
     parseMethod,
   };
@@ -202,15 +212,16 @@ const v1ChartDataRequest = async (
 };
 
 export async function getChartDataRequest({
-  formData,
-  setDataMask = () => {},
-  resultFormat = 'json',
-  resultType = 'full',
-  force = false,
-  method = 'POST',
-  requestParams = {},
-  ownState = {},
-}) {
+                                            formData,
+                                            setDataMask = () => {
+                                            },
+                                            resultFormat = 'json',
+                                            resultType = 'full',
+                                            force = false,
+                                            method = 'POST',
+                                            requestParams = {},
+                                            ownState = {},
+                                          }) {
   let querySettings = {
     ...requestParams,
   };
@@ -247,13 +258,13 @@ export async function getChartDataRequest({
 }
 
 export function runAnnotationQuery({
-  annotation,
-  timeout = 60,
-  formData = null,
-  key,
-  isDashboardRequest = false,
-  force = false,
-}) {
+                                     annotation,
+                                     timeout = 60,
+                                     formData = null,
+                                     key,
+                                     isDashboardRequest = false,
+                                     force = false,
+                                   }) {
   return function (dispatch, getState) {
     const sliceKey = key || Object.keys(getState().charts)[0];
     // make a copy of formData, not modifying original formData
@@ -295,7 +306,7 @@ export function runAnnotationQuery({
 
     const url = getAnnotationJsonUrl(annotation.value, force);
     const controller = new AbortController();
-    const { signal } = controller;
+    const {signal} = controller;
 
     dispatch(annotationQueryStarted(annotation, controller, sliceKey));
 
@@ -310,7 +321,7 @@ export function runAnnotationQuery({
       url,
       signal,
       timeout: timeout * 1000,
-      headers: { 'Content-Type': 'application/json' },
+      headers: {'Content-Type': 'application/json'},
       jsonPayload: buildV1ChartDataPayload({
         formData: fd,
         force,
@@ -318,9 +329,9 @@ export function runAnnotationQuery({
         resultType: 'full',
       }),
     })
-      .then(({ json }) => {
+      .then(({json}) => {
         const data = json?.result?.[0]?.annotation_data?.[annotation.name];
-        return dispatch(annotationQuerySuccess(annotation, { data }, sliceKey));
+        return dispatch(annotationQuerySuccess(annotation, {data}, sliceKey));
       })
       .catch(response =>
         getClientErrorObject(response).then(err => {
@@ -328,7 +339,7 @@ export function runAnnotationQuery({
             dispatch(
               annotationQueryFailed(
                 annotation,
-                { error: 'Query timeout' },
+                {error: 'Query timeout'},
                 sliceKey,
               ),
             );
@@ -343,31 +354,36 @@ export function runAnnotationQuery({
 }
 
 export const TRIGGER_QUERY = 'TRIGGER_QUERY';
+
 export function triggerQuery(value = true, key) {
-  return { type: TRIGGER_QUERY, value, key };
+  return {type: TRIGGER_QUERY, value, key};
 }
 
 // this action is used for forced re-render without fetch data
 export const RENDER_TRIGGERED = 'RENDER_TRIGGERED';
+
 export function renderTriggered(value, key) {
-  return { type: RENDER_TRIGGERED, value, key };
+  return {type: RENDER_TRIGGERED, value, key};
 }
 
 export const UPDATE_QUERY_FORM_DATA = 'UPDATE_QUERY_FORM_DATA';
+
 export function updateQueryFormData(value, key) {
-  return { type: UPDATE_QUERY_FORM_DATA, value, key };
+  return {type: UPDATE_QUERY_FORM_DATA, value, key};
 }
 
 // in the sql lab -> explore flow, user can inline edit chart title,
 // then the chart will be assigned a new slice_id
 export const UPDATE_CHART_ID = 'UPDATE_CHART_ID';
+
 export function updateChartId(newId, key = 0) {
-  return { type: UPDATE_CHART_ID, newId, key };
+  return {type: UPDATE_CHART_ID, newId, key};
 }
 
 export const ADD_CHART = 'ADD_CHART';
+
 export function addChart(chart, key) {
-  return { type: ADD_CHART, chart, key };
+  return {type: ADD_CHART, chart, key};
 }
 
 export function exploreJSON(
@@ -406,7 +422,7 @@ export function exploreJSON(
     dispatch(chartUpdateStarted(controller, formData, key));
 
     const chartDataRequestCaught = chartDataRequest
-      .then(({ response, json }) => {
+      .then(({response, json}) => {
         if (isFeatureEnabled(FeatureFlag.GLOBAL_ASYNC_QUERIES)) {
           // deal with getChartDataRequest transforming the response data
           const result = 'result' in json ? json.result : json;
@@ -515,6 +531,7 @@ export function exploreJSON(
 }
 
 export const POST_CHART_FORM_DATA = 'POST_CHART_FORM_DATA';
+
 export function postChartFormData(
   formData,
   force = false,
@@ -537,8 +554,8 @@ export function postChartFormData(
 
 export function redirectSQLLab(formData, history) {
   return dispatch => {
-    getChartDataRequest({ formData, resultFormat: 'json', resultType: 'query' })
-      .then(({ json }) => {
+    getChartDataRequest({formData, resultFormat: 'json', resultType: 'query'})
+      .then(({json}) => {
         const redirectUrl = '/sqllab/';
         const payload = {
           datasourceKey: formData.datasource,
@@ -587,7 +604,9 @@ export function refreshChart(chartKey, force, dashboardId) {
     );
   };
 }
+
 export const SAVE_SLICE_STATE = 'SAVE_SLICE_STATE';
+
 export function saveSliceState(payload, key) {
   return {
     type: SAVE_SLICE_STATE,
@@ -595,17 +614,19 @@ export function saveSliceState(payload, key) {
     key,
   };
 }
+
 export const saveChartState = chartId => (dispatch, getState) => {
-  const { charts } = getState();
-  const currentChartData = charts[chartId];
+  const {charts} = getState();
+  const currentChartData = (charts[chartId] || {});
+  console.log('currentChartData', currentChartData)
   const prevFormData = {
-    formData: currentChartData.latestQueryFormData,
-    filters: [...(currentChartData.latestQueryFormData.filters || [])],
-    groupby: [...currentChartData.latestQueryFormData.groupby],
+    formData: currentChartData?.latestQueryFormData,
+    filters: [...(currentChartData?.latestQueryFormData?.filters || [])],
+    groupby: [...(currentChartData?.latestQueryFormData?.groupby || [])],
     // columns: [...(action.payload.latestQueryFormData.columns || [])],
   };
   const prev = [prevFormData, ...(currentChartData?.prevFormData || [])];
-  const newChartData = { ...currentChartData, prevFormData: prev };
+  const newChartData = {...currentChartData, prevFormData: prev};
   console.log('saveChartState')
   console.log('prev', prev)
   console.log('newChartData', newChartData)
@@ -614,11 +635,12 @@ export const saveChartState = chartId => (dispatch, getState) => {
 export const revertChartState = chartId => (dispatch, getState) => {
   const timeout =
     getState().dashboardInfo.common.conf.SUPERSET_WEBSERVER_TIMEOUT;
-  const { charts } = getState();
+  const {charts} = getState();
   const currentChartData = charts[chartId];
   const prev = [...(currentChartData?.prevFormData || [])];
   const data = prev[prev.length - 1] || {};
-  const newChartData = { ...data.formData, prevFormData: prev.splice(0, prev.length - 1) };
+  const newChartData = {...data.formData, prevFormData: prev.splice(0, prev.length - 1)};
+  console.log('newChartData =========>', newChartData)
   dispatch(saveSliceState(newChartData, chartId));
 
   dispatch(
@@ -635,6 +657,7 @@ export const revertChartState = chartId => (dispatch, getState) => {
 };
 
 export const DD = 'DD';
+
 export function postDDChartFormData(payload, key) {
   return {
     type: DD,
@@ -642,11 +665,12 @@ export function postDDChartFormData(payload, key) {
     key,
   };
 }
+
 export function drilldownToChart(chartKey, toChartKey, dashboardId, filters) {
   return (dispatch, getState) => {
     dispatch(saveChartState(chartKey));
 
-    console.log('getState().charts ', getState().charts )
+    console.log('getState().charts ', getState().charts)
     const newChart = (getState().charts || {})[toChartKey];
     const currentChart = (getState().charts || {})[chartKey];
     const timeout =
@@ -655,7 +679,10 @@ export function drilldownToChart(chartKey, toChartKey, dashboardId, filters) {
     //TODO уточнить на бэке в какой фильтр добавлять
     // const newFormData = {...fd, extra_filters: [...fd.extra_filters, ...filters] };
     console.log('fd ===========>', fd)
-    const newFormData = {...fd, extra_form_data: {...fd.extra_form_data, filters: [...fd.extra_form_data.filters, ...filters]} };
+    const newFormData = {
+      ...fd,
+      extra_form_data: {...(fd.extra_form_data || {}), filters: [...(fd.extra_form_data.filters || []), ...(filters || [])]}
+    };
     // const prevFD = fd
     dispatch(
       postChartFormData(
@@ -702,7 +729,7 @@ export const getDatasourceSamples = async (
     const clientError = await getClientErrorObject(err);
     throw new Error(
       clientError.message || clientError.error || t('Sorry, an error occurred'),
-      { cause: err },
+      {cause: err},
     );
   }
 };

@@ -5924,7 +5924,8 @@
       "year": ["год"],
       "zoom area": [""],
       "Drill to chart by": ["Перейти на отчет"],
-      "Drill to chart: %s": ["Перейти на отчет: "]
+      "Drill to chart: %s": ["Перейти на отчет: "],
+      "go back'": ["Назад"]
     }
   }
 }

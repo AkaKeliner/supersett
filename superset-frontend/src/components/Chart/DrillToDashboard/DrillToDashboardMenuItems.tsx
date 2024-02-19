@@ -1,4 +1,4 @@
-import React, {ReactNode, useContext, useMemo} from 'react';
+import React, {ReactNode, useMemo} from 'react';
 import {
   BinaryQueryObjectFilterClause,
   css,
@@ -68,6 +68,8 @@ const DrillToDashboardMenuItems = ({
     try {
       // const dashboardId = filter.url;
       //ToDO Тестовый фильтр для инфопанели
+
+      // @ts-ignore
       const testFilter = {
         id: "NATIVE_FILTER-7p4ZcGPbt",
         controlValues: {
