@@ -18,12 +18,15 @@ import contextlib
 import logging
 from abc import ABC
 from typing import Any, cast, Optional
-
+from superset.extensions import db
+from sqlalchemy.orm import subqueryload
 import simplejson as json
 from flask import request
 from flask_babel import lazy_gettext as _
 from sqlalchemy.exc import SQLAlchemyError
-
+from superset.models.slice import Slice
+from superset.connectors.sqla.models import SqlaTable
+from superset.models.dashboard import Dashboard
 from superset.commands.base import BaseCommand
 from superset.commands.explore.form_data.get import GetFormDataCommand
 from superset.commands.explore.form_data.parameters import (
@@ -87,9 +90,9 @@ class GetExploreCommand(BaseCommand, ABC):
                         "Form data not found in cache, reverting to chart metadata."
                     )
             elif self._datasource_id:
-                initial_form_data[
-                    "datasource"
-                ] = f"{self._datasource_id}__{self._datasource_type}"
+                initial_form_data["datasource"] = (
+                    f"{self._datasource_id}__{self._datasource_type}"
+                )
                 if self._form_data_key:
                     message = _(
                         "Form data not found in cache, reverting to dataset metadata."
@@ -146,7 +149,17 @@ class GetExploreCommand(BaseCommand, ABC):
             message = "SQLAlchemy error"
 
         metadata = None
+        datasource_id = form_data.get("datasource")
+        if datasource_id:
+            datasource_id = datasource_id.split("_")[0]
 
+        try:
+            slices_data, dashboards_data = self.find_slices_and_dashboards_for_table(
+                datasource_id
+            )
+        except Exception as e:
+            slices_data, dashboards_data = [], []
+            logging.error(e)
         if slc:
             metadata = {
                 "created_on_humanized": slc.created_on_humanized,
@@ -168,7 +181,46 @@ class GetExploreCommand(BaseCommand, ABC):
             "slice": slc.data if slc else None,
             "message": message,
             "metadata": metadata,
+            "slices_data": slices_data,
+            "dashboards_data": dashboards_data,
         }
 
     def validate(self) -> None:
         pass
+
+    def find_slices_and_dashboards_for_table(
+        self,
+        table_id: int,
+    ) -> tuple[list[Slice], list[Dashboard]]:
+        # Найти все срезы, связанные с таблицей
+        slices = (
+            db.session.query(Slice)
+            .join(Slice.table)
+            .filter(SqlaTable.id == int(table_id) - 1)
+            .options(subqueryload(Slice.dashboards))
+            .all()
+        )
+        slices_data = [slice.data for slice in slices]
+
+        # Собрать все панели управления, связанные со срезами
+        dashboards = []
+        for slice_ in slices:
+            if slice_.dashboards not in dashboards:
+                dashboards.append(slice_.dashboards)
+
+        dashboards_data = [
+            dashboard.data
+            for instrumentedlist in dashboards
+            for dashboard in instrumentedlist
+        ]
+
+        return slices_data, dashboards_data
+        # table = db.session.query(SqlaTable).all()
+        # return table
+        #
+        # # Собрать все панели управления, связанные со срезами
+        # dashboards = []
+        # for slice_ in slices:
+        #     dashboards.extend(slice_.dashboards)
+        #
+        # return slices, dashboards
