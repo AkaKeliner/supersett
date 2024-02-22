@@ -359,7 +359,7 @@ LANGUAGES = {
 # Turning off i18n by default as translation in most languages are
 # incomplete and not well maintained.
 
-
+DATE_FORMATS = ['smart_date', '%Y-%m-%d', '%d.%m.%Y', '%d/%m/%Y', '%m/%d/%Y', '%d-%m-%Y', '%H:%M:%S']
 # Override the default d3 locale format
 # Default values are equivalent to
 # D3_FORMAT = {
