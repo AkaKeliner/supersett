@@ -671,6 +671,15 @@ export function drilldownToChart(chartKey, toChartKey, dashboardId, filters) {
   return (dispatch, getState) => {
     dispatch(saveChartState(chartKey));
 
+    //тестовый запрос
+    // fetch(`http://localhost:8088/api/v1/chart/${chartKey}/data/`)
+    //   .then((response) => {
+    //     return response.json();
+    //   })
+    //   .then((data) => {
+    //     console.log(data);
+    //   });
+
     // TODO нужно запросить formData для нового chart по его id
     // сейчас newChart - неправильно находится
     const newChart = (getState().charts || {})[toChartKey];

@@ -130,7 +130,8 @@ export const DashboardPage: FC<PageProps> = ({ idOrSlug }: PageProps) => {
       const permalinkKey = getUrlParam(URL_PARAMS.permalinkKey);
       const nativeFilterKeyValue = getUrlParam(URL_PARAMS.nativeFiltersKey);
       const isOldRison = getUrlParam(URL_PARAMS.nativeFilters);
-
+      console.log('nativeFilterKeyValue', nativeFilterKeyValue)
+      console.log('isOldRison', isOldRison)
       let dataMask = nativeFilterKeyValue || {};
       // activeTabs is initialized with undefined so that it doesn't override
       // the currently stored value when hydrating
@@ -142,6 +143,7 @@ export const DashboardPage: FC<PageProps> = ({ idOrSlug }: PageProps) => {
         }
       } else if (nativeFilterKeyValue) {
         dataMask = await getFilterValue(id, nativeFilterKeyValue);
+        console.log('dataMask', dataMask)
       }
       if (isOldRison) {
         dataMask = isOldRison;
