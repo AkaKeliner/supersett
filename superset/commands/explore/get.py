@@ -196,7 +196,7 @@ class GetExploreCommand(BaseCommand, ABC):
         slices = (
             db.session.query(Slice)
             .join(Slice.table)
-            .filter(SqlaTable.id == int(table_id) - 1)
+            .filter(SqlaTable.id == int(table_id))
             .options(subqueryload(Slice.dashboards))
             .all()
         )
