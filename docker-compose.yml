@@ -54,6 +54,16 @@ services:
     networks:
       - superset
 
+  clickhouse:
+    image: yandex/clickhouse-server:21.11.11.1
+    environment:
+      CLICKHOUSE_USER: admin
+      CLICKHOUSE_PASSWORD: admin
+    ports:
+      - "127.0.0.1:8123:8123"
+    volumes:
+      - ./clickhouse_data:/var/lib/clickhouse/data/
+
 
   db:
     env_file: docker/.env
