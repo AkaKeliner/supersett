@@ -105,6 +105,7 @@ export default class URLDrilldownControl extends React.Component {
   onChangeType = (index, type) => {
     if (type && this.props.value[index].type !== type) {
       this.props.value[index].url = null;
+      console.log('this.props', this.props)
       this.setState({
         availableObjects: this.props?.datasource?.[type].map(o => ({
           label: type === 'slices' ? o.slice_name : o.dashboard_title,

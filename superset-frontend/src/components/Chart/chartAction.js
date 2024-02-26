@@ -616,7 +616,6 @@ export function saveSliceState(payload, key) {
 }
 
 export const saveChartState = chartId => (dispatch, getState) => {
-  debugger
 const id = chartId
   const {charts} = getState();
   const currentChartData = (charts[chartId] || {});
@@ -667,19 +666,32 @@ export function postDDChartFormData(payload, key) {
   };
 }
 
-export function drilldownToChart(chartKey, toChartKey, dashboardId, filters) {
-  return (dispatch, getState) => {
+export function drilldownToChart (chartKey, toChartKey, dashboardId, filters) {
+  return async (dispatch, getState) => {
     dispatch(saveChartState(chartKey));
+    // тестовый запрос
 
-    //тестовый запрос
-    // fetch(`http://localhost:8088/api/v1/chart/${chartKey}/data/`)
-    //   .then((response) => {
-    //     return response.json();
+    fetch(`http://localhost:8088/api/v1/chart/${toChartKey}/data/`)
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        console.log('data ===========>', data)
+
+      });
+    // const fetchFormDataByChartId = async (id) => {
+    //   return await new Promise((resolve, reject) => {
+    //     $.getJSON(`http://localhost:8088/api/v1/chart/${id}/data/`, (data) => {
+    //       console.log('data =======Ю', data)
+    //       resolve(data);
+    //     }).fail((jqXHR, textStatus, errorThrown) => {
+    //       reject(errorThrown);
+    //     });
     //   })
-    //   .then((data) => {
-    //     console.log(data);
-    //   });
+    // }
 
+
+    // const newFormData_0 = fetchFormDataByChartId(toChartKey);
     // TODO нужно запросить formData для нового chart по его id
     // сейчас newChart - неправильно находится
     const newChart = (getState().charts || {})[toChartKey];
@@ -695,7 +707,12 @@ export function drilldownToChart(chartKey, toChartKey, dashboardId, filters) {
     console.log('fd ===========>', fd)
     const newFormData = {
       ...fd,
-      extra_form_data: {...(fd.extra_form_data || {}), filters: [...(fd.extra_form_data.filters || []), ...(filters || [])]}
+      extra_form_data: { ...(fd.extra_form_data || {}),
+        filters: [
+          ...(fd.extra_form_data.filters || []),
+          ...(filters || [])
+        ]
+      }
     };
     console.log('newFormData ', newFormData)
     dispatch(

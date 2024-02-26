@@ -66,7 +66,6 @@ const DrillToDashboardMenuItems = ({
         const url = queryString(location.search);
         const hid = url.hid || shortid.generate();
         const hidIndex = Number.parseInt(url.hid_index) || 0;
-        debugger
         console.log('filter', filter);
 
 
