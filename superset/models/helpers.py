@@ -98,7 +98,6 @@ if TYPE_CHECKING:
     from superset.db_engine_specs import BaseEngineSpec
     from superset.models.core import Database
 
-
 config = app.config
 logger = logging.getLogger(__name__)
 
@@ -265,7 +264,7 @@ class ImportExportMixin:
         new_children = {c: dict_rep[c] for c in cls.export_children if c in dict_rep}
         unique_constraints = cls._unique_constraints()
 
-        filters = []  # Using these filters to check if obj already exists
+        filters = []  # Using these filters to checksqla_col if obj already exists
 
         # Remove fields that should not get imported
         for k in list(dict_rep):
@@ -1023,7 +1022,7 @@ class ExploreMixin:  # pylint: disable=too-many-public-methods
                         _("Db engine did not return all queried columns")
                     )
                 if len(df.columns) > len(labels_expected):
-                    df = df.iloc[:, 0 : len(labels_expected)]
+                    df = df.iloc[:, 0: len(labels_expected)]
                 df.columns = labels_expected
             return df
 
@@ -1188,9 +1187,9 @@ class ExploreMixin:  # pylint: disable=too-many-public-methods
                     target_generic_type == utils.GenericDataType.NUMERIC
                     and operator
                     not in {
-                        utils.FilterOperator.ILIKE,
-                        utils.FilterOperator.LIKE,
-                    }
+                    utils.FilterOperator.ILIKE,
+                    utils.FilterOperator.LIKE,
+                }
                 ):
                     # For backwards compatibility and edge cases
                     # where a column data type might have changed
@@ -1427,7 +1426,8 @@ class ExploreMixin:  # pylint: disable=too-many-public-methods
         col = self.make_sqla_column_compatible(col, label)
         return col
 
-    def get_sqla_query(  # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,too-many-statements
+    def get_sqla_query(
+        # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,too-many-statements
         self,
         apply_fetch_values_predicate: bool = False,
         columns: Optional[list[Column]] = None,
@@ -1728,18 +1728,16 @@ class ExploreMixin:  # pylint: disable=too-many-public-methods
             select_exprs = remove_duplicates(select_exprs + orderby_exprs)
 
         qry = sa.select(select_exprs)
-
         tbl, cte = self.get_from_clause(template_processor)
 
         if groupby_all_columns:
             qry = qry.group_by(*groupby_all_columns.values())
 
-        where_clause_and = []
         having_clause_and = []
 
-        for flt in filter:  # type: ignore
+        def build_condition(flt):
             if not all(flt.get(s) for s in ["col", "op"]):
-                continue
+                return
             flt_col = flt["col"]
             val = flt.get("val")
             flt_grain = flt.get("grain")
@@ -1754,14 +1752,14 @@ class ExploreMixin:  # pylint: disable=too-many-public-methods
                     applied_adhoc_filters_columns.append(flt_col)
                 except ColumnNotFoundException:
                     rejected_adhoc_filters_columns.append(flt_col)
-                    continue
+                    return
             else:
                 col_obj = columns_by_name.get(cast(str, flt_col))
             filter_grain = flt.get("grain")
 
             if get_column_name(flt_col) in removed_filters:
                 # Skip generating SQLA filter when the jinja template handles it.
-                continue
+                return
 
             if col_obj or sqla_col is not None:
                 if sqla_col is not None:
@@ -1798,8 +1796,8 @@ class ExploreMixin:  # pylint: disable=too-many-public-methods
                 if (
                     col_advanced_data_type != ""
                     and feature_flag_manager.is_feature_enabled(
-                        "ENABLE_ADVANCED_DATA_TYPES"
-                    )
+                    "ENABLE_ADVANCED_DATA_TYPES"
+                )
                     and col_advanced_data_type in ADVANCED_DATA_TYPES
                 ):
                     values = eq if is_list_target else [eq]  # type: ignore
@@ -1816,11 +1814,10 @@ class ExploreMixin:  # pylint: disable=too-many-public-methods
                             _(bus_resp["error_message"])
                         )
 
-                    where_clause_and.append(
-                        ADVANCED_DATA_TYPES[col_advanced_data_type].translate_filter(
-                            sqla_col, op, bus_resp["values"]
-                        )
+                    cond = ADVANCED_DATA_TYPES[col_advanced_data_type].translate_filter(
+                        sqla_col, op, bus_resp["values"]
                     )
+
                 elif is_list_target:
                     assert isinstance(eq, (tuple, list))
                     if len(eq) == 0:
@@ -1839,22 +1836,21 @@ class ExploreMixin:  # pylint: disable=too-many-public-methods
                         cond = sqla_col.in_(eq)
                     if op == utils.FilterOperator.NOT_IN.value:
                         cond = ~cond
-                    where_clause_and.append(cond)
                 elif op == utils.FilterOperator.IS_NULL.value:
-                    where_clause_and.append(sqla_col.is_(None))
+                    cond = sqla_col.is_(None)
                 elif op == utils.FilterOperator.IS_NOT_NULL.value:
-                    where_clause_and.append(sqla_col.isnot(None))
+                    cond = sqla_col.isnot(None)
                 elif op == utils.FilterOperator.IS_TRUE.value:
-                    where_clause_and.append(sqla_col.is_(True))
+                    cond = sqla_col.is_(True)
                 elif op == utils.FilterOperator.IS_FALSE.value:
-                    where_clause_and.append(sqla_col.is_(False))
+                    cond = sqla_col.is_(False)
                 else:
                     if (
                         op
                         not in {
-                            utils.FilterOperator.EQUALS.value,
-                            utils.FilterOperator.NOT_EQUALS.value,
-                        }
+                        utils.FilterOperator.EQUALS.value,
+                        utils.FilterOperator.NOT_EQUALS.value,
+                    }
                         and eq is None
                     ):
                         raise QueryObjectValidationError(
@@ -1864,17 +1860,17 @@ class ExploreMixin:  # pylint: disable=too-many-public-methods
                             )
                         )
                     if op == utils.FilterOperator.EQUALS.value:
-                        where_clause_and.append(sqla_col == eq)
+                        cond = sqla_col == eq
                     elif op == utils.FilterOperator.NOT_EQUALS.value:
-                        where_clause_and.append(sqla_col != eq)
+                        cond = sqla_col != eq
                     elif op == utils.FilterOperator.GREATER_THAN.value:
-                        where_clause_and.append(sqla_col > eq)
+                        cond = sqla_col > eq
                     elif op == utils.FilterOperator.LESS_THAN.value:
-                        where_clause_and.append(sqla_col < eq)
+                        cond = sqla_col < eq
                     elif op == utils.FilterOperator.GREATER_THAN_OR_EQUALS.value:
-                        where_clause_and.append(sqla_col >= eq)
+                        cond = sqla_col >= eq
                     elif op == utils.FilterOperator.LESS_THAN_OR_EQUALS.value:
-                        where_clause_and.append(sqla_col <= eq)
+                        cond = sqla_col <= eq
                     elif op in {
                         utils.FilterOperator.ILIKE.value,
                         utils.FilterOperator.LIKE.value,
@@ -1883,9 +1879,9 @@ class ExploreMixin:  # pylint: disable=too-many-public-methods
                             sqla_col = sa.cast(sqla_col, sa.String)
 
                         if op == utils.FilterOperator.LIKE.value:
-                            where_clause_and.append(sqla_col.like(eq))
+                            cond = sqla_col.like(eq)
                         else:
-                            where_clause_and.append(sqla_col.ilike(eq))
+                            cond = sqla_col.ilike(eq)
                     elif (
                         op == utils.FilterOperator.TEMPORAL_RANGE.value
                         and isinstance(eq, str)
@@ -1896,21 +1892,48 @@ class ExploreMixin:  # pylint: disable=too-many-public-methods
                             time_shift=time_shift,
                             extras=extras,
                         )
-                        where_clause_and.append(
-                            self.get_time_filter(
-                                time_col=col_obj,
-                                start_dttm=_since,
-                                end_dttm=_until,
-                                time_grain=flt_grain,
-                                label=sqla_col.key,
-                                template_processor=template_processor,
-                            )
+                        cond = self.get_time_filter(
+                            time_col=col_obj,
+                            start_dttm=_since,
+                            end_dttm=_until,
+                            time_grain=flt_grain,
+                            label=sqla_col.key,
+                            template_processor=template_processor,
                         )
                     else:
                         raise QueryObjectValidationError(
                             _("Invalid filter operation type: %(op)s", op=op)
                         )
-        where_clause_and += self.get_sqla_row_level_filters(template_processor)
+            return cond
+
+        def build_filter(filter):
+            prev_operation = None
+            where = None
+
+            for flt in filter:  # type: ignore
+                if flt.get('children'):
+                    cond = build_filter(flt.get('children'))
+                else:
+                    cond = build_condition(flt)
+                    if cond is None:
+                        continue
+
+                if where is None:
+                    where = cond
+                else:
+                    if not prev_operation or prev_operation == 'and':
+                        where = where & cond
+                    else:
+                        where = where | (cond)
+
+                prev_operation = flt.get('conjuction')
+
+            return where
+
+        where_clause = build_filter(filter)
+        where_extras = []
+        sqla_row_level_filters = self.get_sqla_row_level_filters(template_processor)
+        qry = qry.where(*sqla_row_level_filters)
         if extras:
             where = extras.get("where")
             if where:
@@ -1929,7 +1952,7 @@ class ExploreMixin:  # pylint: disable=too-many-public-methods
                     schema=self.schema,
                     template_processor=template_processor,
                 )
-                where_clause_and += [self.text(where)]
+                where_extras = [sa.text('({})'.format(where))]
             having = extras.get("having")
             if having:
                 try:
@@ -1949,14 +1972,18 @@ class ExploreMixin:  # pylint: disable=too-many-public-methods
                 )
                 having_clause_and += [self.text(having)]
 
+        if where_extras:
+            qry = qry.where(*where_extras)
+
         if apply_fetch_values_predicate and self.fetch_values_predicate:
             qry = qry.where(
                 self.get_fetch_values_predicate(template_processor=template_processor)
             )
         if granularity:
-            qry = qry.where(and_(*(time_filters + where_clause_and)))
-        else:
-            qry = qry.where(and_(*where_clause_and))
+            qry = qry.where(*(time_filters))
+        if where_clause is not None:
+            qry = qry.where(where_clause)
+
         qry = qry.having(and_(*having_clause_and))
 
         self.make_orderby_compatible(select_exprs, orderby_exprs)
@@ -2011,7 +2038,9 @@ class ExploreMixin:  # pylint: disable=too-many-public-methods
                             template_processor=template_processor,
                         )
                     ]
-                subq = subq.where(and_(*(where_clause_and + inner_time_filter)))
+                subq = subq.where(*[inner_time_filter])
+                if where_clause is not None:
+                    subq = subq.where(where_clause)
                 subq = subq.group_by(*inner_groupby_exprs)
 
                 ob = inner_main_metric_expr
@@ -2078,7 +2107,6 @@ class ExploreMixin:  # pylint: disable=too-many-public-methods
                 qry = qry.where(top_groups)
 
         qry = qry.select_from(tbl)
-
         if is_rowcount:
             if not db_engine_spec.allows_subqueries:
                 raise QueryObjectValidationError(
@@ -2091,21 +2119,22 @@ class ExploreMixin:  # pylint: disable=too-many-public-methods
 
         filter_columns = [flt.get("col") for flt in filter] if filter else []
         rejected_filter_columns = [
-            col
-            for col in filter_columns
-            if col
-            and not is_adhoc_column(col)
-            and col not in self.column_names
-            and col not in applied_template_filters
-        ] + rejected_adhoc_filters_columns
+                                      col
+                                      for col in filter_columns
+                                      if col
+                                         and not is_adhoc_column(col)
+                                         and col not in self.column_names
+                                         and col not in applied_template_filters
+                                  ] + rejected_adhoc_filters_columns
 
         applied_filter_columns = [
-            col
-            for col in filter_columns
-            if col
-            and not is_adhoc_column(col)
-            and (col in self.column_names or col in applied_template_filters)
-        ] + applied_adhoc_filters_columns
+                                     col
+                                     for col in filter_columns
+                                     if col
+                                        and not is_adhoc_column(col)
+                                        and (
+                                            col in self.column_names or col in applied_template_filters)
+                                 ] + applied_adhoc_filters_columns
 
         return SqlaQuery(
             applied_template_filters=applied_template_filters,
