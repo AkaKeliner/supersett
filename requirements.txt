@@ -682,3 +682,5 @@ tzlocal==4.3
     # via trino
 websocket-client==1.5.1
     # via docker
+clickhouse-connect==0.3.0
+    # via clickhouse
