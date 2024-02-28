@@ -203,9 +203,7 @@
     "use-event-callback": "^0.1.0",
     "use-immer": "^0.8.1",
     "use-query-params": "^1.1.9",
-    "yargs": "^15.4.1",
-    "html2canvas" : "^1.4.1",
-    "canvg" : "^4.0.1"
+    "yargs": "^15.4.1"
   },
   "devDependencies": {
     "@applitools/eyes-storybook": "^3.30.1",
@@ -343,9 +341,7 @@
     "webpack-cli": "^4.10.0",
     "webpack-dev-server": "^4.15.1",
     "webpack-manifest-plugin": "^4.1.1",
-    "webpack-sources": "^3.2.3",
-    "html2canvas" : "^1.4.1",
-    "canvg" : "^4.0.1"
+    "webpack-sources": "^3.2.3"
   },
   "engines": {
     "node": "^16.20.2",
