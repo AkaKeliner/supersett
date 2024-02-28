@@ -55,7 +55,7 @@ services:
     networks:
       - superset
 
- clickhouse:
+  clickhouse:
     image: yandex/clickhouse-server:21.11.11.1
     command: bash -c "chown -R 1000:1000 /var/lib/clickhouse && /entrypoint.sh"
 #    entrypoint: ["chown", "-R", "1000:1000", "/var/lib/clickhouse"]
