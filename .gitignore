@@ -91,6 +91,7 @@ venv
 .run
 
 # Test data
+clickhouse_data/
 celery_results.sqlite
 celerybeat-schedule
 celerydb.sqlite

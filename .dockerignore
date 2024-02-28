@@ -44,4 +44,5 @@ superset-frontend/cypress-base/
 superset-frontend/coverage/
 superset/static/assets/
 superset-websocket/dist/
+clickhouse_data/
 venv
