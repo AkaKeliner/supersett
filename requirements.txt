@@ -670,6 +670,8 @@ rfc3339-validator==0.1.4
     # via openapi-schema-validator
 sqlalchemy-bigquery==1.6.1
     # via apache-superset
+sqlalchemy_mptt==0.2.5
+    # via apache-superset
 statsd==4.0.1
     # via -r requirements/testing.in
 tqdm==4.65.0
