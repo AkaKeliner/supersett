@@ -43,9 +43,11 @@ import { Menu } from 'src/components/Menu';
 import { AntdDropdown as Dropdown } from 'src/components/index';
 import { updateDataMask } from 'src/dataMask/actions';
 import { DrillDetailMenuItems } from '../DrillDetail';
+import { DrillToChartMenuItems } from '../DrillToChart';
 import { getMenuAdjustedY } from '../utils';
 import { MenuItemTooltip } from '../DisabledMenuItemTooltip';
 import { DrillByMenuItems } from '../DrillBy/DrillByMenuItems';
+import { DrillToDashboardMenuItems } from '../DrillToDashboard';
 
 export enum ContextMenuItem {
   CrossFilter,
@@ -240,6 +242,36 @@ const ChartContextMenu = (
         contextMenuY={clientY}
         submenuIndex={submenuIndex}
         {...(additionalConfig?.drillBy || {})}
+      />,
+    );
+  }
+  if (filters?.drillToCharts) {
+    menuItems.push(
+      <DrillToChartMenuItems
+        drillToChart={filters.drillToCharts}
+        // drillToDashboards={filters.drillToDashboards}
+        formData={formData}
+        filters={filters?.drillToDetail}
+        isContextMenu
+        contextMenuY={clientY}
+        onSelection={onSelection}
+        submenuIndex={showCrossFilters ? 2 : 1}
+        {...(additionalConfig?.drillToDetail || {})}
+      />,
+    );
+  }
+  if (filters?.drillToDashboards) {
+    menuItems.push(
+      <DrillToDashboardMenuItems
+        // drillToChart={filters.drillToCharts}
+        drillToDashboards={filters.drillToDashboards}
+        formData={formData}
+        filters={filters?.drillToDetail}
+        isContextMenu
+        contextMenuY={clientY}
+        onSelection={onSelection}
+        submenuIndex={showCrossFilters ? 2 : 1}
+        {...(additionalConfig?.drillToDetail || {})}
       />,
     );
   }

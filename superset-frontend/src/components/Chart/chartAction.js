@@ -45,6 +45,7 @@ import { waitForAsyncData } from 'src/middleware/asyncEvent';
 import { safeStringify } from 'src/utils/safeStringify';
 
 export const CHART_UPDATE_STARTED = 'CHART_UPDATE_STARTED';
+
 export function chartUpdateStarted(queryController, latestQueryFormData, key) {
   return {
     type: CHART_UPDATE_STARTED,
@@ -55,46 +56,55 @@ export function chartUpdateStarted(queryController, latestQueryFormData, key) {
 }
 
 export const CHART_UPDATE_SUCCEEDED = 'CHART_UPDATE_SUCCEEDED';
+
 export function chartUpdateSucceeded(queriesResponse, key) {
   return { type: CHART_UPDATE_SUCCEEDED, queriesResponse, key };
 }
 
 export const CHART_UPDATE_STOPPED = 'CHART_UPDATE_STOPPED';
+
 export function chartUpdateStopped(key) {
   return { type: CHART_UPDATE_STOPPED, key };
 }
 
 export const CHART_UPDATE_FAILED = 'CHART_UPDATE_FAILED';
+
 export function chartUpdateFailed(queriesResponse, key) {
   return { type: CHART_UPDATE_FAILED, queriesResponse, key };
 }
 
 export const CHART_RENDERING_FAILED = 'CHART_RENDERING_FAILED';
+
 export function chartRenderingFailed(error, key, stackTrace) {
   return { type: CHART_RENDERING_FAILED, error, key, stackTrace };
 }
 
 export const CHART_RENDERING_SUCCEEDED = 'CHART_RENDERING_SUCCEEDED';
+
 export function chartRenderingSucceeded(key) {
   return { type: CHART_RENDERING_SUCCEEDED, key };
 }
 
 export const REMOVE_CHART = 'REMOVE_CHART';
+
 export function removeChart(key) {
   return { type: REMOVE_CHART, key };
 }
 
 export const ANNOTATION_QUERY_SUCCESS = 'ANNOTATION_QUERY_SUCCESS';
+
 export function annotationQuerySuccess(annotation, queryResponse, key) {
   return { type: ANNOTATION_QUERY_SUCCESS, annotation, queryResponse, key };
 }
 
 export const ANNOTATION_QUERY_STARTED = 'ANNOTATION_QUERY_STARTED';
+
 export function annotationQueryStarted(annotation, queryController, key) {
   return { type: ANNOTATION_QUERY_STARTED, annotation, queryController, key };
 }
 
 export const ANNOTATION_QUERY_FAILED = 'ANNOTATION_QUERY_FAILED';
+
 export function annotationQueryFailed(annotation, queryResponse, key) {
   return { type: ANNOTATION_QUERY_FAILED, annotation, queryResponse, key };
 }
@@ -343,17 +353,20 @@ export function runAnnotationQuery({
 }
 
 export const TRIGGER_QUERY = 'TRIGGER_QUERY';
+
 export function triggerQuery(value = true, key) {
   return { type: TRIGGER_QUERY, value, key };
 }
 
 // this action is used for forced re-render without fetch data
 export const RENDER_TRIGGERED = 'RENDER_TRIGGERED';
+
 export function renderTriggered(value, key) {
   return { type: RENDER_TRIGGERED, value, key };
 }
 
 export const UPDATE_QUERY_FORM_DATA = 'UPDATE_QUERY_FORM_DATA';
+
 export function updateQueryFormData(value, key) {
   return { type: UPDATE_QUERY_FORM_DATA, value, key };
 }
@@ -361,11 +374,13 @@ export function updateQueryFormData(value, key) {
 // in the sql lab -> explore flow, user can inline edit chart title,
 // then the chart will be assigned a new slice_id
 export const UPDATE_CHART_ID = 'UPDATE_CHART_ID';
+
 export function updateChartId(newId, key = 0) {
   return { type: UPDATE_CHART_ID, newId, key };
 }
 
 export const ADD_CHART = 'ADD_CHART';
+
 export function addChart(chart, key) {
   return { type: ADD_CHART, chart, key };
 }
@@ -514,6 +529,7 @@ export function exploreJSON(
 }
 
 export const POST_CHART_FORM_DATA = 'POST_CHART_FORM_DATA';
+
 export function postChartFormData(
   formData,
   force = false,
@@ -521,8 +537,17 @@ export function postChartFormData(
   key,
   dashboardId,
   ownState,
+  isDD,
 ) {
-  return exploreJSON(formData, force, timeout, key, dashboardId, ownState);
+  return exploreJSON(
+    formData,
+    force,
+    timeout,
+    key,
+    dashboardId,
+    ownState,
+    isDD,
+  );
 }
 
 export function redirectSQLLab(formData, history) {
@@ -573,6 +598,117 @@ export function refreshChart(chartKey, force, dashboardId) {
         chart.id,
         dashboardId,
         getState().dataMask[chart.id]?.ownState,
+      ),
+    );
+  };
+}
+
+export const SAVE_SLICE_STATE = 'SAVE_SLICE_STATE';
+
+export function saveSliceState(payload, key) {
+  return {
+    type: SAVE_SLICE_STATE,
+    payload,
+    key,
+  };
+}
+
+export const saveChartState = chartId => (dispatch, getState) => {
+  // const id = chartId;
+  const { charts } = getState();
+  const currentChartData = charts[chartId] || {};
+  const prevFormData = {
+    formData: currentChartData?.latestQueryFormData,
+    filters: [...(currentChartData?.latestQueryFormData?.filters || [])],
+    groupby: [...(currentChartData?.latestQueryFormData?.groupby || [])],
+    // columns: [...(action.payload.latestQueryFormData.columns || [])],
+  };
+  const prev = [prevFormData, ...(currentChartData?.prevFormData || [])];
+  const newChartData = { ...currentChartData, prevFormData: prev };
+  dispatch(saveSliceState(newChartData, chartId));
+};
+export const revertChartState = chartId => (dispatch, getState) => {
+  const timeout =
+    getState().dashboardInfo.common.conf.SUPERSET_WEBSERVER_TIMEOUT;
+  const { charts } = getState();
+  const currentChartData = charts[chartId];
+  const prev = [...(currentChartData?.prevFormData || [])];
+  const data = prev[prev.length - 1] || {};
+  const newChartData = {
+    ...data.formData,
+    prevFormData: prev.splice(0, prev.length - 1),
+  };
+  dispatch(saveSliceState(newChartData, chartId));
+
+  dispatch(
+    postChartFormData(
+      newChartData,
+      false,
+      timeout,
+      newChartData.slice_id,
+      newChartData.dashboardId,
+      getState().dataMask[newChartData.slice_id]?.ownState,
+      true,
+    ),
+  );
+};
+
+export const DD = 'DD';
+export function postDDChartFormData(payload, key) {
+  return {
+    type: DD,
+    payload,
+    key,
+  };
+}
+
+export function drilldownToChart(chartKey, toChartKey, dashboardId, filters) {
+  return async (dispatch, getState) => {
+    dispatch(saveChartState(chartKey));
+    // тестовый запрос
+
+    fetch(`http://localhost:8088/api/v1/chart/${toChartKey}/data/`).then(
+      response => response.json(),
+    );
+    // .then(data => {});
+    // const fetchFormDataByChartId = async (id) => {
+    //   return await new Promise((resolve, reject) => {
+    //     $.getJSON(`http://localhost:8088/api/v1/chart/${id}/data/`, (data) => {
+    //       resolve(data);
+    //     }).fail((jqXHR, textStatus, errorThrown) => {
+    //       reject(errorThrown);
+    //     });
+    //   })
+    // }
+
+    // const newFormData_0 = fetchFormDataByChartId(toChartKey);
+    // TODO нужно запросить formData для нового chart по его id
+    // сейчас newChart - неправильно находится
+    const newChart = (getState().charts || {})[toChartKey];
+
+    const currentChart = (getState().charts || {})[chartKey];
+    const timeout =
+      getState().dashboardInfo.common.conf.SUPERSET_WEBSERVER_TIMEOUT;
+    const fd = newChart.latestQueryFormData;
+    // TODO уточнить на бэке в какой фильтр добавлять
+    // const newFormData = {...fd, extra_filters: [...fd.extra_filters, ...filters] };
+    const newFormData = {
+      ...fd,
+      extra_form_data: {
+        ...(fd.extra_form_data || {}),
+        filters: [...(fd.extra_form_data.filters || []), ...(filters || [])],
+      },
+    };
+
+    dispatch(
+      postChartFormData(
+        newFormData,
+        false,
+        timeout,
+        currentChart.id,
+        dashboardId,
+        getState().dataMask[newChart.id]?.ownState,
+        true,
       ),
     );
   };

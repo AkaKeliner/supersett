@@ -1,0 +1,133 @@
+x-superset-image: &superset-image registry.zdrav.netrika.ru:443/new-superset:${TAG:-latest-dev}
+x-superset-user: &superset-user root
+x-superset-depends-on: &superset-depends-on
+  - db
+  - redis
+  - clickhouse
+x-superset-volumes: &superset-volumes
+  # /app/pythonpath_docker will be appended to the PYTHONPATH in the final container
+  - ./docker:/app/docker
+  - ./superset:/app/superset
+  - superset_home:/app/superset_home
+  - ./tests:/app/tests
+
+version: "3.7"
+services:
+  redis:
+    image: redis:7
+    container_name: superset_cache
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis:/data
+    networks:
+      - superset
+
+  clickhouse:
+    image: yandex/clickhouse-server:21.11.11.1
+    command: bash -c "chown -R 1000:1000 /var/lib/clickhouse && /entrypoint.sh"
+#    entrypoint: ["chown", "-R", "1000:1000", "/var/lib/clickhouse"]
+    environment:
+      CLICKHOUSE_USER: admin
+      CLICKHOUSE_PASSWORD: admin
+    ports:
+      - "127.0.0.1:8123:8123"
+    volumes:
+      - ./clickhouse_data:/var/lib/clickhouse/data/
+      - ./clickhouse_data/logs:/var/log/clickhouse-server/
+    networks:
+      - superset
+
+
+  db:
+    env_file: docker/.env
+    image: postgres:15
+    container_name: superset_db
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - db_home:/var/lib/postgresql/data
+      - ./docker/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    networks:
+      - superset
+
+
+  superset:
+    env_file: docker/.env
+    build: .
+    image: *superset-image
+    container_name: superset_app
+    command: ["/app/docker/docker-bootstrap.sh", "app"]
+    restart: unless-stopped
+    ports:
+      - 8088:8088
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    user: *superset-user
+    depends_on: *superset-depends-on
+    volumes: *superset-volumes
+    environment:
+      CYPRESS_CONFIG: "${CYPRESS_CONFIG}"
+    networks:
+      - superset
+
+
+  superset-websocket:
+    container_name: superset_websocket
+    build: ./superset-websocket
+    image: superset-websocket
+    ports:
+      - 8080:8080
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - redis
+    # Mount everything in superset-websocket into container and
+    # then exclude node_modules and dist with bogus volume mount.
+    # This is necessary because host and container need to have
+    # their own, separate versions of these files. .dockerignore
+    # does not seem to work when starting the service through
+    # docker compose.
+    #
+    # For example, node_modules may contain libs with native bindings.
+    # Those bindings need to be compiled for each OS and the container
+    # OS is not necessarily the same as host OS.
+    volumes:
+      - ./superset-websocket:/home/superset-websocket
+      - /home/superset-websocket/node_modules
+      - /home/superset-websocket/dist
+    environment:
+      - PORT=8080
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_SSL=false
+    networks:
+      - superset
+
+
+  # superset-init:
+  #   image: *superset-image
+  #   container_name: superset_init
+  #   command: ["/app/docker/docker-init.sh"]
+  #   env_file: docker/.env
+  #   depends_on: *superset-depends-on
+  #   user: *superset-user
+  #   volumes: *superset-volumes
+  #   environment:
+  #     CYPRESS_CONFIG: "${CYPRESS_CONFIG}"
+  #   healthcheck:
+  #     disable: true
+  #   networks:
+  #     - superset
+
+volumes:
+  superset_home:
+    external: false
+  db_home:
+    external: false
+  redis:
+    external: false
+networks:
+  superset:

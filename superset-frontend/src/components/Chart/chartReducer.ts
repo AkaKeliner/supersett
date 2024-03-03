@@ -40,6 +40,7 @@ export const chart: ChartState = {
   queriesResponse: null,
   triggerQuery: true,
   lastRendered: 0,
+  prevFormData: [],
 };
 
 type ChartActionHandler = (state: ChartState) => ChartState;
@@ -130,6 +131,9 @@ export default function chartReducer(
     [actions.UPDATE_QUERY_FORM_DATA](state) {
       return { ...state, latestQueryFormData: action.value };
     },
+    [actions.DD](state) {
+      return { ...state, form_data: action.payload };
+    },
     [actions.ANNOTATION_QUERY_STARTED](state) {
       if (state.annotationQuery?.[action.annotation.name]) {
         state.annotationQuery[action.annotation.name].abort();
@@ -176,6 +180,9 @@ export default function chartReducer(
         annotationError,
         annotationQuery,
       };
+    },
+    [actions.SAVE_SLICE_STATE](state) {
+      return { ...state, ...action.payload };
     },
   };
 

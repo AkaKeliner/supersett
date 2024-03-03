@@ -391,7 +391,8 @@ class ChartDataRestApi(ChartRestApi):
 
         if result_format == ChartDataResultFormat.JSON:
             response_data = simplejson.dumps(
-                {"result": result["queries"]},
+                {"result": result["queries"],
+                 'form_data':form_data},
                 default=json_int_dttm_ser,
                 ignore_nan=True,
             )

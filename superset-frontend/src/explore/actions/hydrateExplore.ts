@@ -52,6 +52,8 @@ enum ColorSchemeType {
 export const HYDRATE_EXPLORE = 'HYDRATE_EXPLORE';
 export const hydrateExplore =
   ({
+    dashboards_data,
+    slices_data,
     form_data,
     slice,
     dataset,
@@ -96,9 +98,11 @@ export const hydrateExplore =
     if (dashboardId) {
       initialFormData.dashboardId = dashboardId;
     }
-
-    const initialDatasource = dataset;
-
+    const initialDatasource = {
+      ...dataset,
+      dashboards: dashboards_data,
+      slices: slices_data,
+    };
     const initialExploreState = {
       form_data: initialFormData,
       slice: initialSlice,
@@ -187,6 +191,7 @@ export const hydrateExplore =
       queriesResponse: null,
       triggerQuery: false,
       lastRendered: 0,
+      prevFormData: [],
     };
 
     return dispatch({

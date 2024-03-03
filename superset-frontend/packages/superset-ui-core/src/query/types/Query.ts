@@ -27,7 +27,7 @@ import {
   QueryFormData,
   QueryFormMetric,
 } from './QueryFormData';
-import { Maybe } from '../../types';
+import { DataRecordValueDD, Maybe } from '../../types';
 import { PostProcessingRule } from './PostProcessing';
 import { JsonObject } from '../../connection';
 import { TimeGranularity } from '../../time-format';
@@ -462,6 +462,13 @@ export enum ContributionType {
 
 export type DatasourceSamplesQuery = {
   filters?: QueryObjectFilterClause[];
+};
+export type DDChart = {
+  url: number;
+  type: string;
+  field: string;
+  title: string;
+  value: DataRecordValueDD | DataRecordValueDD[];
 };
 
 export default {};

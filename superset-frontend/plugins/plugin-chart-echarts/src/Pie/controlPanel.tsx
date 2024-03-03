@@ -51,6 +51,7 @@ const config: ControlPanelConfig = {
       expanded: true,
       controlSetRows: [
         ['groupby'],
+        // ['url_drillDowns'],
         ['metric'],
         ['adhoc_filters'],
         ['row_limit'],

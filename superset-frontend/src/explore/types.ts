@@ -57,6 +57,7 @@ export interface ChartState {
   queryController: AbortController | null;
   queriesResponse: QueryData | null;
   triggerQuery: boolean;
+  prevFormData: Array<any>;
 }
 
 export type OptionSortType = Partial<
@@ -71,6 +72,8 @@ export type Datasource = Dataset & {
 };
 
 export interface ExplorePageInitialData {
+  dashboards_data: Array<any>;
+  slices_data: Array<any>;
   dataset: Dataset;
   form_data: QueryFormData;
   slice: Slice | null;

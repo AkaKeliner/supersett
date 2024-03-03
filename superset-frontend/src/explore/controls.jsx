@@ -464,4 +464,16 @@ export const controls = {
     description: t('The color scheme for rendering chart'),
     schemes: () => categoricalSchemeRegistry.getMap(),
   },
+  url_drillDowns: {
+    type: 'URLDrilldownControl',
+    label: t('URL Drilldowns'),
+    default: [],
+    mapStateToProps(explore) {
+      return {
+        // state,
+        // chart,
+        datasource: explore.datasource,
+      };
+    },
+  },
 };

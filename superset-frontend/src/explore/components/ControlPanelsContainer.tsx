@@ -504,7 +504,10 @@ export const ControlPanelsContainer = (props: ControlPanelsContainerProps) => {
         return true;
       };
     }
-
+    const allProps = {
+      ...restProps,
+      latestQueryFormData: props.chart?.latestQueryFormData,
+    };
     return (
       <Control
         key={`control-${name}`}
@@ -514,7 +517,7 @@ export const ControlPanelsContainer = (props: ControlPanelsContainerProps) => {
         validationErrors={validationErrors}
         actions={props.actions}
         isVisible={isVisible}
-        {...restProps}
+        {...allProps}
       />
     );
   };

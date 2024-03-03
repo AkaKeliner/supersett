@@ -1,3 +1,4 @@
+/* eslint-disable react-prefer-function-component/react-prefer-function-component */
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -143,6 +144,7 @@ class Chart extends React.Component {
     this.setHeaderRef = this.setHeaderRef.bind(this);
     this.getChartHeight = this.getChartHeight.bind(this);
     this.getDescriptionHeight = this.getDescriptionHeight.bind(this);
+    this.revertChartState = this.revertChartState.bind(this);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -358,6 +360,11 @@ class Chart extends React.Component {
     });
   }
 
+  revertChartState(chartId) {
+    // const chartId = '';
+    this.props.revertChartState(chartId);
+  }
+
   forceRefresh() {
     this.props.logEvent(LOG_ACTIONS_FORCE_REFRESH_CHART, {
       slice_id: this.props.slice.slice_id,
@@ -463,6 +470,7 @@ class Chart extends React.Component {
           formData={formData}
           width={width}
           height={this.getHeaderHeight()}
+          revertChartState={this.revertChartState}
         />
 
         {/*

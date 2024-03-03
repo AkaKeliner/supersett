@@ -328,6 +328,17 @@ const currency_format: SharedControlConfig<'CurrencyControl'> = {
   label: t('Currency format'),
   renderTrigger: true,
 };
+const url_drillDowns: SharedControlConfig<'URLDrilldownControl'> = {
+  type: 'URLDrilldownControl',
+  label: t('URL Drilldowns'),
+  renderTrigger: true,
+  mapStateToProps: state => ({
+    datasource: state.datasource,
+    slices: [state.slice],
+    // @ts-ignore
+    dashboards: state.metadata.dashboards,
+  }),
+};
 
 const x_axis_time_format: SharedControlConfig<
   'SelectControl',
@@ -419,4 +430,5 @@ export default {
   show_empty_columns,
   temporal_columns_lookup,
   currency_format,
+  url_drillDowns,
 };

@@ -73,6 +73,7 @@ const MENU_KEYS = {
   VIEW_RESULTS: 'view_results',
   DRILL_TO_DETAIL: 'drill_to_detail',
   CROSS_FILTER_SCOPING: 'cross_filter_scoping',
+  BACK: 'back',
 };
 
 // TODO: replace 3 dots with an icon
@@ -158,7 +159,9 @@ export interface SliceHeaderControlsProps {
   supersetCanCSV?: boolean;
 
   crossFiltersEnabled?: boolean;
+  revertChartState?: (sliceId: number) => void;
 }
+
 type SliceHeaderControlsPropsWithRouter = SliceHeaderControlsProps &
   RouteComponentProps;
 
@@ -250,6 +253,12 @@ const SliceHeaderControls = (props: SliceHeaderControlsPropsWithRouter) => {
   const [openScopingModal, scopingModal] = useCrossFiltersScopingModal(
     props.slice.slice_id,
   );
+  const hasPrevFormData = useSelector(state => {
+    const sliceId = props.slice.slice_id;
+    const chart = sliceId && state.charts[sliceId];
+    const prevFormData = chart?.prevFormData;
+    return !!prevFormData?.length;
+  });
 
   const canEditCrossFilters =
     useSelector<RootState, boolean>(
@@ -274,6 +283,9 @@ const SliceHeaderControls = (props: SliceHeaderControlsPropsWithRouter) => {
     domEvent: MouseEvent<HTMLElement>;
   }) => {
     switch (key) {
+      case MENU_KEYS.BACK:
+        props.revertChartState(slice.slice_id);
+        break;
       case MENU_KEYS.FORCE_REFRESH:
         refreshChart();
         props.addSuccessToast(t('Data refreshed'));
@@ -385,6 +397,16 @@ const SliceHeaderControls = (props: SliceHeaderControlsPropsWithRouter) => {
       selectable={false}
       data-test={`slice_${slice.slice_id}-menu`}
     >
+      {hasPrevFormData && (
+        <Menu.Item
+          key={MENU_KEYS.BACK}
+          style={{ height: 'auto', lineHeight: 'initial' }}
+          data-test="back-chart"
+        >
+          {t('go back')}
+        </Menu.Item>
+      )}
+
       <Menu.Item
         key={MENU_KEYS.FORCE_REFRESH}
         disabled={props.chartStatus === 'loading'}

@@ -48,6 +48,7 @@ import {
   css,
   t,
   tn,
+  DDChart,
 } from '@superset-ui/core';
 
 import { DataColumnMeta, TableChartTransformedProps } from './types';
@@ -238,7 +239,9 @@ export default function TableChart<D extends DataRecord = DataRecord>(
     allowRearrangeColumns = false,
     onContextMenu,
     emitCrossFilters,
+    urlDrillDowns,
   } = props;
+  console.log('urlDrillDowns1', urlDrillDowns);
   const timestampFormatter = useCallback(
     value => getTimeFormatterForGranularity(timeGrain)(value),
     [timeGrain],
@@ -355,7 +358,6 @@ export default function TableChart<D extends DataRecord = DataRecord>(
     },
     [emitCrossFilters, getCrossFilterDataMask, setDataMask],
   );
-
   const getSharedStyle = (column: DataColumnMeta): CSSProperties => {
     const { isNumeric, config = {} } = column;
     const textAlign = config.horizontalAlign
@@ -367,51 +369,69 @@ export default function TableChart<D extends DataRecord = DataRecord>(
       textAlign,
     };
   };
+  const handleContextMenu = !(onContextMenu && !isRawRecords)
+    ? undefined
+    : (
+        value: D,
+        cellPoint: {
+          key: string;
+          value: DataRecordValue;
+          isMetric?: boolean;
+        },
+        clientX: number,
+        clientY: number,
+      ) => {
+        const drillToDetailFilters: BinaryQueryObjectFilterClause[] = [];
+        const ddToCharts: DDChart[] = [];
+        const ddToDashboards: DDChart[] = [];
+        columnsMeta.forEach(col => {
+          if (!col.isMetric) {
+            const dataRecordValue = value[col.key];
+            drillToDetailFilters.push({
+              col: col.key,
+              op: '==',
+              val: dataRecordValue as string | number | boolean,
+              formattedVal: formatColumnValue(col, dataRecordValue)[1],
+            });
+          }
+        });
+        if (urlDrillDowns?.length) {
+          urlDrillDowns.forEach(dd => {
+            if (dd.key === cellPoint.key) {
+              if (dd.type === 'slices') {
+                // @ts-ignore
+                ddToCharts.push({ ...dd, value: cellPoint.value });
+              }
 
-  const handleContextMenu =
-    onContextMenu && !isRawRecords
-      ? (
-          value: D,
-          cellPoint: {
-            key: string;
-            value: DataRecordValue;
-            isMetric?: boolean;
-          },
-          clientX: number,
-          clientY: number,
-        ) => {
-          const drillToDetailFilters: BinaryQueryObjectFilterClause[] = [];
-          columnsMeta.forEach(col => {
-            if (!col.isMetric) {
-              const dataRecordValue = value[col.key];
-              drillToDetailFilters.push({
-                col: col.key,
-                op: '==',
-                val: dataRecordValue as string | number | boolean,
-                formattedVal: formatColumnValue(col, dataRecordValue)[1],
-              });
+              if (dd.type === 'dashboards') {
+                // @ts-ignore
+                ddToDashboards.push({ ...dd, value: cellPoint.value });
+              }
             }
           });
-          onContextMenu(clientX, clientY, {
-            drillToDetail: drillToDetailFilters,
-            crossFilter: cellPoint.isMetric
-              ? undefined
-              : getCrossFilterDataMask(cellPoint.key, cellPoint.value),
-            drillBy: cellPoint.isMetric
-              ? undefined
-              : {
-                  filters: [
-                    {
-                      col: cellPoint.key,
-                      op: '==',
-                      val: cellPoint.value as string | number | boolean,
-                    },
-                  ],
-                  groupbyFieldName: 'groupby',
-                },
-          });
         }
-      : undefined;
+        console.log('ddToCharts', ddToCharts);
+        onContextMenu(clientX, clientY, {
+          drillToDetail: drillToDetailFilters,
+          crossFilter: cellPoint.isMetric
+            ? undefined
+            : getCrossFilterDataMask(cellPoint.key, cellPoint.value),
+          drillBy: cellPoint.isMetric
+            ? undefined
+            : {
+                filters: [
+                  {
+                    col: cellPoint.key,
+                    op: '==',
+                    val: cellPoint.value as string | number | boolean,
+                  },
+                ],
+                groupbyFieldName: 'groupby',
+              },
+          drillToCharts: ddToCharts?.length ? ddToCharts : null,
+          drillToDashboards: ddToDashboards?.length ? ddToDashboards : null,
+        });
+      };
 
   const getColumnConfigs = useCallback(
     (column: DataColumnMeta, i: number): ColumnWithLooseAccessor<D> => {
