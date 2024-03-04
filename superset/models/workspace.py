@@ -105,11 +105,13 @@ class WorkSpace(AuditMixinNullable, ImportExportMixin, Model, BaseNestedSets):
     workspace_title = Column(String(500))
     description = Column(Text)
     tag = Column(String(500))
-    dashboard_objects:list[Dashboard] = relationship(
+    dashboard_objects: list[Dashboard] = relationship(
         Dashboard, secondary=workspace_dashboards, backref="workspaces"
     )
-    slice_objects:list[Slice] = relationship(Slice, secondary=workspace_slices, backref="workspaces")
-    dataset_objects:list[Dataset] = relationship(
+    slice_objects: list[Slice] = relationship(
+        Slice, secondary=workspace_slices, backref="workspaces"
+    )
+    dataset_objects: list[Dataset] = relationship(
         Dataset, secondary=workspace_datasets, backref="workspaces"
     )
     owners = relationship(
@@ -149,7 +151,6 @@ class WorkSpace(AuditMixinNullable, ImportExportMixin, Model, BaseNestedSets):
                 .all()
             )
 
-
         # return {
         #     datasource
         #     for cls_model, datasource_ids in datasources_by_cls_model.items()
@@ -172,16 +173,15 @@ class WorkSpace(AuditMixinNullable, ImportExportMixin, Model, BaseNestedSets):
 
     @property
     def data(self) -> dict[str, Any]:
-
         return {
             "id": self.id,
             "metadata": self.params_dict,
             "workspace_title": self.workspace_title,
-            "description":self.description,
-            "tag":self.tag,
+            "description": self.description,
+            "tag": self.tag,
             "slices": [slc.data for slc in self.slices],
-            "dashboards":[dshbrd.data for dshbrd in self.dashboard_objects],
-            'datasets':[dataset.to_json() for dataset in self.dataset_objects]
+            "dashboards": [dshbrd.data for dshbrd in self.dashboard_objects],
+            "datasets": [dataset.to_json() for dataset in self.dataset_objects],
         }
 
     @property
@@ -191,7 +191,6 @@ class WorkSpace(AuditMixinNullable, ImportExportMixin, Model, BaseNestedSets):
     @params.setter
     def params(self, value: str) -> None:
         self.json_metadata = value
-
 
     @classmethod
     def get(cls, id: str | int) -> Dashboard:
