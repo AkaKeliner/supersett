@@ -18,6 +18,7 @@
  */
 
 export enum EXPRESSION_TYPES {
+  BRACKETS = 'BRACKETS',
   SIMPLE = 'SIMPLE',
   SQL = 'SQL',
 }

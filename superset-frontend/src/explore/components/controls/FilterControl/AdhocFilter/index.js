@@ -74,6 +74,9 @@ export default class AdhocFilter {
     this.isExtra = !!adhocFilter.isExtra;
     this.isNew = !!adhocFilter.isNew;
     this.datasourceWarning = !!adhocFilter.datasourceWarning;
+    this.conjuction = adhocFilter.conjuction;
+    this.path = adhocFilter.path || [];
+    this.children = adhocFilter.children?.map(item => new AdhocFilter(item));
 
     this.filterOptionName =
       adhocFilter.filterOptionName ||

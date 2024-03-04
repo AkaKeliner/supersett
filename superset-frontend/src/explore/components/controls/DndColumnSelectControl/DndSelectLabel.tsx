@@ -29,20 +29,22 @@ import {
   DatasourcePanelDndItem,
   DndItemValue,
 } from 'src/explore/components/DatasourcePanel/types';
+import AdhocFilter from 'src/explore/components/controls/FilterControl/AdhocFilter';
 import Icons from 'src/components/Icons';
 import { DndItemType } from '../../DndItemType';
 
 export type DndSelectLabelProps = {
   name: string;
   accept: DndItemType | DndItemType[];
-  ghostButtonText: string;
+  ghostButtonText?: string;
   onDrop: (item: DatasourcePanelDndItem) => void;
   canDrop: (item: DatasourcePanelDndItem) => boolean;
   canDropValue?: (value: DndItemValue) => boolean;
   onDropValue?: (value: DndItemValue) => void;
-  valuesRenderer: () => ReactNode;
+  valuesRenderer: (values: AdhocFilter[]) => ReactNode;
   displayGhostButton?: boolean;
-  onClickGhostButton: () => void;
+  onClickGhostButton?: () => void;
+  values: AdhocFilter[];
 };
 
 export default function DndSelectLabel({
@@ -71,7 +73,10 @@ export default function DndSelectLabel({
     }),
   });
 
-  const values = useMemo(() => valuesRenderer(), [valuesRenderer]);
+  const values = useMemo(
+    () => valuesRenderer(props.values),
+    [valuesRenderer, props.values],
+  );
 
   function renderGhostButton() {
     return (
@@ -80,7 +85,7 @@ export default function DndSelectLabel({
         onClick={props.onClickGhostButton}
       >
         <Icons.PlusSmall iconColor={theme.colors.grayscale.light1} />
-        {t(props.ghostButtonText)}
+        {t(props.ghostButtonText || '')}
       </AddControlLabel>
     );
   }

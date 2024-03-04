@@ -49,12 +49,16 @@ export default function OptionWrapper(
 ) {
   const {
     index,
+    path,
     label,
     tooltipTitle,
     column,
     type,
     onShiftOptions,
     clickClose,
+    clickBrackets,
+    clickConjuction,
+    conjuction,
     withCaret,
     isExtra,
     datasourceWarningMessage,
@@ -184,10 +188,14 @@ export default function OptionWrapper(
       <Option
         index={index}
         clickClose={clickClose}
+        clickBrackets={clickBrackets}
+        clickConjuction={clickConjuction}
         withCaret={withCaret}
         isExtra={isExtra}
+        conjuction={conjuction}
         datasourceWarningMessage={datasourceWarningMessage}
         canDelete={canDelete}
+        path={path}
       >
         <Label />
       </Option>

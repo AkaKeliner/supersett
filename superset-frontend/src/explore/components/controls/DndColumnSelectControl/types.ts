@@ -24,6 +24,7 @@ import { ColumnMeta } from '@superset-ui/chart-controls';
 export interface OptionProps {
   children?: ReactNode;
   index: number;
+  path: string[];
   label?: string;
   tooltipTitle?: string;
   column?: ColumnMeta | AdhocColumn;
@@ -33,6 +34,9 @@ export interface OptionProps {
   datasourceWarningMessage?: string;
   canDelete?: boolean;
   tooltipOverlay?: ReactNode;
+  conjuction?: 'and' | 'or';
+  clickBrackets?: (path: string[], out?: boolean) => void;
+  clickConjuction?: (index: number) => void;
 }
 
 export interface OptionItemInterface {

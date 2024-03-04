@@ -35,13 +35,18 @@ const StyledInfoTooltipWithTrigger = styled(InfoTooltipWithTrigger)`
 export default function Option({
   children,
   index,
+  path,
   clickClose,
+  clickBrackets,
+  clickConjuction,
+  conjuction = 'and',
   withCaret,
   isExtra,
   datasourceWarningMessage,
   canDelete = true,
 }: OptionProps) {
   const theme = useTheme();
+
   const onClickClose = useCallback(
     e => {
       e.stopPropagation();
@@ -49,6 +54,31 @@ export default function Option({
     },
     [clickClose, index],
   );
+
+  const onClickBracketsIn = useCallback(
+    e => {
+      e.stopPropagation();
+      clickBrackets?.(path);
+    },
+    [clickBrackets, index],
+  );
+
+  const onClickBracketsOut = useCallback(
+    e => {
+      e.stopPropagation();
+      clickBrackets?.(path, true);
+    },
+    [clickBrackets, index],
+  );
+
+  const onClickConjuction = useCallback(
+    e => {
+      e.stopPropagation();
+      clickConjuction?.(index);
+    },
+    [clickConjuction, index],
+  );
+
   return (
     <OptionControlContainer data-test="option-label" withCaret={withCaret}>
       {canDelete && (
@@ -75,6 +105,31 @@ export default function Option({
           }
         />
       )}
+
+      {clickBrackets && (
+        <>
+          {false && (
+            <CaretContainer onClick={onClickBracketsOut}>
+              <Icons.StepBackwardOutlined
+                iconColor={theme.colors.grayscale.light1}
+              />
+            </CaretContainer>
+          )}
+
+          <CaretContainer onClick={onClickBracketsIn}>
+            <Icons.StepForwardOutlined
+              iconColor={theme.colors.grayscale.light1}
+            />
+          </CaretContainer>
+        </>
+      )}
+
+      {clickConjuction && (
+        <CaretContainer onClick={onClickConjuction}>
+          {conjuction}
+        </CaretContainer>
+      )}
+
       {withCaret && (
         <CaretContainer>
           <Icons.CaretRight iconColor={theme.colors.grayscale.light1} />

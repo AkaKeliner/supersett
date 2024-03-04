@@ -29,6 +29,8 @@ export interface DndAdhocFilterOptionProps {
   adhocFilter: AdhocFilter;
   onFilterEdit: (changedFilter: AdhocFilter) => void;
   onClickClose: (index: number) => void;
+  onClickBrackets?: (path: string[], out?: boolean) => void;
+  onClickConjuction?: (index: number) => void;
   onShiftOptions: (dragIndex: number, hoverIndex: number) => void;
   options: OptionSortType[];
   datasource: Record<string, any>;
@@ -43,6 +45,8 @@ export default function DndAdhocFilterOption({
   onFilterEdit,
   onShiftOptions,
   onClickClose,
+  onClickBrackets,
+  onClickConjuction,
   partitionColumn,
   index,
 }: DndAdhocFilterOptionProps) {
@@ -60,13 +64,17 @@ export default function DndAdhocFilterOption({
       <OptionWrapper
         key={index}
         index={index}
+        path={adhocFilter.path}
         label={actualTimeRange ?? adhocFilter.getDefaultLabel()}
         tooltipTitle={title ?? adhocFilter.getTooltipTitle()}
         clickClose={onClickClose}
+        clickBrackets={onClickBrackets}
+        clickConjuction={onClickConjuction}
         onShiftOptions={onShiftOptions}
         type={DndItemType.FilterOption}
         withCaret
         isExtra={adhocFilter.isExtra}
+        conjuction={adhocFilter.conjuction}
         datasourceWarningMessage={
           adhocFilter.datasourceWarning
             ? t('This filter might be incompatible with current dataset')

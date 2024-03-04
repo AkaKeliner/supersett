@@ -79,17 +79,14 @@ export interface DndFilterSelectProps
 }
 
 const DndFilterSelect = (props: DndFilterSelectProps) => {
-  const {
-    datasource,
-    onChange = () => {},
-    name: controlName,
-    canDelete,
-  } = props;
+  const { datasource, onChange = () => {}, canDelete } = props;
 
   const propsValues = Array.from(props.value ?? []);
   const [values, setValues] = useState(
     propsValues.map((filter: OptionValueType) =>
-      isDictionaryForAdhocFilter(filter) ? new AdhocFilter(filter) : filter,
+      isDictionaryForAdhocFilter(filter)
+        ? new AdhocFilter(filter)
+        : (filter as AdhocFilter),
     ),
   );
   const [partitionColumn, setPartitionColumn] = useState(undefined);
@@ -190,10 +187,44 @@ const DndFilterSelect = (props: DndFilterSelectProps) => {
   useEffect(() => {
     setValues(
       (props.value || []).map((filter: OptionValueType) =>
-        isDictionaryForAdhocFilter(filter) ? new AdhocFilter(filter) : filter,
+        isDictionaryForAdhocFilter(filter)
+          ? new AdhocFilter(filter)
+          : (filter as AdhocFilter),
       ),
     );
   }, [props.value]);
+
+  const onClickBrackets = useCallback(
+    (path: string[], out?: boolean) => {
+      const valuesCopy = [...values];
+      if (out) {
+        // OUT
+        /*  */
+      } else {
+        // IN
+        /* valuesCopy[index] = new AdhocFilter({
+          children: [new AdhocFilter({ ...valuesCopy[index], isChild: true })],
+          expressionType: EXPRESSION_TYPES.BRACKETS,
+          isChild: valuesCopy[index].isChild,
+          conjuction: valuesCopy[index].conjuction,
+        }); */
+      }
+      setValues(valuesCopy);
+      onChange(valuesCopy);
+    },
+    [onChange, values],
+  );
+
+  const changeConjuction = useCallback(
+    (index: number) => {
+      const valuesCopy = [...values];
+      valuesCopy[index].conjuction =
+        valuesCopy[index].conjuction === 'or' ? 'and' : 'or';
+      setValues(valuesCopy);
+      onChange(valuesCopy);
+    },
+    [onChange, values],
+  );
 
   const removeValue = useCallback(
     (index: number) => {
@@ -319,9 +350,32 @@ const DndFilterSelect = (props: DndFilterSelectProps) => {
     togglePopover(false);
   }, [togglePopover]);
 
+  const handleDrop = useCallback(
+    (item: DatasourcePanelDndItem) => {
+      setDroppedItem(item.value);
+      togglePopover(true);
+    },
+    [togglePopover],
+  );
+
   const valuesRenderer = useCallback(
-    () =>
-      values.map((adhocFilter: AdhocFilter, index: number) => (
+    (items: AdhocFilter[]) =>
+      items.map((adhocFilter: AdhocFilter, index: number) => (
+        /* if (adhocFilter.children?.length) {
+          return (
+            <div style={{ marginBottom: '5px' }}>
+              <DndSelectLabel
+                onDrop={handleDrop}
+                canDrop={() => true}
+                valuesRenderer={valuesRenderer}
+                accept={DND_ACCEPTED_TYPES}
+                displayGhostButton={false}
+                values={adhocFilter.children}
+                {...props}
+              />
+            </div>
+          );
+        } */
         <DndAdhocFilterOption
           index={index}
           adhocFilter={adhocFilter}
@@ -330,17 +384,20 @@ const DndFilterSelect = (props: DndFilterSelectProps) => {
           onFilterEdit={onFilterEdit}
           partitionColumn={partitionColumn}
           onClickClose={onClickClose}
+          onClickBrackets={onClickBrackets}
+          onClickConjuction={changeConjuction}
           onShiftOptions={onShiftOptions}
         />
       )),
     [
       onClickClose,
+      onClickBrackets,
+      changeConjuction,
       onFilterEdit,
       onShiftOptions,
       options,
       partitionColumn,
       datasource,
-      values,
     ],
   );
 
@@ -382,26 +439,18 @@ const DndFilterSelect = (props: DndFilterSelectProps) => {
       config.comparator = defaultTimeFilter;
     }
     return new AdhocFilter(config);
-  }, [droppedItem]);
-
-  const canDrop = useCallback(() => true, []);
-  const handleDrop = useCallback(
-    (item: DatasourcePanelDndItem) => {
-      setDroppedItem(item.value);
-      togglePopover(true);
-    },
-    [controlName, togglePopover],
-  );
+  }, [droppedItem]); // eslint-disable-line
 
   return (
     <>
       <DndSelectLabel
         onDrop={handleDrop}
-        canDrop={canDrop}
+        canDrop={() => true}
         valuesRenderer={valuesRenderer}
         accept={DND_ACCEPTED_TYPES}
         ghostButtonText={t('Drop columns/metrics here or click')}
         onClickGhostButton={handleClickGhostButton}
+        values={values}
         {...props}
       />
       <AdhocFilterPopoverTrigger

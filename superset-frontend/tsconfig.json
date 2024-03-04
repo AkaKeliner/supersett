@@ -50,6 +50,7 @@
     "forceConsistentCasingInFileNames": true,
 
     /* Backwards Compatibility */
+    "ignoreDeprecations": "5.0",
     "suppressImplicitAnyIndexErrors": true,
 
     /* Language and Environment */
