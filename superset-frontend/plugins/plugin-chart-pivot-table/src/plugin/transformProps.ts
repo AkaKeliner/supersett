@@ -81,6 +81,7 @@ export default function transformProps(chartProps: ChartProps<QueryFormData>) {
     filterState,
     datasource: { verboseMap = {}, columnFormats = {}, currencyFormats = {} },
     emitCrossFilters,
+    ownState,
   } = chartProps;
   const { data, colnames, coltypes } = queriesData[0];
   const {
@@ -105,6 +106,8 @@ export default function transformProps(chartProps: ChartProps<QueryFormData>) {
     conditionalFormatting,
     timeGrainSqla,
     currencyFormat,
+    server_pagination: serverPagination,
+    server_page_length: serverPageLength,
   } = formData;
   const { selectedFilters } = filterState;
   const granularity = extractTimegrain(rawFormData);
@@ -141,6 +144,11 @@ export default function transformProps(chartProps: ChartProps<QueryFormData>) {
       {},
     );
   const metricColorFormatters = getColorFormatters(conditionalFormatting, data);
+  let rowCount;
+  if (serverPagination) {
+    const { data: rowCountData } = queriesData[1];
+    rowCount = rowCountData[0]?.rowcount;
+  }
 
   return {
     width,
@@ -174,5 +182,9 @@ export default function transformProps(chartProps: ChartProps<QueryFormData>) {
     dateFormatters,
     onContextMenu,
     timeGrainSqla,
+    serverPagination,
+    serverPageLength,
+    ownState,
+    rowCount,
   };
 }

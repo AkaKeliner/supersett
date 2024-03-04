@@ -31,6 +31,7 @@ import {
   isFeatureEnabled,
   isPhysicalColumn,
   NumberFormatter,
+  SetDataMaskHook,
   styled,
   t,
   useTheme,
@@ -118,6 +119,18 @@ const aggregatorsFactory = (formatter: NumberFormatter) => ({
   ),
 });
 
+export const updateExternalFormData = (
+  setDataMask: SetDataMaskHook = () => {},
+  pageNumber: number|null,
+  pageSize: number|null,
+) =>
+  setDataMask({
+    ownState: {
+      currentPage: pageNumber,
+      pageSize,
+    },
+  });
+
 /* If you change this logic, please update the corresponding Python
  * function (https://github.com/apache/superset/blob/master/superset/charts/post_processing.py),
  * or reach out to @betodealmeida.
@@ -154,6 +167,10 @@ export default function PivotTableChart(props: PivotTableProps) {
     dateFormatters,
     onContextMenu,
     timeGrainSqla,
+    serverPageLength = 9,
+    serverPagination = false,
+    ownState = {},
+    rowCount = 10,
   } = props;
 
   const theme = useTheme();
@@ -535,7 +552,19 @@ export default function PivotTableChart(props: PivotTableProps) {
       timeGrainSqla,
     ],
   );
+  const handleServerPaginationChange = useCallback(
+    (pageNumber: number|null, pageSize: number|null) => {
+      updateExternalFormData(setDataMask, pageNumber, pageSize);
+    },
+    [setDataMask],
+  );
 
+  if (!serverPagination && ownState.pageSize) {
+      handleServerPaginationChange(null, null)
+  }
+  if(serverPagination && (serverPageLength !== ownState.pageSize)) {
+      handleServerPaginationChange(0, serverPageLength)
+  }
   return (
     <Styles height={height} width={width} margin={theme.gridUnit * 4}>
       <PivotTableWrapper>
@@ -555,6 +584,12 @@ export default function PivotTableChart(props: PivotTableProps) {
           subtotalOptions={subtotalOptions}
           namesMapping={verboseMap}
           onContextMenu={handleContextMenu}
+          serverPageLength={serverPageLength}
+          serverPagination={serverPagination}
+          width={width}
+          onServerPaginationChange={handleServerPaginationChange}
+          serverPaginationData={ownState}
+          rowCount={rowCount}
         />
       </PivotTableWrapper>
     </Styles>

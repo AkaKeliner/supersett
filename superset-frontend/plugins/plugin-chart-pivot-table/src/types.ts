@@ -87,6 +87,10 @@ interface PivotTableCustomizeProps {
   timeGrainSqla?: TimeGranularity;
   time_grain_sqla?: TimeGranularity;
   granularity_sqla?: string;
+  serverPagination?: number;
+  serverPageLength?: number;
+  ownState?: ownStateType;
+  rowCount?: number;
 }
 
 export type PivotTableQueryFormData = QueryFormData &
@@ -97,3 +101,8 @@ export type PivotTableProps = PivotTableStylesProps &
   PivotTableCustomizeProps & {
     data: DataRecord[];
   };
+
+export type ownStateType = {
+  pageSize?: number|null;
+  currentPage?: number|null
+}
