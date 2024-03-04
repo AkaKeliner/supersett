@@ -94,7 +94,9 @@ COPY --chown=superset:superset superset-frontend/package.json superset-frontend/
 COPY ./requirements/local.txt ./requirements/local.txt
 COPY ./requirements/development.txt ./requirements/development.txt
 COPY ./requirements/base.txt ./requirements/base.txt
+COPY ./requirements.txt ./requirements.txt
 RUN pip install -r requirements/local.txt
+RUN pip install -r requirements.txt
 
 
 COPY --chown=superset:superset --from=superset-node /app/superset/static/assets superset/static/assets
@@ -147,9 +149,7 @@ RUN apt-get update -qq \
 # Cache everything for dev purposes...
 COPY ./requirements/base.txt ./requirements/base.txt
 COPY ./requirements/docker.txt ./requirements/docker.txt
-COPY ./requirements.txt ./requirements.txt
-RUN pip install -r requirements/docker.txt \
-    && pip install -r requirements.txt
+RUN pip install -r requirements/docker.txt
 
 #RUN --mount=type=bind,target=./requirements/base.txt,src=./requirements/base.txt \
 #    --mount=type=bind,target=./requirements/docker.txt,src=./requirements/docker.txt \
