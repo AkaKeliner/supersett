@@ -96,7 +96,6 @@ class Slice(  # pylint: disable=too-many-public-methods
         security_manager.user_model, foreign_keys=[last_saved_by_fk]
     )
     workspace_id = Column(Integer, ForeignKey('workspaces.id'))
-    workspaces = relationship('WorkSpace', backref = 'slice_objects')
     owners = relationship(
         security_manager.user_model,
         secondary=slice_user,

@@ -205,3 +205,13 @@ class WorkSpace(AuditMixinNullable, ImportExportMixin, Model, BaseNestedSets):
         """
 
         security_manager.raise_for_access(dashboard=self)
+
+    def get_datasets(self) -> list[dict[str,Any]]:
+        return [dataset.to_json() for dataset in self.dataset_objects]
+
+    def get_slices(self) -> list[dict[str,Any]]:
+        return [slc.data for slc in self.slices]
+
+    def get_dashboards(self) -> list[dict[str,Any]]:
+        return [dshbrd.data for dshbrd in self.dashboard_objects]
+

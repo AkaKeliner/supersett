@@ -111,7 +111,6 @@ class Dataset(AuditMixinNullable, ExtraJSONMixin, ImportExportMixin, Model):
         "Table", secondary=dataset_table_association_table, backref="datasets"
     )
     workspace_id = Column(Integer, ForeignKey('workspaces.id'))
-    workspaces = relationship('WorkSpace', backref = 'dataset_objects')
     # Does the dataset point directly to a ``Table``?
     is_physical = sa.Column(sa.Boolean, default=False)
 
