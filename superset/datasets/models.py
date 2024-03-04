@@ -38,6 +38,17 @@ from superset.models.helpers import (
     ImportExportMixin,
 )
 from superset.tables.models import Table
+from sqlalchemy import (
+    Boolean,
+    Column,
+    ForeignKey,
+    Integer,
+    MetaData,
+    String,
+    Table,
+    Text,
+    UniqueConstraint,
+)
 
 dataset_column_association_table = sa.Table(
     "sl_dataset_columns",
@@ -99,7 +110,8 @@ class Dataset(AuditMixinNullable, ExtraJSONMixin, ImportExportMixin, Model):
     tables: list[Table] = relationship(
         "Table", secondary=dataset_table_association_table, backref="datasets"
     )
-
+    workspace_id = Column(Integer, ForeignKey('workspaces.id'))
+    workspaces = relationship('WorkSpace', backref = 'dataset_objects')
     # Does the dataset point directly to a ``Table``?
     is_physical = sa.Column(sa.Boolean, default=False)
 
