@@ -226,6 +226,7 @@ module.exports = {
     ],
     'class-methods-use-this': 0,
     curly: 2,
+    'prettier/prettier': ['error', { endOfLine: 'auto' }],
     'func-names': 0,
     'guard-for-in': 0,
     'import/extensions': [

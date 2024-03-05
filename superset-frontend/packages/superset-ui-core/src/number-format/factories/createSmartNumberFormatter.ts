@@ -16,14 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import { format as d3Format } from 'd3-format';
+// import { format as d3_format } from 'd3-format';
 import NumberFormatter from '../NumberFormatter';
 import NumberFormats from '../NumberFormats';
+import { d3Format } from './createD3NumberFormatter';
+import { DEFAULT_D3_FORMAT } from '../D3FormatConfig';
 
-const siFormatter = d3Format(`.3~s`);
-const float2PointFormatter = d3Format(`.2~f`);
-const float4PointFormatter = d3Format(`.4~f`);
+const siFormatter = d3Format({ specifier: `.3~s`, locale: DEFAULT_D3_FORMAT });
+const float2PointFormatter = d3Format({
+  specifier: `.2~f`,
+  locale: DEFAULT_D3_FORMAT,
+});
+const float4PointFormatter = d3Format({
+  specifier: `.4~f`,
+  locale: DEFAULT_D3_FORMAT,
+});
 
 function formatValue(value: number) {
   if (value === 0) {

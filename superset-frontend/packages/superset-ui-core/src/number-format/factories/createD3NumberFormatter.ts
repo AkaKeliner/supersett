@@ -36,8 +36,6 @@ const d3SiPrefixMap = {
   n: 'e-9',
   µ: 'e-6',
   m: 'e-3',
-  // s: 'сек',
-  // ms: 'млс',
   '': '',
   k: ' тыс.',
   M: ' млн.',
@@ -47,6 +45,32 @@ const d3SiPrefixMap = {
   E: ' квнтлн.',
   Z: ' скстлн.',
   Y: ' сптлн.',
+};
+export const d3Format = ({
+  specifier,
+  locale,
+}: {
+  specifier: string | number;
+  locale: any;
+}) => {
+  const loc = locale && formatLocale({ ...locale });
+  const formattedSpecifier = formatSpecifier(
+    <string>specifier || defaultFormat,
+  );
+  const valueFormatter = loc?.format(<string>specifier || defaultFormat);
+
+  return (value: string | number) => {
+    // @ts-ignore
+    const result = valueFormatter(value || 0);
+    if (formattedSpecifier.type === 's') {
+      // modify the return value when using si-prefix.
+      const lastChar = result[result.length - 1];
+      if (Object.keys(d3SiPrefixMap).includes(lastChar)) {
+        return result.slice(0, -1) + d3SiPrefixMap[lastChar];
+      }
+    }
+    return result;
+  };
 };
 export default function createD3NumberFormatter(config: {
   description?: string;
@@ -63,35 +87,11 @@ export default function createD3NumberFormatter(config: {
 
   let formatFunc: NumberFormatFunction;
   let isInvalid = false;
-  const d3Format = (specifier: string | number) => {
-    console.log('specifier', specifier);
-    const loc = locale && formatLocale({ ...locale });
-    const formattedSpecifier = formatSpecifier(
-      <string>specifier || defaultFormat,
-    );
-    const valueFormatter = loc?.format(<string>specifier || defaultFormat);
-
-    return (value: string | number) => {
-      // @ts-ignore
-      const result = valueFormatter(value || 0);
-      if (formattedSpecifier.type === 's') {
-        // modify the return value when using si-prefix.
-        const lastChar = result[result.length - 1];
-        if (Object.keys(d3SiPrefixMap).includes(lastChar)) {
-          return result.slice(0, -1) + d3SiPrefixMap[lastChar];
-        }
-      }
-      // return the default result from d3 format in case the format type is not set to `s` (si suffix)
-      return result;
-    };
-  };
   try {
     formatFunc =
       typeof locale === 'undefined'
         ? d3_format(formatString)
-        : d3Format(formatString);
-    console.log('locale', locale);
-    // formatFunc = d3Format(formatString);
+        : d3Format({ specifier: formatString, locale });
   } catch (error) {
     formatFunc = value => `${value} (Invalid format: ${formatString})`;
     isInvalid = true;

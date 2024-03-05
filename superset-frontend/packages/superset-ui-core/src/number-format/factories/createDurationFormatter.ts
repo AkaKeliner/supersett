@@ -20,6 +20,16 @@
 import prettyMsFormatter from 'pretty-ms';
 import NumberFormatter from '../NumberFormatter';
 
+export const localeReplacer = (text: string) =>
+  text &&
+  text
+    .replace('ns', 'нс.')
+    .replace('µs', 'мкс.')
+    .replace('ms', 'мс.')
+    .replace('s', 'с.')
+    .replace('m', 'мин.')
+    .replace('h', 'ч.')
+    .replace('d', 'дн.');
 export default function createDurationFormatter(
   config: {
     description?: string;
@@ -30,10 +40,16 @@ export default function createDurationFormatter(
 ) {
   const { description, id, label, multiplier = 1, ...prettyMsOptions } = config;
 
+  const customFormatter = (value: number) => {
+    const formatValue = prettyMsFormatter(value * multiplier, prettyMsOptions);
+    return localeReplacer(formatValue);
+  };
+
   return new NumberFormatter({
     description,
-    formatFunc: value => prettyMsFormatter(value * multiplier, prettyMsOptions),
+    // formatFunc: value => prettyMsFormatter(value * multiplier, prettyMsOptions),
+    formatFunc: customFormatter,
     id: id ?? 'duration_format',
-    label: label ?? `Duration formatter`,
+    label: label ? localeReplacer(label) : `Duration formatter`,
   });
 }
