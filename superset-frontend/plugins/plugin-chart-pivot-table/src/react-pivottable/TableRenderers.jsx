@@ -22,6 +22,7 @@ import { t } from '@superset-ui/core';
 import PropTypes from 'prop-types';
 import { PivotData, flatKey } from './utilities';
 import { Styles } from './Styles';
+import SimplePagination from '../components/Pagination';
 
 const parseLabel = value => {
   if (typeof value === 'number' || typeof value === 'string') {
@@ -847,7 +848,23 @@ export class TableRenderer extends React.Component {
     return document.contains(document.querySelector('.dashboard--editing'));
   }
 
+  resultOnPageChange = pageNumber => {
+    const {
+      serverPageLength,
+      onServerPaginationChange,
+    } = this.props;
+    onServerPaginationChange(pageNumber, serverPageLength);
+  };
+
   render() {
+    const {
+      serverPagination = false,
+      serverPageLength,
+      width = 360,
+      onServerPaginationChange,
+      serverPaginationData,
+      rowCount,
+    } = this.props;
     if (this.cachedProps !== this.props) {
       this.cachedProps = this.props;
       this.cachedBasePivotSettings = this.getBasePivotSettings();
@@ -877,6 +894,15 @@ export class TableRenderer extends React.Component {
       colSubtotalDisplay,
     );
 
+    const hasPagination = serverPagination;
+    let resultPageCount = Math.ceil(rowCount / serverPageLength);
+    if (!Number.isFinite(resultPageCount)) {
+      resultPageCount = 0;
+    }
+    const paginationStyle = {};
+    const maxPageItemCount = width > 340 ? 9 : 7;
+    const resultCurrentPage = serverPaginationData?.currentPage ?? 0; // pageIndex
+
     const pivotSettings = {
       visibleRowKeys,
       maxRowVisible: Math.max(...visibleRowKeys.map(k => k.length)),
@@ -888,22 +914,34 @@ export class TableRenderer extends React.Component {
     };
 
     return (
-      <Styles isDashboardEditMode={this.isDashboardEditMode()}>
-        <table className="pvtTable" role="grid">
-          <thead>
-            {colAttrs.map((c, j) =>
-              this.renderColHeaderRow(c, j, pivotSettings),
-            )}
-            {rowAttrs.length !== 0 && this.renderRowHeaderRow(pivotSettings)}
-          </thead>
-          <tbody>
-            {visibleRowKeys.map((r, i) =>
-              this.renderTableRow(r, i, pivotSettings),
-            )}
-            {colTotals && this.renderTotalsRow(pivotSettings)}
-          </tbody>
-        </table>
-      </Styles>
+      <div>
+        <Styles isDashboardEditMode={this.isDashboardEditMode()}>
+          <table className="pvtTable" role="grid">
+            <thead>
+              {colAttrs.map((c, j) =>
+                this.renderColHeaderRow(c, j, pivotSettings),
+              )}
+              {rowAttrs.length !== 0 && this.renderRowHeaderRow(pivotSettings)}
+            </thead>
+            <tbody>
+              {visibleRowKeys.map((r, i) =>
+                this.renderTableRow(r, i, pivotSettings),
+              )}
+              {colTotals && this.renderTotalsRow(pivotSettings)}
+            </tbody>
+          </table>
+        </Styles>
+        {serverPagination && resultPageCount > 1 ? (
+          <SimplePagination
+            ref={null}
+            style={paginationStyle}
+            maxPageItemCount={maxPageItemCount}
+            pageCount={resultPageCount}
+            currentPage={resultCurrentPage}
+            onPageChange={this.resultOnPageChange}
+          />
+        ) : null}
+      </div>
     );
   }
 }

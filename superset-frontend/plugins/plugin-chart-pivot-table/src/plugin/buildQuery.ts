@@ -22,12 +22,21 @@ import {
   ensureIsArray,
   hasGenericChartAxes,
   isPhysicalColumn,
+  PostProcessingRule,
   QueryFormColumn,
   QueryFormOrderBy,
+  QueryObject,
 } from '@superset-ui/core';
-import { PivotTableQueryFormData } from '../types';
+import { ownStateType, PivotTableQueryFormData } from '../types';
 
-export default function buildQuery(formData: PivotTableQueryFormData) {
+interface optionType {
+  hooks: any;
+  ownState: ownStateType;
+}
+export default function buildQuery(
+  formData: PivotTableQueryFormData,
+  options: optionType,
+) {
   const { groupbyColumns = [], groupbyRows = [], extra_form_data } = formData;
   const time_grain_sqla =
     extra_form_data?.time_grain_sqla || formData.time_grain_sqla;
@@ -61,19 +70,46 @@ export default function buildQuery(formData: PivotTableQueryFormData) {
   });
 
   return buildQueryContext(formData, baseQueryObject => {
-    const { series_limit_metric, metrics, order_desc } = baseQueryObject;
+    const { series_limit_metric, metrics, order_desc, orderby } =
+      baseQueryObject;
     let orderBy: QueryFormOrderBy[] | undefined;
     if (series_limit_metric) {
       orderBy = [[series_limit_metric, !order_desc]];
     } else if (Array.isArray(metrics) && metrics[0]) {
       orderBy = [[metrics[0], !order_desc]];
     }
-    return [
+    const postProcessing: PostProcessingRule[] = [];
+    const moreProps: Partial<QueryObject> = {};
+    const ownState = options?.ownState ?? {};
+    if (formData.server_pagination) {
+      moreProps.row_limit = ownState.pageSize ?? formData.server_page_length;
+      moreProps.row_offset =
+        (ownState.currentPage ?? 0) * (ownState.pageSize ?? 0);
+    }
+    const queryObject = {
+      ...baseQueryObject,
+      columns,
+      orderby,
+      metrics,
+      post_processing: postProcessing,
+      ...moreProps,
+    };
+    const result = [
       {
-        ...baseQueryObject,
+        ...queryObject,
         orderby: orderBy,
         columns,
       },
     ];
+    if (formData.server_pagination) {
+      result.push({
+        ...queryObject,
+        row_limit: 0,
+        row_offset: 0,
+        post_processing: [],
+        is_rowcount: true,
+      });
+    }
+    return result;
   });
 }

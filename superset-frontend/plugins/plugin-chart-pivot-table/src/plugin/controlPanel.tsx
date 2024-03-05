@@ -34,9 +34,19 @@ import {
   sharedControls,
   Dataset,
   getStandardizedControls,
+  ControlPanelsContainerProps,
+  formatSelectOptions,
 } from '@superset-ui/chart-controls';
 import { MetricsLayoutEnum } from '../types';
 
+export const PAGE_SIZE_OPTIONS = formatSelectOptions<number>([
+  [0, t('page_size.all')],
+  10,
+  20,
+  50,
+  100,
+  200,
+]);
 const config: ControlPanelConfig = {
   controlPanelSections: [
     { ...sections.genericTime, expanded: false },
@@ -129,11 +139,38 @@ const config: ControlPanelConfig = {
         ['series_limit'],
         [
           {
-            name: 'row_limit',
+            name: 'server_pagination',
             config: {
-              ...sharedControls.row_limit,
-              label: t('Cell limit'),
-              description: t('Limits the number of cells that get retrieved.'),
+              type: 'CheckboxControl',
+              label: t('Server pagination'),
+              description: t(
+                'Enable server side pagination of results (experimental feature)',
+              ),
+              default: false,
+            },
+          },
+        ],
+        [
+          {
+            name: 'row_limit',
+            override: {
+              default: 1000,
+              visibility: ({ controls }: ControlPanelsContainerProps) =>
+                !controls?.server_pagination?.value,
+            },
+          },
+          {
+            name: 'server_page_length',
+            config: {
+              type: 'SelectControl',
+              freeForm: true,
+              renderTrigger: true,
+              label: t('Server Page Length'),
+              default: 10,
+              choices: PAGE_SIZE_OPTIONS,
+              description: t('Rows per page, 0 means no pagination'),
+              visibility: ({ controls }: ControlPanelsContainerProps) =>
+                Boolean(controls?.server_pagination?.value),
             },
           },
         ],
