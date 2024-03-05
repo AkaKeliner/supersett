@@ -158,7 +158,7 @@ const config: ControlPanelConfig = {
             config: queryMode,
           },
         ],
-        // ['url_drillDowns'],
+        ['url_drillDowns'],
         [
           {
             name: 'groupby',
@@ -190,7 +190,7 @@ const config: ControlPanelConfig = {
           },
         ],
         [
-          hasGenericChartAxes && isAggMode
+          hasGenericChartAxes
             ? {
                 name: 'time_grain_sqla',
                 config: {
@@ -218,7 +218,7 @@ const config: ControlPanelConfig = {
                 },
               }
             : null,
-          hasGenericChartAxes && isAggMode ? 'temporal_columns_lookup' : null,
+          hasGenericChartAxes ? 'temporal_columns_lookup' : null,
         ],
         [
           {

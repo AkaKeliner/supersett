@@ -208,6 +208,7 @@ const getPageSize = (
 
 const defaultServerPaginationData = {};
 const defaultColorFormatters = [] as ColorFormatters;
+
 const transformProps = (
   chartProps: TableChartProps,
 ): TableChartTransformedProps => {

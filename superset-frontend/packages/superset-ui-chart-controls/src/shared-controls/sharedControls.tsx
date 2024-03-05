@@ -328,6 +328,7 @@ const currency_format: SharedControlConfig<'CurrencyControl'> = {
   label: t('Currency format'),
   renderTrigger: true,
 };
+
 const url_drillDowns: SharedControlConfig<'URLDrilldownControl'> = {
   type: 'URLDrilldownControl',
   label: t('URL Drilldowns'),
@@ -335,8 +336,7 @@ const url_drillDowns: SharedControlConfig<'URLDrilldownControl'> = {
   mapStateToProps: state => ({
     datasource: state.datasource,
     slices: [state.slice],
-    // @ts-ignore
-    dashboards: state.metadata.dashboards,
+    dashboards: state.metadata?.dashboards,
   }),
 };
 
