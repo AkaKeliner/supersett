@@ -60,3 +60,11 @@ class WorkspaceImportError(ImportFailedError):
 
 class WorkspaceAccessDeniedError(ForbiddenError):
     message = _("You don't have access to this workspace.")
+
+class WorkspaceSlugExistsValidationError(ValidationError):
+    """
+    Marshmallow validation error for workspace slug already exists
+    """
+
+    def __init__(self) -> None:
+        super().__init__([_("Must be unique")], field_name="slug")

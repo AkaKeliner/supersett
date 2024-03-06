@@ -15,7 +15,7 @@ from superset.daos.workspace import WorkspaceDAO
 from superset.daos.exceptions import DAODeleteFailedError
 from superset.daos.report import ReportScheduleDAO
 from superset.exceptions import SupersetSecurityException
-from superset.models.workspace import WorkSpace
+from superset.models.workspace import Workspace
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 class DeleteWorkspaceCommand(BaseCommand):
     def __init__(self,model_ids:list[int]):
         self._model_ids = model_ids
-        self._models:Optional[list[WorkSpace]]=None
+        self._models:Optional[list[Workspace]]=None
 
     def run(self)->None:
         self.validate()

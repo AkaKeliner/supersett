@@ -15,19 +15,12 @@ class WorkspaceMixin:
         "workspace_title",
         "owners",
         "roles",
-        "json_metadata",
     ]
     show_columns = edit_columns + ["charts"]
     search_columns = ("workspace_title", "owners")
     add_columns = edit_columns
     base_order = ("changed_on", "desc")
     description_columns = {
-        "json_metadata": _(
-            "This JSON object is generated dynamically when clicking "
-            "the save or overwrite button in the workspace view. It "
-            "is exposed here for reference and for power users who may "
-            "want to alter specific parameters."
-        ),
         "owners": _("Owners is a list of users who can alter the workspace."),
         "roles": _(
             "Roles is a list which defines access to the workspace. "
@@ -43,7 +36,6 @@ class WorkspaceMixin:
         "roles": _("Roles"),
         "creator": _("Creator"),
         "modified": _("Modified"),
-        "json_metadata": _("JSON Metadata"),
     }
 
     def pre_delete(self, item: "WorkspaceMixin") -> None:

@@ -192,6 +192,10 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         from superset.views.sqllab import SqllabView
         from superset.views.tags import TagModelView, TagView
         from superset.views.users.api import CurrentUserRestApi
+        from superset.views.workspace.views import (
+            Workspace,
+            WorkspaceModelView,
+        )
 
         #
         # Setup API views
@@ -253,6 +257,14 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
             category_icon="",
         )
         appbuilder.add_view(
+            WorkspaceModelView,
+            "Workspaces",
+            label=__("Workspaces"),
+            icon="fa-dashboard",
+            category="",
+            category_icon="",
+        )
+        appbuilder.add_view(
             SliceModelView,
             "Charts",
             label=__("Charts"),
@@ -300,6 +312,7 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         appbuilder.add_view_no_menu(ExcelToDatabaseView)
         appbuilder.add_view_no_menu(ColumnarToDatabaseView)
         appbuilder.add_view_no_menu(Dashboard)
+        appbuilder.add_view_no_menu(Workspace)
         appbuilder.add_view_no_menu(DashboardModelViewAsync)
         appbuilder.add_view_no_menu(Datasource)
         appbuilder.add_view_no_menu(DatasetEditor)

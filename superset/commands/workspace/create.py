@@ -8,6 +8,7 @@ from superset.commands.base import BaseCommand, CreateMixin
 from superset.commands.workspace.exceptions import (
     WorkspaceCreateFailedError,
     WorkspaceInvalidError,
+    WorkspaceSlugExistsValidationError
 )
 from superset.commands.utils import populate_roles
 from superset.daos.workspace import WorkspaceDAO
@@ -32,6 +33,9 @@ class CreateWorkspaceCommand(CreateMixin, BaseCommand):
         exceptions: list[ValidationError] = []
         owner_ids: Optional[list[int]] = self._properties.get('owners')
         role_ids: Optional[list[int]] = self._properties.get('roles')
+        slug:str = self._properties.get('slug',"")
+        if not WorkspaceDAO.validate_slug_uniqueness(slug):
+            exceptions.append(WorkspaceSlugExistsValidationError())
         try:
             owners = self.populate_owners(owner_ids)
             self._properties['owners'] = owners

@@ -37,7 +37,7 @@ from sqlalchemy_utils import UUIDType
 from superset.extensions import security_manager
 from superset.models.core import Database
 from superset.models.dashboard import Dashboard
-from superset.models.workspace import WorkSpace
+from superset.models.workspace import Workspace
 from superset.models.helpers import AuditMixinNullable, ExtraJSONMixin
 from superset.models.slice import Slice
 from superset.reports.types import ReportScheduleExtra
@@ -147,7 +147,7 @@ class ReportSchedule(AuditMixinNullable, ExtraJSONMixin, Model):
         passive_deletes=True,
     )
     workspace_id = Column(Integer, ForeignKey("workspaces.id"), nullable=True)
-    workspace = relationship(WorkSpace, backref='report_schedules', foreign_keys=[workspace_id])
+    workspace = relationship(Workspace, backref='report_schedules', foreign_keys=[workspace_id])
     # (Alerts) Stamped last observations
     last_eval_dttm = Column(DateTime)
     last_state = Column(String(50), default=ReportState.NOOP)

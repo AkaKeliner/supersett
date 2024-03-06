@@ -13,7 +13,7 @@ from flask_login import AnonymousUserMixin, login_user
 
 from superset import db, event_logger, is_feature_enabled, security_manager
 from superset.constants import MODEL_VIEW_RW_METHOD_PERMISSION_MAP, RouteMethod
-from superset.models.workspace import WorkSpace as WorkspaceModel
+from superset.models.workspace import Workspace as WorkspaceModel
 from superset.superset_typing import FlaskResponse
 from superset.utils import core as utils
 from superset.views.base import (
@@ -45,7 +45,6 @@ class WorkspaceModelView(WorkspaceMixin, SupersetModelView, DeleteMixin):
     def pre_add(self, item: "WorkspaceModelView") -> None:
         if g.user not in item.owners:
             item.owners.append(g.user)
-        utils.validate_json(item.json_metadata)
         for slc in item.slices:
             slc.owners = list(set(item.owners) | set(slc.owners))
 

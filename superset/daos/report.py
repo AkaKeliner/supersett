@@ -70,10 +70,10 @@ class ReportScheduleDAO(BaseDAO[ReportSchedule]):
         )
 
     @staticmethod
-    def find_by_workspace_id(workspace_id: int) -> list[ReportSchedule]:
+    def find_by_workspace_id(workspace_ids: list[int]) -> list[ReportSchedule]:
         return (
             db.session.query(ReportSchedule)
-            .filter(ReportSchedule.workspace_id == workspace_id)
+            .filter(ReportSchedule.workspace_id.in_(workspace_ids))
             .all()
         )
 

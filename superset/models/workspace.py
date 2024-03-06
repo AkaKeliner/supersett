@@ -97,7 +97,7 @@ WorkSpaceRoles = Table(
 )
 
 
-class WorkSpace(AuditMixinNullable, ImportExportMixin, Model, BaseNestedSets):
+class Workspace(AuditMixinNullable, ImportExportMixin, Model, BaseNestedSets):
     """The workspace object"""
 
     __tablename__ = "workspaces"
@@ -105,6 +105,7 @@ class WorkSpace(AuditMixinNullable, ImportExportMixin, Model, BaseNestedSets):
     workspace_title = Column(String(500))
     description = Column(Text)
     tag = Column(String(500))
+    slug = Column(String(255), unique=True)
     dashboard_objects: list[Dashboard] = relationship(
         Dashboard, secondary=workspace_dashboards, backref="workspaces"
     )
@@ -120,19 +121,19 @@ class WorkSpace(AuditMixinNullable, ImportExportMixin, Model, BaseNestedSets):
         passive_deletes=True,
     )
     roles = relationship(security_manager.role_model, secondary=WorkSpaceRoles)
-    export_fields = ["workspace_title", "description", "tag"]
+    export_fields = ["workspace_title", "description", "tag", "slug"]
 
     def __repr__(self) -> str:
-        return f"<Workspace id={self.id} title= {self.workspace_title}>"
+        return f"<Workspace {self.id or self.slug} title= {self.workspace_title}>"
 
     @property
     def url(self) -> str:
-        return f"/superset/workspace/{self.id}/"
+        return f"/superset/workspace/{self.slug or self.id}/"
 
     @staticmethod
     def get_url(id_: int, slug: str | None = None) -> str:
         # To be able to generate URL's without instantiating a Dashboard object
-        return f"/superset/workspace/{id_}/"
+        return f"/superset/workspace/{slug or id_}/"
 
     @property
     def datasources(self) -> set[BaseDatasource]:
@@ -165,6 +166,23 @@ class WorkSpace(AuditMixinNullable, ImportExportMixin, Model, BaseNestedSets):
         return [slc.chart for slc in self.slice_objects]
 
     @property
+    def changed_by_name(self) -> str:
+        if not self.changed_by:
+            return ""
+        return str(self.changed_by)
+
+    @property
+    def datasets(self) -> list[str]:
+        return [dataset.name for dataset in self.dataset_objects]
+
+    @property
+    def dashboards(self) -> list[str]:
+        return [
+            dashboard.dashboard_title or dashboard.slug
+            for dashboard in self.dashboard_objects
+        ]
+
+    @property
     def sqla_metadata(self) -> None:
         # pylint: disable=no-member
         with self.get_sqla_engine_with_context() as engine:
@@ -179,22 +197,15 @@ class WorkSpace(AuditMixinNullable, ImportExportMixin, Model, BaseNestedSets):
             "workspace_title": self.workspace_title,
             "description": self.description,
             "tag": self.tag,
-            "slices": [slc.data for slc in self.slices],
+            "slug": self.slug,
+            "slices": [slc.data for slc in self.slice_objects],
             "dashboards": [dshbrd.data for dshbrd in self.dashboard_objects],
             "datasets": [dataset.to_json() for dataset in self.dataset_objects],
         }
 
-    @property
-    def params(self) -> str:
-        return self.json_metadata
-
-    @params.setter
-    def params(self, value: str) -> None:
-        self.json_metadata = value
-
     @classmethod
-    def get(cls, id: str | int) -> Dashboard:
-        qry = db.session.query(WorkSpace).filter(id_or_slug_filter(id))
+    def get(cls, id_or_slug: str | int) -> Workspace:
+        qry = db.session.query(Workspace).filter(id_or_slug_filter(id_or_slug))
         return qry.one_or_none()
 
     def raise_for_access(self) -> None:
@@ -206,12 +217,19 @@ class WorkSpace(AuditMixinNullable, ImportExportMixin, Model, BaseNestedSets):
 
         security_manager.raise_for_access(dashboard=self)
 
-    def get_datasets(self) -> list[dict[str,Any]]:
+    def get_datasets(self) -> list[dict[str, Any]]:
         return [dataset.to_json() for dataset in self.dataset_objects]
 
-    def get_slices(self) -> list[dict[str,Any]]:
+    def get_slices(self) -> list[dict[str, Any]]:
         return [slc.data for slc in self.slices]
 
-    def get_dashboards(self) -> list[dict[str,Any]]:
+    def get_dashboards(self) -> list[dict[str, Any]]:
         return [dshbrd.data for dshbrd in self.dashboard_objects]
 
+
+def id_or_slug_filter(id_or_slug: int | str) -> BinaryExpression:
+    if is_int(id_or_slug):
+        return Workspace.id == int(id_or_slug)
+    if is_uuid(id_or_slug):
+        return Workspace.uuid == uuid.UUID(str(id_or_slug))
+    return Workspace.slug == id_or_slug
