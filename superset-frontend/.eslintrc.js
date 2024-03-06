@@ -299,7 +299,6 @@ module.exports = {
     'react/sort-comp': 0, // TODO: re-enable in separate PR
     'react/static-property-placement': 0, // disabled temporarily
     'react-prefer-function-component/react-prefer-function-component': 1,
-    'prettier/prettier': 'error',
   },
   ignorePatterns,
 };
