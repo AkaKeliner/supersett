@@ -140,6 +140,7 @@ module.exports = {
         'react/jsx-fragments': 1,
         'react/jsx-no-bind': 0,
         'react/jsx-props-no-spreading': 0, // re-enable up for discussion
+        'react/jsx-key': 1,
         'react/no-array-index-key': 0,
         'react/no-string-refs': 0,
         'react/no-unescaped-entities': 0,

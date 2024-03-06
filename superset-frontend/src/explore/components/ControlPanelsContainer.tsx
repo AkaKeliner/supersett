@@ -635,8 +635,8 @@ export const ControlPanelsContainer = (props: ControlPanelsContainerProps) => {
                 return controlItem;
               }
               if (
-                controlItem.name &&
-                controlItem.config &&
+                'name' in controlItem &&
+                'config' in controlItem &&
                 controlItem.name !== 'datasource'
               ) {
                 return renderControl(controlItem);

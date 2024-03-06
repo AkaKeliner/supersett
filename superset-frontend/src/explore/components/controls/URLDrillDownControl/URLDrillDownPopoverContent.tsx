@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { SupersetTheme, styled, t } from '@superset-ui/core';
 import { Row, Select } from 'src/components';
 import Button from 'src/components/Button';
 import { Input } from 'src/components/Input';
 import { SelectValue } from 'antd/lib/select';
+import { Slice } from 'src/types/Chart';
+import { DatasetObject } from 'src/features/datasets/types';
 import { ExplorePopoverContent } from '../../ExploreContentPopover';
 
 const URLDrillDownPopoverContentContainer = styled.div`
@@ -37,10 +39,26 @@ const URLDrillDownActionsContainer = styled.div`
   margin-top: ${({ theme }) => theme.gridUnit * 2}px;
 `;
 
+enum URLDrillDownType {
+  dashboards = 'Dashboard',
+  chart = 'Chart',
+}
+
 const targetType = [
-  { value: 'dashboards', label: t('Dashboard') },
-  { value: 'slices', label: t('Slice') },
+  { value: URLDrillDownType.dashboards, label: t('Dashboard') },
+  { value: URLDrillDownType.chart, label: t('Chart') },
 ];
+
+type Dashbord = {
+  id: number;
+  dashboard_title: string;
+};
+
+export type Datasource = {
+  dashboards: Dashbord[];
+  slices: Slice[];
+  metrics: DatasetObject['metrics'];
+};
 
 export type URLDrillDownValueType = {
   label: string;
@@ -54,6 +72,7 @@ type Props = {
   onSave?: (item: URLDrillDownValueType, index?: number) => void;
   drilldown: Partial<URLDrillDownValueType>;
   index?: number;
+  datasource: Datasource;
 };
 
 export const URLDrillDownPopoverContent = ({
@@ -61,24 +80,51 @@ export const URLDrillDownPopoverContent = ({
   onSave,
   drilldown,
   index,
+  datasource,
 }: Props) => {
   const [state, setState] = useState({ ...drilldown });
-  const [errors, setErrors] = useState<
-    Partial<Record<keyof URLDrillDownValueType, boolean>>
-  >({});
+
+  const hasError = !(state.field && state.label && state.type && state.url);
+
+  const metrics = useMemo(
+    () =>
+      datasource.metrics.map(({ id, metric_name }) => ({
+        value: id,
+        label: metric_name,
+      })),
+    [datasource.metrics],
+  );
+
+  const dashboards = useMemo(
+    () =>
+      datasource.dashboards.map(({ id, dashboard_title }) => ({
+        value: id,
+        label: dashboard_title,
+      })),
+    [datasource.dashboards],
+  );
+
+  const charts = useMemo(
+    () =>
+      datasource.slices.map(({ slice_id, slice_name }) => ({
+        value: slice_id,
+        label: slice_name,
+      })),
+    [datasource.slices],
+  );
+
+  const urlOptions =
+    state.type === URLDrillDownType.dashboards ? dashboards : charts;
 
   const handleSave = () => {
-    if (state.field && state.label && state.type && state.url) {
-      onSave?.(state as URLDrillDownValueType, index);
-    }
+    onSave?.(state as URLDrillDownValueType, index);
+    onClose();
   };
 
   const handleChange = (
     field: keyof URLDrillDownValueType,
     value: string | SelectValue,
   ) => {
-    if (errors[field]) setErrors({ ...errors, [field]: false });
-    if (!value) setErrors({ ...errors, [field]: true });
     setState({ ...state, [field]: value });
   };
 
@@ -100,7 +146,7 @@ export const URLDrillDownPopoverContent = ({
           <Row>
             <Select
               placeholder={t('Metric')}
-              options={[]}
+              options={metrics}
               css={(theme: SupersetTheme) => ({
                 marginTop: theme.gridUnit * 4,
               })}
@@ -124,11 +170,12 @@ export const URLDrillDownPopoverContent = ({
           <Row>
             <Select
               placeholder={t('Object')}
-              options={[]}
+              options={urlOptions}
               css={(theme: SupersetTheme) => ({
                 marginTop: theme.gridUnit * 4,
                 marginBottom: theme.gridUnit * 4,
               })}
+              disabled={!state.type}
               value={state.url}
               onChange={value => handleChange('url', value)}
             />
@@ -142,7 +189,7 @@ export const URLDrillDownPopoverContent = ({
 
           <Button
             data-test="url-drill-down-edit-popover-save-button"
-            disabled={false}
+            disabled={hasError}
             buttonStyle="primary"
             buttonSize="small"
             className="m-r-5"

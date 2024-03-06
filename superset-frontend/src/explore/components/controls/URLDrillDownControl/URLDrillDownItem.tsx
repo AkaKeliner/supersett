@@ -1,7 +1,6 @@
-import React, { PropsWithChildren, useState } from 'react';
+import React, { PropsWithChildren } from 'react';
 import Icons from 'src/components/Icons';
 import { styled, useTheme } from '@superset-ui/core';
-import ControlPopover from '../ControlPopover/ControlPopover';
 import {
   CloseContainer,
   Label,
@@ -15,20 +14,31 @@ const ItemLabel = styled.div`
   white-space: nowrap;
 `;
 
+const Container = styled(OptionControlContainer)`
+  margin-bottom: 4px;
+  cursor: pointer;
+`;
+
 type Props = PropsWithChildren<{
-  onDelete?: () => void;
-  onClick?: () => void;
+  onDelete?: (index: number) => void;
+  onClick?: (index: number) => void;
+  index: number;
 }>;
 
-export const URLDrillDownItem = ({ children, onDelete, onClick }: Props) => {
+export const URLDrillDownItem = ({
+  children,
+  index,
+  onDelete,
+  onClick,
+}: Props) => {
   const theme = useTheme();
 
   return (
-    <OptionControlContainer data-test="option-label" onClick={onClick}>
+    <Container data-test="option-label" onClick={() => onClick?.(index)}>
       <CloseContainer
         role="button"
         data-test="remove-control-button"
-        onClick={onDelete}
+        onClick={() => onDelete?.(index)}
       >
         <Icons.XSmall iconColor={theme.colors.grayscale.light1} />
       </CloseContainer>
@@ -36,6 +46,6 @@ export const URLDrillDownItem = ({ children, onDelete, onClick }: Props) => {
       <Label data-test="control-label">
         <ItemLabel>{children}</ItemLabel>
       </Label>
-    </OptionControlContainer>
+    </Container>
   );
 };

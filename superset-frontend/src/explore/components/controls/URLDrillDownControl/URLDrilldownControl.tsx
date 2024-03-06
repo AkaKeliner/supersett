@@ -10,6 +10,7 @@ import {
   HeaderContainer,
 } from '../OptionControls';
 import {
+  Datasource,
   URLDrillDownPopoverContent,
   URLDrillDownValueType,
 } from './URLDrillDownPopoverContent';
@@ -17,6 +18,7 @@ import { URLDrillDownItem } from './URLDrillDownItem';
 
 type URLDrilldownControlProps = Omit<ControlComponentProps, 'value'> & {
   value?: URLDrillDownValueType[];
+  datasource: Datasource;
 };
 
 const URLDrilldownControl = ({
@@ -24,7 +26,6 @@ const URLDrilldownControl = ({
   onChange,
   ...props
 }: URLDrilldownControlProps) => {
-  console.log(props);
   const theme = useTheme();
   const [selectedItem, setSelectedItem] =
     useState<Partial<URLDrillDownValueType>>();
@@ -40,6 +41,16 @@ const URLDrilldownControl = ({
     onChange?.(nextValue);
   };
 
+  const handleDelete = (index: number) => {
+    const nextValue = [...(value || [])];
+    nextValue.splice(index, 1);
+    onChange?.(nextValue);
+  };
+
+  const handleEdit = (idnex: number) => {
+    setSelectedItem(value?.[idnex]);
+  };
+
   return (
     <div>
       <HeaderContainer>
@@ -47,8 +58,15 @@ const URLDrilldownControl = ({
       </HeaderContainer>
 
       <DndLabelsContainer>
-        {value?.map(({ label }) => (
-          <URLDrillDownItem>{label}</URLDrillDownItem>
+        {value?.map(({ label, type }, i) => (
+          <URLDrillDownItem
+            key={i}
+            index={i}
+            onDelete={handleDelete}
+            onClick={handleEdit}
+          >
+            {label} ({t(type)})
+          </URLDrillDownItem>
         ))}
 
         <AddControlLabel onClick={() => setSelectedItem({})}>
@@ -63,6 +81,7 @@ const URLDrilldownControl = ({
               onClose={() => setSelectedItem(undefined)}
               onSave={handleSave}
               drilldown={selectedItem || {}}
+              datasource={props.datasource}
             />
           }
           defaultVisible={false}
