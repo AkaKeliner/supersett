@@ -16,7 +16,6 @@
 # under the License.
 import logging
 
-import numpy
 import numpy as np
 from flask_appbuilder.api import expose, protect, safe
 
