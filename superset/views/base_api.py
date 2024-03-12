@@ -192,7 +192,7 @@ class BaseTagFilter(BaseFilter):  # pylint: disable=too-few-public-methods
 
 
 class BaseSupersetApiMixin:
-    csrf_exempt = False
+    csrf_exempt = True
 
     responses = {
         "400": {"description": "Bad request", "content": error_payload_content},

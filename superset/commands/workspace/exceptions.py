@@ -49,7 +49,7 @@ class WorkspaceUpdateFailedError(UpdateFailedError):
 class WorkspaceDeleteFailedError(DeleteFailedError):
     message = _("Workspace could not be deleted.")
 
-class WorkspaceDeleteFailedReportsExistError(DashboardDeleteFailedError):
+class WorkspaceDeleteFailedReportsExistError(WorkspaceDeleteFailedError):
     message = _("There are associated alerts or reports")
 
 class WorkspaceForbiddenError(ForbiddenError):

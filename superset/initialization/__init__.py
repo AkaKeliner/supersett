@@ -196,6 +196,7 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
             Workspace,
             WorkspaceModelView,
         )
+        from superset.workspace.api import WorkspaceRestApi
 
         #
         # Setup API views
@@ -216,6 +217,7 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         appbuilder.add_api(DatabaseRestApi)
         appbuilder.add_api(DatasetRestApi)
         appbuilder.add_api(DatasetColumnsRestApi)
+        appbuilder.add_api(WorkspaceRestApi)
         appbuilder.add_api(DatasetMetricRestApi)
         appbuilder.add_api(DatasourceRestApi)
         appbuilder.add_api(EmbeddedDashboardRestApi)

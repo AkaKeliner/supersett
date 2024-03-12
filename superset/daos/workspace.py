@@ -73,6 +73,10 @@ class WorkspaceDAO(BaseDAO[Workspace]):
         return workspace.get_dashboards()
 
     @staticmethod
+    def get_charts_for_workspace(id_or_slug: str) -> list[Slice]:
+        return WorkspaceDAO.get_by_id_or_slug(id_or_slug).slice_objects
+
+    @staticmethod
     def validate_slug_uniqueness(slug: str) -> bool:
         if not slug:
             return True
