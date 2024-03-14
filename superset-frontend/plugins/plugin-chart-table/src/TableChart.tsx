@@ -48,7 +48,6 @@ import {
   css,
   t,
   tn,
-  DDChart,
 } from '@superset-ui/core';
 
 import { DataColumnMeta, TableChartTransformedProps } from './types';
@@ -239,7 +238,6 @@ export default function TableChart<D extends DataRecord = DataRecord>(
     allowRearrangeColumns = false,
     onContextMenu,
     emitCrossFilters,
-    urlDrillDowns,
   } = props;
   const timestampFormatter = useCallback(
     value => getTimeFormatterForGranularity(timeGrain)(value),
@@ -282,71 +280,74 @@ export default function TableChart<D extends DataRecord = DataRecord>(
     [filters],
   );
 
-  const getCrossFilterDataMask = (key: string, value: DataRecordValue) => {
-    let updatedFilters = { ...(filters || {}) };
-    if (filters && isActiveFilterValue(key, value)) {
-      updatedFilters = {};
-    } else {
-      updatedFilters = {
-        [key]: [value],
-      };
-    }
-    if (
-      Array.isArray(updatedFilters[key]) &&
-      updatedFilters[key].length === 0
-    ) {
-      delete updatedFilters[key];
-    }
-
-    const groupBy = Object.keys(updatedFilters);
-    const groupByValues = Object.values(updatedFilters);
-    const labelElements: string[] = [];
-    groupBy.forEach(col => {
-      const isTimestamp = col === DTTM_ALIAS;
-      const filterValues = ensureIsArray(updatedFilters?.[col]);
-      if (filterValues.length) {
-        const valueLabels = filterValues.map(value =>
-          isTimestamp ? timestampFormatter(value) : value,
-        );
-        labelElements.push(`${valueLabels.join(', ')}`);
+  const getCrossFilterDataMask = useCallback(
+    (key: string, value: DataRecordValue) => {
+      let updatedFilters = { ...(filters || {}) };
+      if (filters && isActiveFilterValue(key, value)) {
+        updatedFilters = {};
+      } else {
+        updatedFilters = {
+          [key]: [value],
+        };
       }
-    });
+      if (
+        Array.isArray(updatedFilters[key]) &&
+        updatedFilters[key].length === 0
+      ) {
+        delete updatedFilters[key];
+      }
 
-    return {
-      dataMask: {
-        extraFormData: {
-          filters:
-            groupBy.length === 0
-              ? []
-              : groupBy.map(col => {
-                  const val = ensureIsArray(updatedFilters?.[col]);
-                  if (!val.length)
+      const groupBy = Object.keys(updatedFilters);
+      const groupByValues = Object.values(updatedFilters);
+      const labelElements: string[] = [];
+      groupBy.forEach(col => {
+        const isTimestamp = col === DTTM_ALIAS;
+        const filterValues = ensureIsArray(updatedFilters?.[col]);
+        if (filterValues.length) {
+          const valueLabels = filterValues.map(value =>
+            isTimestamp ? timestampFormatter(value) : value,
+          );
+          labelElements.push(`${valueLabels.join(', ')}`);
+        }
+      });
+
+      return {
+        dataMask: {
+          extraFormData: {
+            filters:
+              groupBy.length === 0
+                ? []
+                : groupBy.map(col => {
+                    const val = ensureIsArray(updatedFilters?.[col]);
+                    if (!val.length)
+                      return {
+                        col,
+                        op: 'IS NULL' as const,
+                      };
                     return {
                       col,
-                      op: 'IS NULL' as const,
+                      op: 'IN' as const,
+                      val: val.map(el =>
+                        el instanceof Date ? el.getTime() : el!,
+                      ),
+                      grain: col === DTTM_ALIAS ? timeGrain : undefined,
                     };
-                  return {
-                    col,
-                    op: 'IN' as const,
-                    val: val.map(el =>
-                      el instanceof Date ? el.getTime() : el!,
-                    ),
-                    grain: col === DTTM_ALIAS ? timeGrain : undefined,
-                  };
-                }),
+                  }),
+          },
+          filterState: {
+            label: labelElements.join(', '),
+            value: groupByValues.length ? groupByValues : null,
+            filters:
+              updatedFilters && Object.keys(updatedFilters).length
+                ? updatedFilters
+                : null,
+          },
         },
-        filterState: {
-          label: labelElements.join(', '),
-          value: groupByValues.length ? groupByValues : null,
-          filters:
-            updatedFilters && Object.keys(updatedFilters).length
-              ? updatedFilters
-              : null,
-        },
-      },
-      isCurrentValueSelected: isActiveFilterValue(key, value),
-    };
-  };
+        isCurrentValueSelected: isActiveFilterValue(key, value),
+      };
+    },
+    [filters, timeGrain, timestampFormatter, isActiveFilterValue],
+  );
 
   const toggleFilter = useCallback(
     function toggleFilter(key: string, val: DataRecordValue) {
@@ -376,13 +377,12 @@ export default function TableChart<D extends DataRecord = DataRecord>(
           key: string;
           value: DataRecordValue;
           isMetric?: boolean;
+          row?: Row<D>;
         },
         clientX: number,
         clientY: number,
       ) => {
         const drillToDetailFilters: BinaryQueryObjectFilterClause[] = [];
-        const ddToCharts: DDChart[] = [];
-        const ddToDashboards: DDChart[] = [];
         columnsMeta.forEach(col => {
           if (!col.isMetric) {
             const dataRecordValue = value[col.key];
@@ -394,21 +394,7 @@ export default function TableChart<D extends DataRecord = DataRecord>(
             });
           }
         });
-        if (urlDrillDowns?.length) {
-          urlDrillDowns.forEach(dd => {
-            if (dd.key === cellPoint.key) {
-              if (dd.type === 'slices') {
-                // @ts-ignore
-                ddToCharts.push({ ...dd, value: cellPoint.value });
-              }
 
-              if (dd.type === 'dashboards') {
-                // @ts-ignore
-                ddToDashboards.push({ ...dd, value: cellPoint.value });
-              }
-            }
-          });
-        }
         onContextMenu(clientX, clientY, {
           drillToDetail: drillToDetailFilters,
           crossFilter: cellPoint.isMetric
@@ -426,8 +412,7 @@ export default function TableChart<D extends DataRecord = DataRecord>(
                 ],
                 groupbyFieldName: 'groupby',
               },
-          drillToCharts: ddToCharts?.length ? ddToCharts : null,
-          drillToDashboards: ddToDashboards?.length ? ddToDashboards : null,
+          drillDown: cellPoint.isMetric ? cellPoint.row?.original : undefined,
         });
       };
 
@@ -552,7 +537,7 @@ export default function TableChart<D extends DataRecord = DataRecord>(
                 e.stopPropagation();
                 handleContextMenu(
                   row.original,
-                  { key, value, isMetric },
+                  { key, value, isMetric, row },
                   e.nativeEvent.clientX,
                   e.nativeEvent.clientY,
                 );
@@ -572,6 +557,7 @@ export default function TableChart<D extends DataRecord = DataRecord>(
                   <div
                     className="dt-truncate-cell"
                     style={columnWidth ? { width: columnWidth } : undefined}
+                    // eslint-disable-next-line react/no-danger
                     dangerouslySetInnerHTML={html}
                   />
                 </StyledCell>
@@ -589,7 +575,7 @@ export default function TableChart<D extends DataRecord = DataRecord>(
                   /* The following classes are added to support custom CSS styling */
                   className={cx(
                     'cell-bar',
-                    value && value < 0 ? 'negative' : 'positive',
+                    value && Number(value) < 0 ? 'negative' : 'positive',
                   )}
                   css={cellBarStyles}
                 />

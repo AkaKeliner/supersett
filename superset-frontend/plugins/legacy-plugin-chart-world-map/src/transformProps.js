@@ -46,7 +46,7 @@ export default function transformProps(chartProps) {
     yAxisFormat,
     currencyFormat,
   } = formData;
-  const { r, g, b } = colorPicker;
+  const { r, g, b } = colorPicker || {};
   const { currencyFormats = {}, columnFormats = {} } = datasource;
 
   const formatter = getValueFormatter(

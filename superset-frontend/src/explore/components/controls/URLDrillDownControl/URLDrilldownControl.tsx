@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { ControlComponentProps } from '@superset-ui/chart-controls';
-import { t, useTheme } from '@superset-ui/core';
+import { URLDrillDownValueType, t, useTheme } from '@superset-ui/core';
 import Icons from 'src/components/Icons';
 import ControlHeader from '../../ControlHeader';
 import ControlPopover from '../ControlPopover/ControlPopover';
@@ -12,7 +12,6 @@ import {
 import {
   Datasource,
   URLDrillDownPopoverContent,
-  URLDrillDownValueType,
 } from './URLDrillDownPopoverContent';
 import { URLDrillDownItem } from './URLDrillDownItem';
 
@@ -22,21 +21,20 @@ type URLDrilldownControlProps = Omit<ControlComponentProps, 'value'> & {
 };
 
 const URLDrilldownControl = ({
-  value,
+  value = [],
   onChange,
   ...props
 }: URLDrilldownControlProps) => {
   const theme = useTheme();
-  const [selectedItem, setSelectedItem] =
-    useState<Partial<URLDrillDownValueType>>();
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
-  const togglePopover = useCallback((visible: boolean) => {
-    setSelectedItem(visible ? {} : undefined);
+  const togglePopover = useCallback((value, visible: boolean) => {
+    setSelectedIndex(visible ? value.length : null);
   }, []);
 
   const handleSave = (item: URLDrillDownValueType, index?: number) => {
-    const nextValue = [...(value || [])];
-    if (index) nextValue[index] = item;
+    const nextValue = [...value];
+    if (index !== undefined) nextValue[index] = item;
     else nextValue.push(item);
     onChange?.(nextValue);
   };
@@ -45,10 +43,6 @@ const URLDrilldownControl = ({
     const nextValue = [...(value || [])];
     nextValue.splice(index, 1);
     onChange?.(nextValue);
-  };
-
-  const handleEdit = (idnex: number) => {
-    setSelectedItem(value?.[idnex]);
   };
 
   return (
@@ -63,13 +57,13 @@ const URLDrilldownControl = ({
             key={i}
             index={i}
             onDelete={handleDelete}
-            onClick={handleEdit}
+            onClick={setSelectedIndex}
           >
             {label} ({t(type)})
           </URLDrillDownItem>
         ))}
 
-        <AddControlLabel onClick={() => setSelectedItem({})}>
+        <AddControlLabel onClick={() => setSelectedIndex(value.length)}>
           <Icons.PlusSmall iconColor={theme.colors.grayscale.light1} />
           {t('Add Drilldown URL')}
         </AddControlLabel>
@@ -78,15 +72,16 @@ const URLDrilldownControl = ({
           trigger="click"
           content={
             <URLDrillDownPopoverContent
-              onClose={() => setSelectedItem(undefined)}
+              index={selectedIndex === null ? value.length : selectedIndex}
+              onClose={setSelectedIndex}
               onSave={handleSave}
-              drilldown={selectedItem || {}}
+              drilldown={value[selectedIndex!]}
               datasource={props.datasource}
             />
           }
           defaultVisible={false}
-          visible={!!selectedItem}
-          onVisibleChange={togglePopover}
+          visible={selectedIndex !== null}
+          onVisibleChange={togglePopover.bind(null, value)}
           destroyTooltipOnHide
         />
       </DndLabelsContainer>

@@ -44,6 +44,7 @@ const config: ControlPanelConfig = {
       label: t('Query'),
       expanded: true,
       controlSetRows: [
+        ['url_drillDowns'],
         [
           {
             name: 'groupbyColumns',

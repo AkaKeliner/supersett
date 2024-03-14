@@ -35,6 +35,7 @@ import {
   isFeatureEnabled,
   QueryFormData,
   t,
+  URLDrillDownTypeEnum,
   useTheme,
 } from '@superset-ui/core';
 import { RootState } from 'src/dashboard/types';
@@ -43,11 +44,10 @@ import { Menu } from 'src/components/Menu';
 import { AntdDropdown as Dropdown } from 'src/components/index';
 import { updateDataMask } from 'src/dataMask/actions';
 import { DrillDetailMenuItems } from '../DrillDetail';
-import { DrillToChartMenuItems } from '../DrillToChart';
 import { getMenuAdjustedY } from '../utils';
 import { MenuItemTooltip } from '../DisabledMenuItemTooltip';
 import { DrillByMenuItems } from '../DrillBy/DrillByMenuItems';
-import { DrillToDashboardMenuItems } from '../DrillToDashboard';
+import { DrillDown } from '../DrillDown';
 
 export enum ContextMenuItem {
   CrossFilter,
@@ -55,6 +55,7 @@ export enum ContextMenuItem {
   DrillBy,
   All,
 }
+
 export interface ChartContextMenuProps {
   id: number;
   formData: QueryFormData;
@@ -122,6 +123,16 @@ const ChartContextMenu = (
     isFeatureEnabled(FeatureFlag.DASHBOARD_CROSS_FILTERS) &&
     isDisplayed(ContextMenuItem.CrossFilter);
 
+  const showDrillToChart =
+    formData.url_drillDowns?.some(
+      ({ type }) => type === URLDrillDownTypeEnum.chart,
+    ) && filters?.drillDown;
+
+  const showDrillToDashboard =
+    formData.url_drillDowns?.some(
+      ({ type }) => type === URLDrillDownTypeEnum.dashboard,
+    ) && filters?.drillDown;
+
   const isCrossFilteringSupportedByChart = getChartMetadataRegistry()
     .get(formData.viz_type)
     ?.behaviors?.includes(Behavior.INTERACTIVE_CHART);
@@ -136,11 +147,19 @@ const ChartContextMenu = (
   if (showDrillBy) {
     itemsCount += 1;
   }
+  if (showDrillToChart) {
+    itemsCount += 1;
+  }
+  if (showDrillToDashboard) {
+    itemsCount += 1;
+  }
   if (itemsCount === 0) {
     itemsCount = 1; // "No actions" appears if no actions in menu
   }
 
+  let submenuIndex = 0;
   if (showCrossFilters) {
+    submenuIndex += 1;
     const isCrossFilterDisabled =
       !isCrossFilteringSupportedByChart ||
       !crossFiltersEnabled ||
@@ -213,6 +232,7 @@ const ChartContextMenu = (
     );
   }
   if (showDrillToDetail) {
+    submenuIndex += 1;
     menuItems.push(
       <DrillDetailMenuItems
         chartId={id}
@@ -221,19 +241,13 @@ const ChartContextMenu = (
         isContextMenu
         contextMenuY={clientY}
         onSelection={onSelection}
-        submenuIndex={showCrossFilters ? 2 : 1}
+        submenuIndex={submenuIndex}
         {...(additionalConfig?.drillToDetail || {})}
       />,
     );
   }
   if (showDrillBy) {
-    let submenuIndex = 0;
-    if (showCrossFilters) {
-      submenuIndex += 1;
-    }
-    if (showDrillToDetail) {
-      submenuIndex += 2;
-    }
+    submenuIndex += 1;
     menuItems.push(
       <DrillByMenuItems
         drillByConfig={filters?.drillBy}
@@ -245,33 +259,33 @@ const ChartContextMenu = (
       />,
     );
   }
-  if (filters?.drillToCharts) {
+  if (showDrillToChart) {
+    submenuIndex += 1;
     menuItems.push(
-      <DrillToChartMenuItems
-        drillToChart={filters.drillToCharts}
-        // drillToDashboards={filters.drillToDashboards}
+      <DrillDown
+        title={t('Drill to chart')}
+        type={URLDrillDownTypeEnum.chart}
         formData={formData}
-        filters={filters?.drillToDetail}
+        filters={filters}
+        submenuIndex={submenuIndex}
         isContextMenu
         contextMenuY={clientY}
         onSelection={onSelection}
-        submenuIndex={showCrossFilters ? 2 : 1}
-        {...(additionalConfig?.drillToDetail || {})}
       />,
     );
   }
-  if (filters?.drillToDashboards) {
+  if (showDrillToDashboard) {
+    submenuIndex += 1;
     menuItems.push(
-      <DrillToDashboardMenuItems
-        // drillToChart={filters.drillToCharts}
-        drillToDashboards={filters.drillToDashboards}
+      <DrillDown
+        title={t('Drill to dashboard')}
+        type={URLDrillDownTypeEnum.dashboard}
         formData={formData}
-        filters={filters?.drillToDetail}
+        filters={filters}
+        submenuIndex={submenuIndex}
         isContextMenu
         contextMenuY={clientY}
         onSelection={onSelection}
-        submenuIndex={showCrossFilters ? 2 : 1}
-        {...(additionalConfig?.drillToDetail || {})}
       />,
     );
   }

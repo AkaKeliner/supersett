@@ -17,11 +17,7 @@
  * under the License.
  */
 
-import {
-  BinaryQueryObjectFilterClause,
-  DDChart,
-  ExtraFormData,
-} from '../../query';
+import { BinaryQueryObjectFilterClause, ExtraFormData } from '../../query';
 import { JsonObject } from '../..';
 
 export type HandlerFunction = (...args: unknown[]) => void;
@@ -49,8 +45,7 @@ export interface ContextMenuFilters {
     groupbyFieldName: string;
     adhocFilterFieldName?: string;
   };
-  drillToCharts: Array<DDChart> | null;
-  drillToDashboards: Array<DDChart> | null;
+  drillDown?: Record<string, Date | string | number | boolean | null>;
 }
 
 export enum AppSection {

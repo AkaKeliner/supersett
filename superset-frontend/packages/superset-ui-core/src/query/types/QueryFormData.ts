@@ -139,6 +139,18 @@ export type ExtraFormDataOverride = ExtraFormDataOverrideRegular &
 
 export type ExtraFormData = ExtraFormDataAppend & ExtraFormDataOverride;
 
+export enum URLDrillDownTypeEnum {
+  dashboard = 'Dashboard',
+  chart = 'Chart',
+}
+
+export type URLDrillDownValueType = {
+  label: string;
+  field: string;
+  type: URLDrillDownTypeEnum;
+  url: string;
+};
+
 // Type signature for formData shared by all viz types
 // It will be gradually filled out as we build out the query object
 
@@ -187,12 +199,7 @@ export interface BaseFormData extends TimeRange, FormDataResidual {
   series_columns?: QueryFormColumn[];
   series_limit?: number;
   series_limit_metric?: QueryFormMetric;
-  urlDrillDowns?: Array<{
-    url: number;
-    type: string;
-    field: string;
-    title: string;
-  }>;
+  url_drillDowns?: Array<URLDrillDownValueType>;
 }
 
 /**

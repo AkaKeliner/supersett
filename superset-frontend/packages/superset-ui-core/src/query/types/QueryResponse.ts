@@ -34,7 +34,6 @@ export enum GenericDataType {
  * Primitive types for data field values.
  */
 export type DataRecordValue = number | string | boolean | Date | null;
-export type DataRecordValueDD = number | string | boolean | Date;
 
 export interface DataRecord {
   [key: string]: DataRecordValue;

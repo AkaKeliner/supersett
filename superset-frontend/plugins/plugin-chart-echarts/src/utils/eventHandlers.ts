@@ -25,7 +25,6 @@ import {
   getColumnLabel,
   getNumberFormatter,
   getTimeFormatter,
-  DDChart,
 } from '@superset-ui/core';
 
 import {
@@ -121,21 +120,6 @@ export const contextMenuEventHandler =
       e.event.stop();
       const pointerEvent = e.event.event;
       const drillFilters: BinaryQueryObjectFilterClause[] = [];
-      const ddToCharts: DDChart[] = [];
-      const ddToDashboards: DDChart[] = [];
-      const { urlDrillDowns } = formData;
-      if (urlDrillDowns?.length) {
-        urlDrillDowns.forEach(dd => {
-          const values = labelMap[e.name];
-          if (dd.type === 'slices') {
-            ddToCharts.push({ ...dd, value: values });
-          }
-
-          if (dd.type === 'dashboards') {
-            ddToDashboards.push({ ...dd, value: values });
-          }
-        });
-      }
 
       if (groupby.length > 0) {
         const values = labelMap[e.name];
@@ -152,12 +136,15 @@ export const contextMenuEventHandler =
           });
         });
       }
+
       onContextMenu(pointerEvent.clientX, pointerEvent.clientY, {
         drillToDetail: drillFilters,
         crossFilter: getCrossFilterDataMask(e.name),
         drillBy: { filters: drillFilters, groupbyFieldName: 'groupby' },
-        drillToCharts: ddToCharts?.length ? ddToCharts : null,
-        drillToDashboards: ddToDashboards?.length ? ddToDashboards : null,
+        drillDown: drillFilters.reduce<any>((acc, { col, val }) => {
+          acc[col as string] = val;
+          return acc;
+        }, {}),
       });
     }
   };

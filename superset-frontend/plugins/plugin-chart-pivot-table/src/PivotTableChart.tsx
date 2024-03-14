@@ -523,6 +523,10 @@ export default function PivotTableChart(props: PivotTableProps) {
             ],
             groupbyFieldName: rowKey ? 'groupbyRows' : 'groupbyColumns',
           },
+          drillDown: drillToDetailFilters.reduce<any>((acc, { col, val }) => {
+            acc[col as string] = val;
+            return acc;
+          }, {}),
         });
       }
     },

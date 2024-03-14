@@ -38,7 +38,10 @@ export const URLDrillDownItem = ({
       <CloseContainer
         role="button"
         data-test="remove-control-button"
-        onClick={() => onDelete?.(index)}
+        onClick={e => {
+          e.stopPropagation();
+          onDelete?.(index);
+        }}
       >
         <Icons.XSmall iconColor={theme.colors.grayscale.light1} />
       </CloseContainer>

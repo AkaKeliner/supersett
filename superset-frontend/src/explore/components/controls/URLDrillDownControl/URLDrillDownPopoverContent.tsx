@@ -1,5 +1,11 @@
 import React, { useMemo, useState } from 'react';
-import { SupersetTheme, styled, t } from '@superset-ui/core';
+import {
+  SupersetTheme,
+  URLDrillDownTypeEnum,
+  URLDrillDownValueType,
+  styled,
+  t,
+} from '@superset-ui/core';
 import { Row, Select } from 'src/components';
 import Button from 'src/components/Button';
 import { Input } from 'src/components/Input';
@@ -39,14 +45,9 @@ const URLDrillDownActionsContainer = styled.div`
   margin-top: ${({ theme }) => theme.gridUnit * 2}px;
 `;
 
-enum URLDrillDownType {
-  dashboards = 'Dashboard',
-  chart = 'Chart',
-}
-
 const targetType = [
-  { value: URLDrillDownType.dashboards, label: t('Dashboard') },
-  { value: URLDrillDownType.chart, label: t('Chart') },
+  { value: URLDrillDownTypeEnum.dashboard, label: t('Dashboard') },
+  { value: URLDrillDownTypeEnum.chart, label: t('Chart') },
 ];
 
 type Dashbord = {
@@ -60,17 +61,10 @@ export type Datasource = {
   metrics: DatasetObject['metrics'];
 };
 
-export type URLDrillDownValueType = {
-  label: string;
-  field: string;
-  type: string;
-  url: string;
-};
-
 type Props = {
-  onClose: () => void;
+  onClose: (item: null) => void;
   onSave?: (item: URLDrillDownValueType, index?: number) => void;
-  drilldown: Partial<URLDrillDownValueType>;
+  drilldown?: Partial<URLDrillDownValueType>;
   index?: number;
   datasource: Datasource;
 };
@@ -78,7 +72,7 @@ type Props = {
 export const URLDrillDownPopoverContent = ({
   onClose,
   onSave,
-  drilldown,
+  drilldown = {},
   index,
   datasource,
 }: Props) => {
@@ -88,8 +82,8 @@ export const URLDrillDownPopoverContent = ({
 
   const metrics = useMemo(
     () =>
-      datasource.metrics.map(({ id, metric_name }) => ({
-        value: id,
+      datasource.metrics.map(({ metric_name }) => ({
+        value: metric_name,
         label: metric_name,
       })),
     [datasource.metrics],
@@ -114,11 +108,11 @@ export const URLDrillDownPopoverContent = ({
   );
 
   const urlOptions =
-    state.type === URLDrillDownType.dashboards ? dashboards : charts;
+    state.type === URLDrillDownTypeEnum.dashboard ? dashboards : charts;
 
   const handleSave = () => {
     onSave?.(state as URLDrillDownValueType, index);
-    onClose();
+    onClose(null);
   };
 
   const handleChange = (
@@ -183,7 +177,7 @@ export const URLDrillDownPopoverContent = ({
         </div>
 
         <URLDrillDownActionsContainer>
-          <Button buttonSize="small" onClick={onClose} cta>
+          <Button buttonSize="small" onClick={() => onClose(null)} cta>
             {t('Close')}
           </Button>
 
