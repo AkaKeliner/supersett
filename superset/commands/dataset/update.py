@@ -36,7 +36,7 @@ from superset.commands.dataset.exceptions import (
     DatasetMetricsNotFoundValidationError,
     DatasetNotFoundError,
     DatasetUpdateFailedError,
-    WorkspacesNotFoundValidationErrorб,
+    WorkspacesNotFoundValidationError,
 )
 from superset.connectors.sqla.models import SqlaTable
 from superset.daos.dataset import DatasetDAO
