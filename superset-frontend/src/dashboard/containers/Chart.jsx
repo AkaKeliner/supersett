@@ -32,6 +32,7 @@ import {
 import {
   refreshChart,
   revertChartState,
+  drillToChartUp,
 } from 'src/components/Chart/chartAction';
 import { logEvent } from 'src/logger/actions';
 import {
@@ -120,6 +121,7 @@ function mapDispatchToProps(dispatch) {
       refreshChart,
       logEvent,
       revertChartState,
+      drillToChartUp,
     },
     dispatch,
   );

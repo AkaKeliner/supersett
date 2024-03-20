@@ -17,6 +17,10 @@
  * under the License.
  */
 import {
+  DRILL_TO_CHART_DOWN,
+  DRILL_TO_CHART_UP,
+} from 'src/components/Chart/chartAction';
+import {
   DASHBOARD_ROOT_ID,
   DASHBOARD_GRID_ID,
   NEW_COMPONENTS_SOURCE_ID,
@@ -303,6 +307,14 @@ const actionHandlers = {
         },
       },
     };
+  },
+
+  [DRILL_TO_CHART_DOWN](_, { payload }) {
+    return payload.layout;
+  },
+
+  [DRILL_TO_CHART_UP](_, { payload }) {
+    return payload.layout;
   },
 };
 

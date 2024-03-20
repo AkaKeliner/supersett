@@ -58,6 +58,7 @@ export interface ChartState {
   queriesResponse: QueryData | null;
   triggerQuery: boolean;
   prevFormData: Array<any>;
+  prevSliceId?: number;
 }
 
 export type OptionSortType = Partial<

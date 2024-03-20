@@ -4,11 +4,11 @@ import {
   URLDrillDownTypeEnum,
 } from '@superset-ui/core';
 import React, { useCallback, useMemo } from 'react';
-import { Menu } from 'src/components/Menu';
 import { useDispatch } from 'react-redux';
-import { updateDataMask } from 'src/dataMask/actions';
-import { getSubmenuYOffset } from '../utils';
+import { Menu } from 'src/components/Menu';
 import { MenuItemWithTruncation } from '../MenuItemWithTruncation';
+import { drillToChartDown } from '../chartAction';
+import { getSubmenuYOffset } from '../utils';
 
 type Props = {
   type: URLDrillDownTypeEnum;
@@ -55,10 +55,9 @@ export const DrillDown = ({
     (item, filters, e) => {
       onClick(e);
       onSelection();
-      // dispatch(updateDataMask(item.url, filters.crossFilter.dataMask));
-      console.log(item, filters?.drillDown);
+      dispatch(drillToChartDown(formData.slice_id, item, filters));
     },
-    [onSelection, onClick],
+    [dispatch, onSelection, onClick, formData.slice_id],
   );
 
   return (

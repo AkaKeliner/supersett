@@ -25,6 +25,7 @@ import {
   SupersetClient,
   t,
   isFeatureEnabled,
+  makeApi,
 } from '@superset-ui/core';
 import { getControlsState } from 'src/explore/store';
 import {
@@ -43,6 +44,8 @@ import { allowCrossDomain as domainShardingEnabled } from 'src/utils/hostNamesCo
 import { updateDataMask } from 'src/dataMask/actions';
 import { waitForAsyncData } from 'src/middleware/asyncEvent';
 import { safeStringify } from 'src/utils/safeStringify';
+import { replaceChart } from 'src/dashboard/util/replaceChart';
+import { removeSlice } from 'src/dashboard/actions/dashboardState';
 
 export const CHART_UPDATE_STARTED = 'CHART_UPDATE_STARTED';
 
@@ -537,17 +540,8 @@ export function postChartFormData(
   key,
   dashboardId,
   ownState,
-  isDD,
 ) {
-  return exploreJSON(
-    formData,
-    force,
-    timeout,
-    key,
-    dashboardId,
-    ownState,
-    isDD,
-  );
+  return exploreJSON(formData, force, timeout, key, dashboardId, ownState);
 }
 
 export function redirectSQLLab(formData, history) {
@@ -653,64 +647,76 @@ export const revertChartState = chartId => (dispatch, getState) => {
   );
 };
 
-export const DD = 'DD';
-export function postDDChartFormData(payload, key) {
-  return {
-    type: DD,
-    payload,
-    key,
-  };
-}
+export const DRILL_TO_CHART_DOWN = 'DRILL_TO_CHART_DOWN';
 
-export function drilldownToChart(chartKey, toChartKey, dashboardId, filters) {
+export function drillToChartDown(sliceId, drillDown, filters) {
   return async (dispatch, getState) => {
-    dispatch(saveChartState(chartKey));
-    // тестовый запрос
+    const { dashboardLayout, dashboardInfo } = getState();
 
-    fetch(`http://localhost:8088/api/v1/chart/${toChartKey}/data/`).then(
-      response => response.json(),
-    );
-    // .then(data => {});
-    // const fetchFormDataByChartId = async (id) => {
-    //   return await new Promise((resolve, reject) => {
-    //     $.getJSON(`http://localhost:8088/api/v1/chart/${id}/data/`, (data) => {
-    //       resolve(data);
-    //     }).fail((jqXHR, textStatus, errorThrown) => {
-    //       reject(errorThrown);
-    //     });
-    //   })
-    // }
+    const { result } = await makeApi({
+      method: 'GET',
+      endpoint: 'api/v1/explore/',
+    })(new URLSearchParams(`slice_id=${drillDown.url}`));
 
-    // const newFormData_0 = fetchFormDataByChartId(toChartKey);
-    // TODO нужно запросить formData для нового chart по его id
-    // сейчас newChart - неправильно находится
-    const newChart = (getState().charts || {})[toChartKey];
-
-    const currentChart = (getState().charts || {})[chartKey];
-    const timeout =
-      getState().dashboardInfo.common.conf.SUPERSET_WEBSERVER_TIMEOUT;
-    const fd = newChart.latestQueryFormData;
-    // TODO уточнить на бэке в какой фильтр добавлять
-    // const newFormData = {...fd, extra_filters: [...fd.extra_filters, ...filters] };
-    const newFormData = {
-      ...fd,
-      extra_form_data: {
-        ...(fd.extra_form_data || {}),
-        filters: [...(fd.extra_form_data.filters || []), ...(filters || [])],
+    const slices = {
+      [result.form_data.slice_id]: {
+        slice_id: result.form_data.slice_id,
+        form_data: result.form_data,
+        slice_url: result.slice.slice_url,
+        slice_name: result.slice.slice_name,
+        viz_type: result.slice.form_data.viz_type,
+        datasource: result.slice.form_data.datasource,
+        description: result.slice.description,
+        description_markeddown: result.slice.description_markeddown,
+        owners: result.slice.owners,
+        modified: result.slice.modified,
+        changed_on: new Date(result.slice.changed_on).getTime(),
       },
     };
 
-    dispatch(
-      postChartFormData(
-        newFormData,
-        false,
-        timeout,
-        currentChart.id,
-        dashboardId,
-        getState().dataMask[newChart.id]?.ownState,
-        true,
-      ),
+    const layout = replaceChart(
+      dashboardLayout.present,
+      sliceId,
+      drillDown.url,
+      result.slice.slice_name,
     );
+
+    dispatch({
+      type: DRILL_TO_CHART_DOWN,
+      payload: {
+        prevSliceId: sliceId,
+        formData: result.form_data,
+        slices,
+        layout,
+      },
+      key: result.form_data.slice_id,
+    });
+
+    const timeout = dashboardInfo.common.conf.SUPERSET_WEBSERVER_TIMEOUT;
+
+    dispatch(exploreJSON(result.form_data, false, timeout, drillDown.url));
+  };
+}
+
+export const DRILL_TO_CHART_UP = 'DRILL_TO_CHART_UP';
+
+export function drillToChartUp(sliceId) {
+  return async (dispatch, getState) => {
+    const { charts, dashboardLayout, sliceEntities } = getState();
+
+    const { prevSliceId } = charts[sliceId];
+    const prevSliceName = sliceEntities.slices[prevSliceId].slice_name;
+
+    const layout = replaceChart(
+      dashboardLayout.present,
+      sliceId,
+      prevSliceId,
+      prevSliceName,
+    );
+
+    dispatch({ type: DRILL_TO_CHART_UP, payload: { layout } });
+    dispatch(removeChart(sliceId));
+    dispatch(removeSlice(sliceId));
   };
 }
 

@@ -131,8 +131,12 @@ export default function chartReducer(
     [actions.UPDATE_QUERY_FORM_DATA](state) {
       return { ...state, latestQueryFormData: action.value };
     },
-    [actions.DD](state) {
-      return { ...state, form_data: action.payload };
+    [actions.DRILL_TO_CHART_DOWN]() {
+      return {
+        ...chart,
+        prevSliceId: action.payload.prevSliceId,
+        form_data: action.payload.formData,
+      };
     },
     [actions.ANNOTATION_QUERY_STARTED](state) {
       if (state.annotationQuery?.[action.annotation.name]) {

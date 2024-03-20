@@ -83,7 +83,10 @@ export type ChartConfiguration = {
 
 export type ActiveTabs = string[];
 export type DashboardLayout = { [key: string]: LayoutItem };
-export type DashboardLayoutState = { present: DashboardLayout };
+export type DashboardLayoutState = {
+  present: DashboardLayout;
+  past: DashboardLayout[];
+};
 export type DashboardState = {
   preselectNativeFilters?: JsonObject;
   editMode: boolean;

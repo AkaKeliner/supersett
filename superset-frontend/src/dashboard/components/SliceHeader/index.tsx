@@ -53,6 +53,7 @@ type SliceHeaderProps = SliceHeaderControlsProps & {
   width: number;
   height: number;
   revertChartState?: (sliceId: number) => void;
+  drillToChartUp?: (sliceId: number) => void;
 };
 
 const annotationsLoading = t('Annotation layers are still loading.');
@@ -60,6 +61,14 @@ const annotationsError = t('One ore more annotation layers failed loading.');
 const CrossFilterIcon = styled(Icons.ApartmentOutlined)`
   ${({ theme }) => `
     cursor: default;
+    color: ${theme.colors.primary.base};
+    line-height: 1.8;
+  `}
+`;
+
+const DrillUpIcon = styled(Icons.UpLevel)`
+  ${({ theme }) => `
+    cursor: pointer;
     color: ${theme.colors.primary.base};
     line-height: 1.8;
   `}
@@ -164,6 +173,7 @@ const SliceHeader: FC<SliceHeaderProps> = ({
   width,
   height,
   revertChartState,
+  drillToChartUp,
 }) => {
   const SliceHeaderExtension = extensionsRegistry.get('dashboard.slice.header');
   const uiConfig = useUiConfig();
@@ -176,6 +186,10 @@ const SliceHeader: FC<SliceHeaderProps> = ({
   );
   const isCrossFiltersEnabled = useSelector<RootState, boolean>(
     ({ dashboardInfo }) => dashboardInfo.crossFiltersEnabled,
+  );
+
+  const prevSliceId = useSelector<RootState, number | undefined>(
+    ({ charts }) => charts[slice.slice_id].prevSliceId,
   );
 
   const canExplore = !editMode && supersetCanExplore;
@@ -249,6 +263,17 @@ const SliceHeader: FC<SliceHeaderProps> = ({
                 sliceId={slice.slice_id}
                 dashboardId={dashboardId}
               />
+            )}
+            {prevSliceId && (
+              <Tooltip
+                placement="top"
+                title={t('Back to previous chart state.')}
+              >
+                <DrillUpIcon
+                  iconSize="m"
+                  onClick={() => drillToChartUp?.(slice.slice_id)}
+                />
+              </Tooltip>
             )}
             {crossFilterValue && (
               <Tooltip

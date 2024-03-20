@@ -1,3 +1,4 @@
+/* eslint-disable react-prefer-function-component/react-prefer-function-component */
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file

@@ -18,6 +18,7 @@
  */
 import { t } from '@superset-ui/core';
 
+import { DRILL_TO_CHART_DOWN } from 'src/components/Chart/chartAction';
 import {
   FETCH_ALL_SLICES_FAILED,
   FETCH_ALL_SLICES_STARTED,
@@ -71,6 +72,12 @@ export default function sliceEntitiesReducer(
         lastUpdated: new Date().getTime(),
         errorMessage:
           action.payload.error || t('Could not fetch all saved charts'),
+      };
+    },
+    [DRILL_TO_CHART_DOWN]() {
+      return {
+        ...state,
+        slices: { ...state.slices, ...action.payload.slices },
       };
     },
   };

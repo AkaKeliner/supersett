@@ -33,6 +33,7 @@ import {
   ContextMenuFilters,
   CurrencyFormatter,
   Currency,
+  URLDrillDownValueType,
 } from '@superset-ui/core';
 import { ColorFormatters } from '@superset-ui/chart-controls';
 
@@ -130,13 +131,7 @@ export interface TableChartTransformedProps<D extends DataRecord = DataRecord> {
   onChangeFilter?: ChartProps['hooks']['onAddFilter'];
   columnColorFormatters?: ColorFormatters;
   allowRearrangeColumns?: boolean;
-  urlDrillDowns?: Array<{
-    url: number;
-    type: string;
-    field: string;
-    title: string;
-    key: string;
-  }>;
+  urlDrillDowns?: Array<URLDrillDownValueType>;
   onContextMenu?: (
     clientX: number,
     clientY: number,

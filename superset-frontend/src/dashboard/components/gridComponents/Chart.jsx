@@ -84,6 +84,7 @@ const propTypes = {
   datasetsStatus: PropTypes.oneOf(['loading', 'error', 'complete']),
   isInView: PropTypes.bool,
   emitCrossFilters: PropTypes.bool,
+  drillToChartUp: PropTypes.func,
 };
 
 const defaultProps = {
@@ -410,6 +411,7 @@ class Chart extends React.Component {
       isInView,
       emitCrossFilters,
       logEvent,
+      drillToChartUp,
     } = this.props;
 
     const { width } = this.state;
@@ -471,6 +473,7 @@ class Chart extends React.Component {
           width={width}
           height={this.getHeaderHeight()}
           revertChartState={this.revertChartState}
+          drillToChartUp={drillToChartUp}
         />
 
         {/*
