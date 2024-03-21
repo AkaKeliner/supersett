@@ -266,7 +266,7 @@ const ChartContextMenu = (
         title={t('Drill to chart')}
         type={URLDrillDownTypeEnum.chart}
         formData={formData}
-        filters={filters}
+        filters={filters.drillDown}
         submenuIndex={submenuIndex}
         isContextMenu
         contextMenuY={clientY}
@@ -281,7 +281,7 @@ const ChartContextMenu = (
         title={t('Drill to dashboard')}
         type={URLDrillDownTypeEnum.dashboard}
         formData={formData}
-        filters={filters}
+        filters={filters.drillDown}
         submenuIndex={submenuIndex}
         isContextMenu
         contextMenuY={clientY}

@@ -14,7 +14,7 @@ type Props = {
   type: URLDrillDownTypeEnum;
   title: string;
   formData: QueryFormData;
-  filters?: ContextMenuFilters;
+  filters: ContextMenuFilters['drillDown'];
   contextMenuY?: number;
   submenuIndex?: number;
   isContextMenu?: boolean;
