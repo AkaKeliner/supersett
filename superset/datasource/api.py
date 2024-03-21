@@ -16,6 +16,7 @@
 # under the License.
 import logging
 
+import numpy as np
 from flask_appbuilder.api import expose, protect, safe
 
 from superset import app, event_logger
@@ -122,7 +123,9 @@ class DatasourceRestApi(BaseSupersetApi):
                 limit=row_limit,
                 denormalize_column=denormalize_column,
             )
-            return self.response(200, result=payload)
+            payload = np.array(payload)
+            payload = np.where(np.isnan(payload), None, payload)
+            return self.response(200, result=payload.tolist())
         except KeyError:
             return self.response(
                 400, message=f"Column name {column_name} does not exist"
