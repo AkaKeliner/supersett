@@ -240,7 +240,6 @@ const transformProps = (
     show_totals: showTotals,
     conditional_formatting: conditionalFormatting,
     allow_rearrange_columns: allowRearrangeColumns,
-    url_drillDowns: urlDrillDowns,
   } = formData;
   const timeGrain = extractTimegrain(formData);
 
@@ -295,7 +294,6 @@ const transformProps = (
     timeGrain,
     allowRearrangeColumns,
     onContextMenu,
-    urlDrillDowns,
   };
 };
 

@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { ControlComponentProps } from '@superset-ui/chart-controls';
-import { URLDrillDownValueType, t, useTheme } from '@superset-ui/core';
+import { DrillDownValue, t, useTheme } from '@superset-ui/core';
 import Icons from 'src/components/Icons';
 import ControlHeader from '../../ControlHeader';
 import ControlPopover from '../ControlPopover/ControlPopover';
@@ -9,22 +9,19 @@ import {
   DndLabelsContainer,
   HeaderContainer,
 } from '../OptionControls';
-import {
-  Datasource,
-  URLDrillDownPopoverContent,
-} from './URLDrillDownPopoverContent';
-import { URLDrillDownItem } from './URLDrillDownItem';
+import { Datasource, DrillDownPopoverContent } from './DrillDownPopoverContent';
+import { DrillDownItem } from './DrillDownItem';
 
-type URLDrilldownControlProps = Omit<ControlComponentProps, 'value'> & {
-  value?: URLDrillDownValueType[];
+type DrilldownControlProps = Omit<ControlComponentProps, 'value'> & {
+  value?: DrillDownValue[];
   datasource: Datasource;
 };
 
-const URLDrilldownControl = ({
+const DrilldownControl = ({
   value = [],
   onChange,
   ...props
-}: URLDrilldownControlProps) => {
+}: DrilldownControlProps) => {
   const theme = useTheme();
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
@@ -32,7 +29,7 @@ const URLDrilldownControl = ({
     setSelectedIndex(visible ? value.length : null);
   }, []);
 
-  const handleSave = (item: URLDrillDownValueType, index?: number) => {
+  const handleSave = (item: DrillDownValue, index?: number) => {
     const nextValue = [...value];
     if (index !== undefined) nextValue[index] = item;
     else nextValue.push(item);
@@ -53,14 +50,14 @@ const URLDrilldownControl = ({
 
       <DndLabelsContainer>
         {value?.map(({ label, type }, i) => (
-          <URLDrillDownItem
+          <DrillDownItem
             key={i}
             index={i}
             onDelete={handleDelete}
             onClick={setSelectedIndex}
           >
             {label} ({t(type)})
-          </URLDrillDownItem>
+          </DrillDownItem>
         ))}
 
         <AddControlLabel onClick={() => setSelectedIndex(value.length)}>
@@ -71,7 +68,7 @@ const URLDrilldownControl = ({
         <ControlPopover
           trigger="click"
           content={
-            <URLDrillDownPopoverContent
+            <DrillDownPopoverContent
               index={selectedIndex === null ? value.length : selectedIndex}
               onClose={setSelectedIndex}
               onSave={handleSave}
@@ -89,4 +86,4 @@ const URLDrilldownControl = ({
   );
 };
 
-export default URLDrilldownControl;
+export default DrilldownControl;

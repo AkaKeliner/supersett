@@ -50,7 +50,7 @@ const config: ControlPanelConfig = {
       label: t('Query'),
       expanded: true,
       controlSetRows: [
-        ['url_drillDowns'],
+        ['drill_downs'],
         ['groupby'],
         ['metric'],
         ['adhoc_filters'],

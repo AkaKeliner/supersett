@@ -149,7 +149,7 @@ export type InternalControlType =
   | 'CollectionControl'
   | 'ColorPickerControl'
   | 'ColorSchemeControl'
-  | 'URLDrilldownControl'
+  | 'DrilldownControl'
   | 'DatasourceControl'
   | 'DateFilterControl'
   | 'FixedOrMetricControl'
@@ -282,7 +282,7 @@ export type SelectControlType =
   | 'FixedOrMetricControl'
   | 'AdhocFilterControl'
   | 'FilterBoxItemControl'
-  | 'URLDrilldownControl';
+  | 'DrilldownControl';
 
 export interface FilterOption<T extends SelectOption> {
   label: string;

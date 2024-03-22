@@ -657,7 +657,7 @@ export function drillToChartDown(sliceId, drillDown, restrictions) {
     const { result } = await makeApi({
       method: 'GET',
       endpoint: 'api/v1/explore/',
-    })(new URLSearchParams(`slice_id=${drillDown.url}`));
+    })(new URLSearchParams(`slice_id=${drillDown.id}`));
 
     const filters = [];
 
@@ -702,7 +702,7 @@ export function drillToChartDown(sliceId, drillDown, restrictions) {
     const layout = replaceChart(
       dashboardLayout.present,
       sliceId,
-      drillDown.url,
+      drillDown.id,
       result.slice.slice_name,
     );
 

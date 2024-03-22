@@ -329,8 +329,8 @@ const currency_format: SharedControlConfig<'CurrencyControl'> = {
   renderTrigger: true,
 };
 
-const url_drillDowns: SharedControlConfig<'URLDrilldownControl'> = {
-  type: 'URLDrilldownControl',
+const drill_downs: SharedControlConfig<'DrilldownControl'> = {
+  type: 'DrilldownControl',
   label: t('URL Drilldowns'),
   renderTrigger: true,
   visibility: ({ form_data }) => Boolean(form_data.slice_id),
@@ -429,5 +429,5 @@ export default {
   show_empty_columns,
   temporal_columns_lookup,
   currency_format,
-  url_drillDowns,
+  drill_downs,
 };

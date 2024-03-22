@@ -25,7 +25,7 @@ type Props = PropsWithChildren<{
   index: number;
 }>;
 
-export const URLDrillDownItem = ({
+export const DrillDownItem = ({
   children,
   index,
   onDelete,

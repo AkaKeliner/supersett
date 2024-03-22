@@ -35,7 +35,7 @@ import {
   isFeatureEnabled,
   QueryFormData,
   t,
-  URLDrillDownTypeEnum,
+  DrillDownType,
   useTheme,
 } from '@superset-ui/core';
 import { RootState } from 'src/dashboard/types';
@@ -124,13 +124,12 @@ const ChartContextMenu = (
     isDisplayed(ContextMenuItem.CrossFilter);
 
   const showDrillToChart =
-    formData.url_drillDowns?.some(
-      ({ type }) => type === URLDrillDownTypeEnum.chart,
-    ) && filters?.drillDown;
+    formData.drill_downs?.some(({ type }) => type === DrillDownType.chart) &&
+    filters?.drillDown;
 
   const showDrillToDashboard =
-    formData.url_drillDowns?.some(
-      ({ type }) => type === URLDrillDownTypeEnum.dashboard,
+    formData.drill_downs?.some(
+      ({ type }) => type === DrillDownType.dashboard,
     ) && filters?.drillDown;
 
   const isCrossFilteringSupportedByChart = getChartMetadataRegistry()
@@ -264,7 +263,7 @@ const ChartContextMenu = (
     menuItems.push(
       <DrillDown
         title={t('Drill to chart')}
-        type={URLDrillDownTypeEnum.chart}
+        type={DrillDownType.chart}
         formData={formData}
         filters={filters.drillDown}
         submenuIndex={submenuIndex}
@@ -279,7 +278,7 @@ const ChartContextMenu = (
     menuItems.push(
       <DrillDown
         title={t('Drill to dashboard')}
-        type={URLDrillDownTypeEnum.dashboard}
+        type={DrillDownType.dashboard}
         formData={formData}
         filters={filters.drillDown}
         submenuIndex={submenuIndex}

@@ -100,21 +100,6 @@ function fillNativeFilters(
   });
 }
 
-/* function fillDrillDownFilters({
-  charts,
-  mergedDataMask,
-}: {
-  charts: Charts;
-  mergedDataMask: DataMaskStateWithId;
-}) {
-  Object.values(charts).forEach(({ form_data }) => {
-    if (form_data.url_drillDowns?.length) {
-      console.log(form_data.url_drillDowns);
-    }
-  });
-  console.log(mergedDataMask);
-} */
-
 const dataMaskReducer = produce(
   (draft: DataMaskStateWithId, action: AnyDataMaskAction) => {
     const cleanState = {};
@@ -150,11 +135,6 @@ const dataMaskReducer = produce(
           // @ts-ignore
           action.data.dataMask,
         );
-        /* fillDrillDownFilters({
-          // @ts-ignore
-          charts: action.data.charts,
-          mergedDataMask: cleanState,
-        }); */
         return cleanState;
       case SET_DATA_MASK_FOR_FILTER_CONFIG_COMPLETE:
         fillNativeFilters(

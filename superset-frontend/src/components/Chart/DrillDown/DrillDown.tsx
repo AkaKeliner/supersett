@@ -1,7 +1,7 @@
 import {
   ContextMenuFilters,
   QueryFormData,
-  URLDrillDownTypeEnum,
+  DrillDownType,
 } from '@superset-ui/core';
 import React, { useCallback, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
@@ -11,7 +11,7 @@ import { drillToChartDown } from '../chartAction';
 import { getSubmenuYOffset } from '../utils';
 
 type Props = {
-  type: URLDrillDownTypeEnum;
+  type: DrillDownType;
   title: string;
   formData: QueryFormData;
   filters: ContextMenuFilters['drillDown'];
@@ -36,8 +36,8 @@ export const DrillDown = ({
   const dispatch = useDispatch();
 
   const drillToItems = useMemo(
-    () => (formData.url_drillDowns || []).filter(item => item.type === type),
-    [formData.url_drillDowns, type],
+    () => (formData.drill_downs || []).filter(item => item.type === type),
+    [formData.drill_downs, type],
   );
 
   // Ensure submenu doesn't appear offscreen
@@ -55,9 +55,12 @@ export const DrillDown = ({
     (item, filters, e) => {
       onClick(e);
       onSelection();
-      dispatch(drillToChartDown(formData.slice_id, item, filters));
+      if (type === DrillDownType.chart) {
+        dispatch(drillToChartDown(formData.slice_id, item, filters));
+      }
+      // if (type === DrillDownType.dashboard) {}
     },
-    [dispatch, onSelection, onClick, formData.slice_id],
+    [dispatch, onSelection, onClick, formData.slice_id, type],
   );
 
   return (

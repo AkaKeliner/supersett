@@ -29,7 +29,7 @@ import {
   TimeGranularity,
   ContextMenuFilters,
   Currency,
-  URLDrillDownValueType,
+  DrillDownValue,
 } from '@superset-ui/core';
 import { ColorFormatters } from '@superset-ui/chart-controls';
 
@@ -88,7 +88,7 @@ interface PivotTableCustomizeProps {
   timeGrainSqla?: TimeGranularity;
   time_grain_sqla?: TimeGranularity;
   granularity_sqla?: string;
-  urlDrillDowns?: URLDrillDownValueType[];
+  drill_downs?: DrillDownValue[];
 }
 
 export type PivotTableQueryFormData = QueryFormData &

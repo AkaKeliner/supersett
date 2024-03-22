@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import {
   SupersetTheme,
-  URLDrillDownTypeEnum,
-  URLDrillDownValueType,
+  DrillDownType,
+  DrillDownValue,
   styled,
   t,
 } from '@superset-ui/core';
@@ -14,7 +14,7 @@ import { Slice } from 'src/types/Chart';
 import { DatasetObject } from 'src/features/datasets/types';
 import { ExplorePopoverContent } from '../../ExploreContentPopover';
 
-const URLDrillDownPopoverContentContainer = styled.div`
+const DrillDownPopoverContentContainer = styled.div`
   .adhoc-filter-edit-tabs > .nav-tabs {
     margin-bottom: ${({ theme }) => theme.gridUnit * 2}px;
 
@@ -41,13 +41,13 @@ const URLDrillDownPopoverContentContainer = styled.div`
   }
 `;
 
-const URLDrillDownActionsContainer = styled.div`
+const DrillDownActionsContainer = styled.div`
   margin-top: ${({ theme }) => theme.gridUnit * 2}px;
 `;
 
 const targetType = [
-  { value: URLDrillDownTypeEnum.dashboard, label: t('Dashboard') },
-  { value: URLDrillDownTypeEnum.chart, label: t('Chart') },
+  { value: DrillDownType.dashboard, label: t('Dashboard') },
+  { value: DrillDownType.chart, label: t('Chart') },
 ];
 
 type Dashbord = {
@@ -63,13 +63,13 @@ export type Datasource = {
 
 type Props = {
   onClose: (item: null) => void;
-  onSave?: (item: URLDrillDownValueType, index?: number) => void;
-  drilldown?: Partial<URLDrillDownValueType>;
+  onSave?: (item: DrillDownValue, index?: number) => void;
+  drilldown?: Partial<DrillDownValue>;
   index?: number;
   datasource: Datasource;
 };
 
-export const URLDrillDownPopoverContent = ({
+export const DrillDownPopoverContent = ({
   onClose,
   onSave,
   drilldown = {},
@@ -78,7 +78,7 @@ export const URLDrillDownPopoverContent = ({
 }: Props) => {
   const [state, setState] = useState({ ...drilldown });
 
-  const hasError = !(state.field && state.label && state.type && state.url);
+  const hasError = !(state.field && state.label && state.type && state.id);
 
   const metrics = useMemo(
     () =>
@@ -108,15 +108,15 @@ export const URLDrillDownPopoverContent = ({
   );
 
   const urlOptions =
-    state.type === URLDrillDownTypeEnum.dashboard ? dashboards : charts;
+    state.type === DrillDownType.dashboard ? dashboards : charts;
 
   const handleSave = () => {
-    onSave?.(state as URLDrillDownValueType, index);
+    onSave?.(state as DrillDownValue, index);
     onClose(null);
   };
 
   const handleChange = (
-    field: keyof URLDrillDownValueType,
+    field: keyof DrillDownValue,
     value: string | SelectValue,
   ) => {
     setState({ ...state, [field]: value });
@@ -124,7 +124,7 @@ export const URLDrillDownPopoverContent = ({
 
   return (
     <ExplorePopoverContent>
-      <URLDrillDownPopoverContentContainer
+      <DrillDownPopoverContentContainer
         id="url-drill-down-edit-popover"
         data-test="url-drill-down-edit-popover"
       >
@@ -170,13 +170,13 @@ export const URLDrillDownPopoverContent = ({
                 marginBottom: theme.gridUnit * 4,
               })}
               disabled={!state.type}
-              value={state.url}
-              onChange={value => handleChange('url', value)}
+              value={state.id}
+              onChange={value => handleChange('id', value)}
             />
           </Row>
         </div>
 
-        <URLDrillDownActionsContainer>
+        <DrillDownActionsContainer>
           <Button buttonSize="small" onClick={() => onClose(null)} cta>
             {t('Close')}
           </Button>
@@ -192,8 +192,8 @@ export const URLDrillDownPopoverContent = ({
           >
             {t('Save')}
           </Button>
-        </URLDrillDownActionsContainer>
-      </URLDrillDownPopoverContentContainer>
+        </DrillDownActionsContainer>
+      </DrillDownPopoverContentContainer>
     </ExplorePopoverContent>
   );
 };

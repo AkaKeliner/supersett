@@ -158,7 +158,7 @@ const config: ControlPanelConfig = {
             config: queryMode,
           },
         ],
-        ['url_drillDowns'],
+        ['drill_downs'],
         [
           {
             name: 'groupby',
