@@ -106,6 +106,7 @@ export const hydrateDashboard =
     const slices = {};
     const sliceIds = new Set();
     const slicesFromExploreCount = new Map();
+    const { filters = [] } = history.location.state || {};
 
     charts.forEach(slice => {
       const key = slice.slice_id;
@@ -116,6 +117,7 @@ export const hydrateDashboard =
           ...regularUrlParams,
         },
       };
+      if (filters.length) formData.extra_form_data = { filters };
       chartQueries[key] = {
         ...chart,
         id: key,

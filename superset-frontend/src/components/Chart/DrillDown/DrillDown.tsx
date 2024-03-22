@@ -6,9 +6,11 @@ import {
 import React, { useCallback, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { Menu } from 'src/components/Menu';
+import { useHistory } from 'react-router-dom';
 import { MenuItemWithTruncation } from '../MenuItemWithTruncation';
 import { drillToChartDown } from '../chartAction';
 import { getSubmenuYOffset } from '../utils';
+import { useDrillDownFilters } from './useDrillDownFilters';
 
 type Props = {
   type: DrillDownType;
@@ -33,7 +35,9 @@ export const DrillDown = ({
   onClick = () => null,
   ...props
 }: Props) => {
+  const { push } = useHistory();
   const dispatch = useDispatch();
+  const drillDownFilters = useDrillDownFilters(formData.slice_id, filters);
 
   const drillToItems = useMemo(
     () => (formData.drill_downs || []).filter(item => item.type === type),
@@ -58,9 +62,14 @@ export const DrillDown = ({
       if (type === DrillDownType.chart) {
         dispatch(drillToChartDown(formData.slice_id, item, filters));
       }
-      // if (type === DrillDownType.dashboard) {}
+      if (type === DrillDownType.dashboard) {
+        push({
+          pathname: `/superset/dashboard/${item.id}`,
+          state: { filters },
+        });
+      }
     },
-    [dispatch, onSelection, onClick, formData.slice_id, type],
+    [dispatch, onSelection, onClick, formData.slice_id, type, push],
   );
 
   return (
@@ -76,7 +85,7 @@ export const DrillDown = ({
             {...props}
             tooltipText={`${title}`}
             key={`drill-to-chart-${i}`}
-            onClick={handleSelect.bind(null, item, filters)}
+            onClick={handleSelect.bind(null, item, drillDownFilters)}
           >
             {item.label}
           </MenuItemWithTruncation>

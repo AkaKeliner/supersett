@@ -46,7 +46,6 @@ import { waitForAsyncData } from 'src/middleware/asyncEvent';
 import { safeStringify } from 'src/utils/safeStringify';
 import { replaceChart } from 'src/dashboard/util/replaceChart';
 import { removeSlice } from 'src/dashboard/actions/dashboardState';
-import { Operators } from 'src/explore/constants';
 
 export const CHART_UPDATE_STARTED = 'CHART_UPDATE_STARTED';
 
@@ -650,36 +649,14 @@ export const revertChartState = chartId => (dispatch, getState) => {
 
 export const DRILL_TO_CHART_DOWN = 'DRILL_TO_CHART_DOWN';
 
-export function drillToChartDown(sliceId, drillDown, restrictions) {
+export function drillToChartDown(sliceId, drillDown, filters) {
   return async (dispatch, getState) => {
-    const { dashboardLayout, nativeFilters, charts } = getState();
+    const { dashboardLayout } = getState();
 
     const { result } = await makeApi({
       method: 'GET',
       endpoint: 'api/v1/explore/',
     })(new URLSearchParams(`slice_id=${drillDown.id}`));
-
-    const filters = [];
-
-    Object.values(nativeFilters.filters).forEach(
-      ({ defaultDataMask, chartsInScope }) => {
-        if (chartsInScope.includes(sliceId)) {
-          filters.push(...defaultDataMask.extraFormData.filters);
-        }
-      },
-    );
-
-    charts[sliceId].latestQueryFormData.adhoc_filters.forEach(
-      ({ comparator, subject, operator }) => {
-        if (Array.isArray(comparator) && subject && operator) {
-          filters.push({ val: comparator, col: subject, op: operator });
-        }
-      },
-    );
-
-    Object.entries(restrictions).forEach(([col, val]) => {
-      filters.push({ col, val: [val], op: Operators.IN });
-    });
 
     result.form_data.extra_form_data = { filters };
 
