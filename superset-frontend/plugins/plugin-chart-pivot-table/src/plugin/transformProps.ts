@@ -106,8 +106,8 @@ export default function transformProps(chartProps: ChartProps<QueryFormData>) {
     conditionalFormatting,
     timeGrainSqla,
     currencyFormat,
-    server_pagination: serverPagination,
-    server_page_length: serverPageLength,
+    serverPagination,
+    serverPageLength,
   } = formData;
   const { selectedFilters } = filterState;
   const granularity = extractTimegrain(rawFormData);

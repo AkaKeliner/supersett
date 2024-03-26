@@ -849,10 +849,7 @@ export class TableRenderer extends React.Component {
   }
 
   resultOnPageChange = pageNumber => {
-    const {
-      serverPageLength,
-      onServerPaginationChange,
-    } = this.props;
+    const { serverPageLength, onServerPaginationChange } = this.props;
     onServerPaginationChange(pageNumber, serverPageLength);
   };
 
@@ -861,7 +858,6 @@ export class TableRenderer extends React.Component {
       serverPagination = false,
       serverPageLength,
       width = 360,
-      onServerPaginationChange,
       serverPaginationData,
       rowCount,
     } = this.props;
@@ -894,7 +890,6 @@ export class TableRenderer extends React.Component {
       colSubtotalDisplay,
     );
 
-    const hasPagination = serverPagination;
     let resultPageCount = Math.ceil(rowCount / serverPageLength);
     if (!Number.isFinite(resultPageCount)) {
       resultPageCount = 0;

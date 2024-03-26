@@ -177,7 +177,6 @@ class SuperChart extends React.PureComponent<Props, {}> {
       height,
       width,
       theme,
-      formData: rest.formData,
     });
 
     let chart;
