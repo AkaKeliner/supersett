@@ -1,3 +1,4 @@
+/* eslint-disable react-prefer-function-component/react-prefer-function-component */
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -23,11 +24,11 @@ import { recurseReactClone } from './utils';
 import Field from './Field';
 
 interface FieldsetProps {
-  children: React.ReactNode;
-  onChange: Function;
-  item: Record<string, any>;
-  title: React.ReactNode;
-  compact: boolean;
+  children?: React.ReactNode;
+  onChange?: Function;
+  item?: Record<string, any>;
+  title?: React.ReactNode;
+  compact?: boolean;
 }
 
 type fieldKeyType = string | number;
@@ -44,7 +45,7 @@ export default class Fieldset extends React.PureComponent<FieldsetProps> {
   }
 
   onChange(fieldKey: fieldKeyType, val: any) {
-    return this.props.onChange({
+    return this.props.onChange?.({
       ...this.props.item,
       [fieldKey]: val,
     });
@@ -54,7 +55,7 @@ export default class Fieldset extends React.PureComponent<FieldsetProps> {
     const { title } = this.props;
     const propExtender = (field: { props: { fieldKey: fieldKeyType } }) => ({
       onChange: this.onChange,
-      value: this.props.item[field.props.fieldKey],
+      value: this.props.item?.[field.props.fieldKey],
       compact: this.props.compact,
     });
     return (

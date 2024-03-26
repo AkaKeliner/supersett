@@ -1,3 +1,4 @@
+/* eslint-disable react-prefer-function-component/react-prefer-function-component */
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -45,12 +46,15 @@ interface CRUDCollectionProps {
     React.TdHTMLAttributes<HTMLTableCellElement>,
     HTMLTableCellElement
   >)[];
-  itemRenderers?: ((
-    val: unknown,
-    onChange: () => void,
-    label: string,
-    record: any,
-  ) => ReactNode)[];
+  itemRenderers?: Record<
+    string,
+    (
+      val: unknown,
+      onChange: () => void,
+      label: string,
+      record: any,
+    ) => ReactNode
+  >;
   onChange?: (arg0: any) => void;
   tableColumns: Array<any>;
   sortColumns: Array<string>;

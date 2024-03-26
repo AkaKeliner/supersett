@@ -2629,6 +2629,7 @@
       "Link Copied!": ["Ссылка скопирована"],
       "List Saved Query": [""],
       "List Unique Values": ["Список уникальных значений"],
+      "List of hierarchies": ["Список иерархий"],
       "List of n+1 values for bucketing metric into n buckets.": [""],
       "List of values to mark with lines": [
         "Список числовых значений для отображения в виде линий на графике. Например, 10,20,30"

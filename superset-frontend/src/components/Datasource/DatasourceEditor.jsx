@@ -1,3 +1,4 @@
+/* eslint-disable react-prefer-function-component/react-prefer-function-component */
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -57,6 +58,7 @@ import CurrencyControl from 'src/explore/components/controls/CurrencyControl';
 import CollectionTable from './CollectionTable';
 import Fieldset from './Fieldset';
 import Field from './Field';
+import HierarchiesTable from './HierarchiesTable';
 
 const DatasourceContainer = styled.div`
   .change-warning {
@@ -1510,6 +1512,17 @@ class DatasourceEditor extends React.PureComponent {
                 <FormContainer>{this.renderAdvancedFieldset()}</FormContainer>
               </Col>
             </Row>
+          </Tabs.TabPane>
+          <Tabs.TabPane key={5} tab={t('List of hierarchies')}>
+            <StyledColumnsTabWrapper>
+              <HierarchiesTable
+                datasource={datasource}
+                onChange={this.onDatasourcePropChange.bind(
+                  this,
+                  'hierarchiesList',
+                )}
+              />
+            </StyledColumnsTabWrapper>
           </Tabs.TabPane>
         </StyledTableTabs>
       </DatasourceContainer>

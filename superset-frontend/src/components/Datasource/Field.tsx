@@ -34,9 +34,9 @@ interface FieldProps<V> {
   label: string;
   description?: React.ReactNode;
   control: React.ReactElement;
-  onChange: (fieldKey: string, newValue: V) => void;
-  compact: boolean;
-  inline: boolean;
+  onChange?: (fieldKey: string, newValue: V) => void;
+  compact?: boolean;
+  inline?: boolean;
 }
 
 export default function Field<V>({
