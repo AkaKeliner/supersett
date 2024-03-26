@@ -42,12 +42,13 @@ import ConditionalFormattingControl from './ConditionalFormattingControl';
 import ContourControl from './ContourControl';
 import DndColumnSelectControl, {
   DndColumnSelect,
-  DndFilterSelect,
+  // DndFilterSelect,
   DndMetricSelect,
 } from './DndColumnSelectControl';
 import XAxisSortControl from './XAxisSortControl';
 import CurrencyControl from './CurrencyControl';
 import ColumnConfigControl from './ColumnConfigControl';
+import DndFilterSelectContainer from './DndColumnSelectControl/DndFilterSelectContainer';
 
 const controlMap = {
   AnnotationLayerControl,
@@ -62,7 +63,7 @@ const controlMap = {
   DateFilterControl,
   DndColumnSelectControl,
   DndColumnSelect,
-  DndFilterSelect,
+  DndFilterSelect: DndFilterSelectContainer,
   DndMetricSelect,
   FixedOrMetricControl,
   HiddenControl,

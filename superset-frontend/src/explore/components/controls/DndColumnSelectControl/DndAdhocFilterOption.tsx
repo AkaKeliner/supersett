@@ -46,7 +46,7 @@ export default function DndAdhocFilterOption({
   onShiftOptions,
   onClickClose,
   onClickBrackets,
-  onClickConjuction,
+  // onClickConjuction,
   partitionColumn,
   index,
 }: DndAdhocFilterOptionProps) {
@@ -69,12 +69,12 @@ export default function DndAdhocFilterOption({
         tooltipTitle={title ?? adhocFilter.getTooltipTitle()}
         clickClose={onClickClose}
         clickBrackets={onClickBrackets}
-        clickConjuction={onClickConjuction}
+        // clickConjuction={onClickConjuction}
         onShiftOptions={onShiftOptions}
         type={DndItemType.FilterOption}
         withCaret
         isExtra={adhocFilter.isExtra}
-        conjuction={adhocFilter.conjuction}
+        // conjuction={adhocFilter.conjuction}
         datasourceWarningMessage={
           adhocFilter.datasourceWarning
             ? t('This filter might be incompatible with current dataset')

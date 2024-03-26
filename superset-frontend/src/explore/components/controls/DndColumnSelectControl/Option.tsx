@@ -38,8 +38,8 @@ export default function Option({
   path,
   clickClose,
   clickBrackets,
-  clickConjuction,
-  conjuction = 'and',
+  // clickConjuction,
+  // conjuction = 'and',
   withCaret,
   isExtra,
   datasourceWarningMessage,
@@ -71,13 +71,13 @@ export default function Option({
     [clickBrackets, index],
   );
 
-  const onClickConjuction = useCallback(
-    e => {
-      e.stopPropagation();
-      clickConjuction?.(index);
-    },
-    [clickConjuction, index],
-  );
+  // const onClickConjuction = useCallback(
+  //   e => {
+  //     e.stopPropagation();
+  //     clickConjuction?.(index);
+  //   },
+  //   [clickConjuction, index],
+  // );
 
   return (
     <OptionControlContainer data-test="option-label" withCaret={withCaret}>
@@ -124,11 +124,11 @@ export default function Option({
         </>
       )}
 
-      {clickConjuction && (
-        <CaretContainer onClick={onClickConjuction}>
-          {conjuction}
-        </CaretContainer>
-      )}
+      {/* {clickConjuction && ( */}
+      {/*  <CaretContainer onClick={onClickConjuction}> */}
+      {/*    {conjuction} */}
+      {/*  </CaretContainer> */}
+      {/* )} */}
 
       {withCaret && (
         <CaretContainer>

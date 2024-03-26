@@ -57,8 +57,8 @@ export default function OptionWrapper(
     onShiftOptions,
     clickClose,
     clickBrackets,
-    clickConjuction,
-    conjuction,
+    // clickConjuction,
+    // conjuction,
     withCaret,
     isExtra,
     datasourceWarningMessage,
@@ -189,10 +189,10 @@ export default function OptionWrapper(
         index={index}
         clickClose={clickClose}
         clickBrackets={clickBrackets}
-        clickConjuction={clickConjuction}
+        // clickConjuction={clickConjuction}
         withCaret={withCaret}
         isExtra={isExtra}
-        conjuction={conjuction}
+        // conjuction={conjuction}
         datasourceWarningMessage={datasourceWarningMessage}
         canDelete={canDelete}
         path={path}

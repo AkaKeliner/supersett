@@ -19,6 +19,7 @@
 import React, { ReactNode, useMemo } from 'react';
 import { useDrop } from 'react-dnd';
 import { t, useTheme } from '@superset-ui/core';
+import { CloseOutlined } from '@ant-design/icons';
 import ControlHeader from 'src/explore/components/ControlHeader';
 import {
   AddControlLabel,
@@ -31,10 +32,12 @@ import {
 } from 'src/explore/components/DatasourcePanel/types';
 import AdhocFilter from 'src/explore/components/controls/FilterControl/AdhocFilter';
 import Icons from 'src/components/Icons';
+import { Button } from 'antd';
 import { DndItemType } from '../../DndItemType';
 
 export type DndSelectLabelProps = {
   name: string;
+  id: number;
   accept: DndItemType | DndItemType[];
   ghostButtonText?: string;
   onDrop: (item: DatasourcePanelDndItem) => void;
@@ -44,6 +47,7 @@ export type DndSelectLabelProps = {
   valuesRenderer: (values: AdhocFilter[]) => ReactNode;
   displayGhostButton?: boolean;
   onClickGhostButton?: () => void;
+  onRemoveFilter?: (id: number) => void;
   values: AdhocFilter[];
 };
 
@@ -51,6 +55,8 @@ export default function DndSelectLabel({
   displayGhostButton = true,
   accept,
   valuesRenderer,
+  onRemoveFilter,
+  id,
   ...props
 }: DndSelectLabelProps) {
   const theme = useTheme();
@@ -90,11 +96,23 @@ export default function DndSelectLabel({
     );
   }
 
+  const renderRemoveFilter = (id: number | string | null) => (
+    <div style={{ float: 'inline-end' }}>
+      <Button
+        size="small"
+        icon={<CloseOutlined />}
+        // @ts-ignore
+        onClick={() => onRemoveFilter(id)}
+      />
+    </div>
+  );
   return (
     <div ref={datasourcePanelDrop}>
       <HeaderContainer>
         <ControlHeader {...props} />
       </HeaderContainer>
+      {id && renderRemoveFilter(id)}
+      {/* @ts-ignore */}
       <DndLabelsContainer
         data-test="dnd-labels-container"
         canDrop={canDrop}

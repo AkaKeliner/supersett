@@ -72,6 +72,7 @@ export interface DndFilterSelectProps
   savedMetrics: Metric[];
   selectedMetrics: QueryFormMetric[];
   datasource: Datasource;
+  onRemoveFilter: (id: number) => void;
   canDelete?: (
     valueToBeDeleted: OptionValueType,
     values: OptionValueType[],
@@ -215,16 +216,16 @@ const DndFilterSelect = (props: DndFilterSelectProps) => {
     [onChange, values],
   );
 
-  const changeConjuction = useCallback(
-    (index: number) => {
-      const valuesCopy = [...values];
-      valuesCopy[index].conjuction =
-        valuesCopy[index].conjuction === 'or' ? 'and' : 'or';
-      setValues(valuesCopy);
-      onChange(valuesCopy);
-    },
-    [onChange, values],
-  );
+  // const changeConjuction = useCallback(
+  //   (index: number) => {
+  //     const valuesCopy = [...values];
+  //     valuesCopy[index].conjuction =
+  //       valuesCopy[index].conjuction === 'or' ? 'and' : 'or';
+  //     setValues(valuesCopy);
+  //     onChange(valuesCopy);
+  //   },
+  //   [onChange, values],
+  // );
 
   const removeValue = useCallback(
     (index: number) => {
@@ -385,14 +386,14 @@ const DndFilterSelect = (props: DndFilterSelectProps) => {
           partitionColumn={partitionColumn}
           onClickClose={onClickClose}
           onClickBrackets={onClickBrackets}
-          onClickConjuction={changeConjuction}
+          // onClickConjuction={changeConjuction}
           onShiftOptions={onShiftOptions}
         />
       )),
     [
       onClickClose,
       onClickBrackets,
-      changeConjuction,
+      // changeConjuction,
       onFilterEdit,
       onShiftOptions,
       options,
