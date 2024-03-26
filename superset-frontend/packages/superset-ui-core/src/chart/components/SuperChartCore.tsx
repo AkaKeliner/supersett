@@ -76,6 +76,7 @@ export type Props = {
   postTransformProps?: PostTransformProps;
   onRenderSuccess?: HandlerFunction;
   onRenderFailure?: HandlerFunction;
+  formData?: any;
 };
 
 export default class SuperChartCore extends React.PureComponent<Props, {}> {

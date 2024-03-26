@@ -177,6 +177,7 @@ class SuperChart extends React.PureComponent<Props, {}> {
       height,
       width,
       theme,
+      formData: rest.formData,
     });
 
     let chart;
@@ -205,8 +206,7 @@ class SuperChart extends React.PureComponent<Props, {}> {
           id={id}
           className={className}
           chartType={chartType}
-          // @ts-ignore
-          chartProps={{ ...chartProps, formData: rest.formData }}
+          chartProps={chartProps}
           preTransformProps={preTransformProps}
           overrideTransformProps={overrideTransformProps}
           postTransformProps={postTransformProps}
