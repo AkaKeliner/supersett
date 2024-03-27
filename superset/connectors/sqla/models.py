@@ -1867,6 +1867,7 @@ class SqlaTable(
                 new_column = TableColumn(
                     column_name=col["column_name"],
                     type=col["type"],
+                    verbose_name=col['comment'] if col['comment']!='' else None,
                     table=self,
                 )
                 new_column.is_dttm = new_column.is_temporal
