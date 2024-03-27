@@ -122,6 +122,7 @@ const DatasourceModal: FunctionComponent<DatasourceModalProps> = ({
     SupersetClient.put({
       endpoint: `/api/v1/dataset/${currentDatasource.id}`,
       jsonPayload: {
+        hierarchiesList: currentDatasource.hierarchiesList,
         table_name: currentDatasource.table_name,
         database_id: currentDatasource.database?.id,
         sql: currentDatasource.sql,

@@ -48,6 +48,7 @@ import { getMenuAdjustedY } from '../utils';
 import { MenuItemTooltip } from '../DisabledMenuItemTooltip';
 import { DrillByMenuItems } from '../DrillBy/DrillByMenuItems';
 import { DrillDown } from '../DrillDown';
+import Hierarchy from '../Hierarchy';
 
 export enum ContextMenuItem {
   CrossFilter,
@@ -132,6 +133,8 @@ const ChartContextMenu = (
       ({ type }) => type === DrillDownType.dashboard,
     ) && filters?.drillDown;
 
+  const showHierarchy = Boolean(filters?.hierarchy);
+
   const isCrossFilteringSupportedByChart = getChartMetadataRegistry()
     .get(formData.viz_type)
     ?.behaviors?.includes(Behavior.INTERACTIVE_CHART);
@@ -150,6 +153,9 @@ const ChartContextMenu = (
     itemsCount += 1;
   }
   if (showDrillToDashboard) {
+    itemsCount += 1;
+  }
+  if (showHierarchy) {
     itemsCount += 1;
   }
   if (itemsCount === 0) {
@@ -281,6 +287,21 @@ const ChartContextMenu = (
         type={DrillDownType.dashboard}
         formData={formData}
         filters={filters.drillDown}
+        submenuIndex={submenuIndex}
+        isContextMenu
+        contextMenuY={clientY}
+        onSelection={onSelection}
+      />,
+    );
+  }
+  if (showHierarchy) {
+    submenuIndex += 1;
+    menuItems.push(
+      <Hierarchy
+        title={t('Hierarchy')}
+        type={DrillDownType.dashboard}
+        formData={formData}
+        filters={filters?.hierarchy}
         submenuIndex={submenuIndex}
         isContextMenu
         contextMenuY={clientY}

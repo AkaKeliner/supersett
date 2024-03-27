@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
-import { styled, t } from '@superset-ui/core';
+import { ColumnsHierarchy, styled, t } from '@superset-ui/core';
 import EditableTitle from 'src/components/EditableTitle';
-import CollectionTable from '../CollectionTable';
-import { ColumnsHierarchy, HierarchyControl } from './HierarchyControl';
 import Card from 'src/components/Card';
+import CollectionTable from '../CollectionTable';
+import { HierarchyControl } from './HierarchyControl';
 import Fieldset from '../Fieldset';
 import Field from '../Field';
 
@@ -26,17 +26,14 @@ type Props = {
   onChange?: (value: ColumnsHierarchy[]) => void;
 };
 
-export const HierarchiesTable = ({
-  datasource,
-  onChange,
-}: Props) => {
+export const HierarchiesTable = ({ datasource, onChange }: Props) => {
   const hierarchies = datasource.hierarchiesList || [];
 
   const options = useMemo(
     () =>
-    (datasource.columns || []).map(col => ({
+      (datasource.columns || []).map(col => ({
         label: col.verbose_name || col.column_name,
-        value: col.id,
+        value: col.column_name,
       })),
     [datasource.columns],
   );
@@ -76,7 +73,7 @@ export const HierarchiesTable = ({
       itemGenerator={() => ({
         name: `Новая иерархия ${hierarchies.length}`,
         created: new Date().toISOString(),
-        columns: []
+        columns: [],
       })}
     />
   );

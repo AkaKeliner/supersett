@@ -1,5 +1,5 @@
 import React from 'react';
-import { styled, t } from '@superset-ui/core';
+import { ColumnHierarchyItem, styled, t } from '@superset-ui/core';
 import TextControl from 'src/explore/components/controls/TextControl';
 import { SelectOptionsType } from 'src/components/Select/types';
 import Button from 'src/components/Button';
@@ -19,15 +19,6 @@ const ButtonWrapper = styled.div`
   margin-top: 20px;
 `;
 
-export type ColumnHierarchyItem = { value: number; id: number };
-
-export type ColumnsHierarchy = {
-  name: string;
-  created: string;
-  updated?: string | null;
-  columns: ColumnHierarchyItem[];
-};
-
 type Props = {
   value?: ColumnHierarchyItem[];
   onChange?: (value: ColumnHierarchyItem[]) => void;
@@ -41,7 +32,7 @@ export const HierarchyControl = ({
 }: Props) => {
   const handleColumnChange = (index: number, value: SelectValue) => {
     const next = [...columns];
-    next[index].id = value as number;
+    next[index].name = value as string;
     onChange?.(next);
   };
 
@@ -55,8 +46,8 @@ export const HierarchyControl = ({
 
   return (
     <Container>
-      {columns.map(({ value, id }, i) => (
-        <Row gutter={16} key={id}>
+      {columns.map(({ value, name }, i) => (
+        <Row gutter={16} key={name}>
           <Col xs={18}>
             <Select
               ariaLabel={t('Column')}
@@ -65,7 +56,7 @@ export const HierarchyControl = ({
               allowNewOptions
               allowClear
               onChange={handleColumnChange.bind(null, i)}
-              value={id}
+              value={name}
             />
           </Col>
 

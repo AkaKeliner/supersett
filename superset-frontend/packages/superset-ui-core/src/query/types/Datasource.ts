@@ -32,6 +32,14 @@ export interface Currency {
   symbolPosition: string;
 }
 
+export type ColumnHierarchyItem = { value: number; name: string };
+export type ColumnsHierarchy = {
+  name: string;
+  created: string;
+  updated?: string | null;
+  columns: ColumnHierarchyItem[];
+};
+
 /**
  * Datasource metadata.
  */
@@ -52,6 +60,7 @@ export interface Datasource {
   verboseMap?: {
     [key: string]: string;
   };
+  hierarchies?: ColumnsHierarchy[];
 }
 
 export const DEFAULT_METRICS: Metric[] = [

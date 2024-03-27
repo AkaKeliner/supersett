@@ -46,6 +46,7 @@ export interface ContextMenuFilters {
     adhocFilterFieldName?: string;
   };
   drillDown?: Record<string, Date | string | number | boolean | null>;
+  hierarchy?: any;
 }
 
 export enum AppSection {
