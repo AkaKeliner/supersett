@@ -425,7 +425,7 @@ export default function TableChart<D extends DataRecord = DataRecord>(
         dataType,
         isMetric,
         isPercentMetric,
-        hierarchyConfig,
+        hierarchy,
         config = {},
       } = column;
       const columnWidth = Number.isNaN(Number(config.columnWidth))
@@ -611,11 +611,12 @@ export default function TableChart<D extends DataRecord = DataRecord>(
             }}
             onClick={onClick}
             onContextMenu={(e: MouseEvent) => {
-              if (hierarchyConfig) {
+              if (hierarchy) {
                 e.preventDefault();
                 e.stopPropagation();
                 onContextMenu?.(e.nativeEvent.clientX, e.nativeEvent.clientY, {
-                  hierarchy: hierarchyConfig,
+                  key,
+                  hierarchy,
                 });
               }
             }}

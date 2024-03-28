@@ -17,7 +17,11 @@
  * under the License.
  */
 
-import { BinaryQueryObjectFilterClause, ExtraFormData } from '../../query';
+import {
+  BinaryQueryObjectFilterClause,
+  ColumnsHierarchy,
+  ExtraFormData,
+} from '../../query';
 import { JsonObject } from '../..';
 
 export type HandlerFunction = (...args: unknown[]) => void;
@@ -46,7 +50,8 @@ export interface ContextMenuFilters {
     adhocFilterFieldName?: string;
   };
   drillDown?: Record<string, Date | string | number | boolean | null>;
-  hierarchy?: any;
+  hierarchy?: ColumnsHierarchy;
+  key?: string;
 }
 
 export enum AppSection {

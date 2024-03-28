@@ -46,18 +46,6 @@ import {
   TableChartTransformedProps,
 } from './types';
 
-const mockHierarchies: ColumnsHierarchy[] = [
-  {
-    name: 'Hierarchy',
-    created: new Date().toISOString(),
-    columns: [
-      { name: 'YEAR', value: 10 },
-      { name: 'MONTH', value: 20 },
-      { name: 'DAY', value: 30 },
-    ],
-  },
-];
-
 const { PERCENT_3_POINT } = NumberFormats;
 const { DATABASE_DATETIME } = TimeFormats;
 
@@ -102,7 +90,7 @@ const processColumns = memoizeOne(function processColumns(
       columnFormats,
       currencyFormats,
       verboseMap,
-      hierarchies = mockHierarchies,
+      hierarchies = [],
     },
     rawFormData: {
       table_timestamp_format: tableTimestampFormat,
@@ -122,6 +110,16 @@ const processColumns = memoizeOne(function processColumns(
   const metricsSet = new Set(metrics);
   const percentMetricsSet = new Set(percentMetrics);
   const rawPercentMetricsSet = new Set(rawPercentMetrics);
+
+  const hierarchiesMap = hierarchies.reduce<Record<string, ColumnsHierarchy>>(
+    (acc, item) => {
+      item.columns.forEach(col => {
+        acc[col.name] = item;
+      });
+      return acc;
+    },
+    {},
+  );
 
   const columns: DataColumnMeta[] = (colnames || [])
     .filter(
@@ -187,21 +185,6 @@ const processColumns = memoizeOne(function processColumns(
           : getNumberFormatter(numberFormat);
       }
 
-      let hierarchyColumns: ColumnsHierarchy['columns'] | undefined;
-      hierarchies.some(({ columns }) => {
-        if (columns.some(({ name }) => name === key)) {
-          hierarchyColumns = columns.sort((a, b) =>
-            a.value > b.value ? 1 : -1,
-          );
-          return true;
-        }
-        return false;
-      });
-
-      const hierarchyConfig = hierarchyColumns
-        ?.slice(hierarchyColumns?.findIndex(({ name }) => name === key) + 1)
-        .map(item => ({ ...item, active: colnames.includes(item.name) }));
-
       return {
         key,
         label,
@@ -210,7 +193,7 @@ const processColumns = memoizeOne(function processColumns(
         isMetric,
         isPercentMetric,
         formatter,
-        hierarchyConfig,
+        hierarchy: hierarchiesMap[key],
         config,
       };
     });

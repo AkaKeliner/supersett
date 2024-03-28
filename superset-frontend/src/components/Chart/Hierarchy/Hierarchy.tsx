@@ -1,37 +1,44 @@
-import {
-  ContextMenuFilters,
-  QueryFormData,
-  DrillDownType,
-} from '@superset-ui/core';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Menu } from 'src/components/Menu';
+import { CheckboxChecked, CheckboxUnchecked } from 'src/components/Checkbox';
+import { styled } from '@superset-ui/core';
+import { useDispatch } from 'react-redux';
 import { MenuItemWithTruncation } from '../MenuItemWithTruncation';
 import { getSubmenuYOffset } from '../utils';
+import { HierarchyConfig, useHierarchy } from './useHierarchy';
+import { setGroupbyFromHierarchy } from '../chartAction';
 
-type Props = {
-  type: DrillDownType;
+const MenuItem = styled.div`
+  display: flex;
+  align-items: center;
+
+  & > *:first-child {
+    margin-right: 10px;
+  }
+`;
+
+type Props = HierarchyConfig & {
   title: string;
-  formData: QueryFormData;
-  filters: ContextMenuFilters['hierarchy'];
   contextMenuY?: number;
   submenuIndex?: number;
-  isContextMenu?: boolean;
   onSelection?: () => void;
   onClick?: (event: MouseEvent) => void;
 };
 
 export const Hierarchy = ({
-  type,
   title,
   formData,
-  filters,
+  hierarchy,
+  columnKey,
   contextMenuY = 0,
   submenuIndex = 0,
   onSelection = () => null,
   onClick = () => null,
   ...props
 }: Props) => {
-  const subMenuItems = useMemo(() => [], []);
+  const dispatch = useDispatch();
+
+  const subMenuItems = useHierarchy({ columnKey, hierarchy, formData });
 
   // Ensure submenu doesn't appear offscreen
   const submenuYOffset = useMemo(
@@ -43,6 +50,21 @@ export const Hierarchy = ({
       ),
     [contextMenuY, subMenuItems.length, submenuIndex],
   );
+
+  const handleSelect = useCallback(
+    ({ name, active }, e) => {
+      onClick(e);
+      onSelection();
+      if (active) {
+        dispatch(setGroupbyFromHierarchy(formData.slice_id, name));
+      } else {
+        dispatch(setGroupbyFromHierarchy(formData.slice_id, columnKey, name));
+      }
+    },
+    [dispatch, onSelection, onClick, formData.slice_id, columnKey],
+  );
+
+  if (!subMenuItems.length) return null;
 
   return (
     <Menu.SubMenu
@@ -57,9 +79,12 @@ export const Hierarchy = ({
             {...props}
             tooltipText={`${title}`}
             key={`hierarchy-${i}`}
-            onClick={console.log}
+            onClick={handleSelect.bind(null, item)}
           >
-            {item}
+            <MenuItem>
+              {item.active ? <CheckboxChecked /> : <CheckboxUnchecked />}
+              {item.name}
+            </MenuItem>
           </MenuItemWithTruncation>
         ))}
       </div>

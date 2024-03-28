@@ -84,6 +84,7 @@ function mapStateToProps(
   });
 
   formData.dashboardId = dashboardInfo.id;
+  formData.groupby = chart.form_data.groupby;
 
   return {
     chart,

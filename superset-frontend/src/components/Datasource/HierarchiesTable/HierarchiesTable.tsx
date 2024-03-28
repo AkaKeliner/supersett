@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { ColumnsHierarchy, styled, t } from '@superset-ui/core';
+import { ColumnsHierarchy, Datasource, styled, t } from '@superset-ui/core';
 import EditableTitle from 'src/components/EditableTitle';
 import Card from 'src/components/Card';
 import CollectionTable from '../CollectionTable';
@@ -15,19 +15,13 @@ const StyledLabelWrapper = styled.div`
   }
 `;
 
-type Datasource = {
-  datasource_name: string;
-  hierarchiesList?: ColumnsHierarchy[];
-  columns: { id: number; column_name: string; verbose_name: string | null }[];
-};
-
 type Props = {
   datasource: Datasource;
   onChange?: (value: ColumnsHierarchy[]) => void;
 };
 
 export const HierarchiesTable = ({ datasource, onChange }: Props) => {
-  const hierarchies = datasource.hierarchiesList || [];
+  const { hierarchies = [] } = datasource;
 
   const options = useMemo(
     () =>

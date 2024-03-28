@@ -33,7 +33,7 @@ import {
   ContextMenuFilters,
   CurrencyFormatter,
   Currency,
-  ColumnHierarchyItem,
+  ColumnsHierarchy,
 } from '@superset-ui/core';
 import { ColorFormatters } from '@superset-ui/chart-controls';
 
@@ -52,10 +52,6 @@ export type TableColumnConfig = {
   currencyFormat?: Currency;
 };
 
-export type HierarchyConfig = ColumnHierarchyItem & {
-  active?: boolean;
-};
-
 export interface DataColumnMeta {
   // `key` is what is called `label` in the input props
   key: string;
@@ -70,7 +66,7 @@ export interface DataColumnMeta {
   isMetric?: boolean;
   isPercentMetric?: boolean;
   isNumeric?: boolean;
-  hierarchyConfig?: HierarchyConfig[];
+  hierarchy?: ColumnsHierarchy;
   config?: TableColumnConfig;
 }
 

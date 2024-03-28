@@ -1517,10 +1517,7 @@ class DatasourceEditor extends React.PureComponent {
             <StyledColumnsTabWrapper>
               <HierarchiesTable
                 datasource={datasource}
-                onChange={this.onDatasourcePropChange.bind(
-                  this,
-                  'hierarchiesList',
-                )}
+                onChange={this.onDatasourcePropChange.bind(this, 'hierarchies')}
               />
             </StyledColumnsTabWrapper>
           </Tabs.TabPane>

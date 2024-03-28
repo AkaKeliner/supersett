@@ -608,7 +608,6 @@ export function saveSliceState(payload, key) {
 }
 
 export const saveChartState = chartId => (dispatch, getState) => {
-  // const id = chartId;
   const { charts } = getState();
   const currentChartData = charts[chartId] || {};
   const prevFormData = {
@@ -715,6 +714,28 @@ export function drillToChartUp(sliceId) {
     dispatch({ type: DRILL_TO_CHART_UP, payload: { layout } });
     dispatch(removeChart(sliceId));
     dispatch(removeSlice(sliceId));
+  };
+}
+
+export const SET_GROUPBY_FROM_HIERARCHY = 'SET_GROUPBY_FROM_HIERARCHY';
+
+export function setGroupbyFromHierarchy(sliceId, columnKey, nextColumnKey) {
+  return async (dispatch, getState) => {
+    const { charts } = getState();
+    const groupby = [...charts[sliceId].form_data.groupby];
+    const formData = { ...charts[sliceId].form_data, groupby };
+
+    if (nextColumnKey) {
+      groupby.splice(groupby.indexOf(columnKey) + 1, 0, nextColumnKey);
+    } else {
+      groupby.splice(groupby.indexOf(columnKey), 1);
+    }
+
+    dispatch({
+      type: SET_GROUPBY_FROM_HIERARCHY,
+      payload: { formData },
+      key: sliceId,
+    });
   };
 }
 

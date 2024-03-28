@@ -138,6 +138,13 @@ export default function chartReducer(
         form_data: action.payload.formData,
       };
     },
+    [actions.SET_GROUPBY_FROM_HIERARCHY](state) {
+      return {
+        ...state,
+        form_data: action.payload.formData,
+        triggerQuery: true,
+      };
+    },
     [actions.ANNOTATION_QUERY_STARTED](state) {
       if (state.annotationQuery?.[action.annotation.name]) {
         state.annotationQuery[action.annotation.name].abort();

@@ -133,7 +133,7 @@ const ChartContextMenu = (
       ({ type }) => type === DrillDownType.dashboard,
     ) && filters?.drillDown;
 
-  const showHierarchy = Boolean(filters?.hierarchy);
+  const showHierarchy = Boolean(filters?.hierarchy && filters?.key);
 
   const isCrossFilteringSupportedByChart = getChartMetadataRegistry()
     .get(formData.viz_type)
@@ -298,12 +298,11 @@ const ChartContextMenu = (
     submenuIndex += 1;
     menuItems.push(
       <Hierarchy
-        title={t('Hierarchy')}
-        type={DrillDownType.dashboard}
+        title={filters!.hierarchy!.name}
         formData={formData}
-        filters={filters?.hierarchy}
+        hierarchy={filters!.hierarchy!}
+        columnKey={filters!.key!}
         submenuIndex={submenuIndex}
-        isContextMenu
         contextMenuY={clientY}
         onSelection={onSelection}
       />,
